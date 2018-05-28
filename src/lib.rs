@@ -1,4 +1,4 @@
-//! **Assert process::Command** - Easy command initialization and assertions.
+//! **Assert `process::Command`** - Easy command initialization and assertions.
 //!
 //! ```toml
 //! [dependencies]

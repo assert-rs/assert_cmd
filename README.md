@@ -1,6 +1,6 @@
 # assert_cmd
 
-> **Assert process::Command** - Easy command initialization and assertions.
+> **Assert `process::Command`** - Easy command initialization and assertions.
 
 [![Travis Status](https://travis-ci.org/assert-rs/assert_cmd.svg?branch=master)](https://travis-ci.org/assert-rs/assert_cmd)
 [![Appveyor Status](https://ci.appveyor.com/api/projects/status/i1e8vpebw3hu0afg/branch/master?svg=true)](https://ci.appveyor.com/project/epage/assert-fs/branch/master)

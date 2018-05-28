@@ -161,7 +161,7 @@ impl OutputOkExt for process::Output {
 
 impl<'c> OutputOkExt for &'c mut process::Command {
     fn ok(self) -> OutputResult {
-        let output = self.output().map_err(|e| OutputError::with_cause(e))?;
+        let output = self.output().map_err(OutputError::with_cause)?;
         if output.status.success() {
             Ok(output)
         } else {
@@ -184,7 +184,7 @@ impl<'c> OutputOkExt for &'c mut process::Command {
 
 impl<'c> OutputOkExt for &'c mut StdInCommand {
     fn ok(self) -> OutputResult {
-        let output = self.output().map_err(|e| OutputError::with_cause(e))?;
+        let output = self.output().map_err(OutputError::with_cause)?;
         if output.status.success() {
             Ok(output)
         } else {
