@@ -12,14 +12,18 @@ extern crate failure;
 extern crate failure_derive;
 extern crate predicates;
 
+mod assert;
+pub use assert::*;
 mod cmd;
 pub use cmd::*;
-
+mod stdin;
+pub use stdin::*;
 mod errors;
+pub use errors::*;
 
 /// Extension traits that are useful to have available.
 pub mod prelude {
-    pub use cmd::CommandStdInExt;
+    pub use assert::OutputAssertExt;
     pub use cmd::OutputOkExt;
-    pub use cmd::OutputAssertExt;
+    pub use stdin::CommandStdInExt;
 }
