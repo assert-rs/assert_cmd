@@ -1,0 +1,15 @@
+[package]
+name = "assert_cmd"
+version = "0.1.0"
+description = "Test CLI Applications."
+authors = ["Pascal Hertleif <killercup@gmail.com>", "Ed Page <eopage@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/assert-rs/assert_cmd.git"
+homepage = "https://github.com/assert-rs/assert_cmd"
+documentation = "http://docs.rs/assert_cmd/"
+readme = "README.md"
+categories = ["development-tools::testing"]
+keywords = ["cli", "testing", "assert", "command-line-interface"]
+
+[dependencies]
+failure = "0.1"

@@ -1,0 +1,4 @@
+[clog]
+repository = "https://github.com/assert-rs/assert_cmd"
+changelog = "CHANGELOG.md"
+from-latest-tag = true
