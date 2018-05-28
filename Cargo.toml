@@ -13,3 +13,5 @@ keywords = ["cli", "testing", "assert", "command-line-interface"]
 
 [dependencies]
 failure = "0.1"
+failure_derive = "0.1"
+predicates = "0.4"

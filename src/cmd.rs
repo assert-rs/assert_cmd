@@ -1,4 +1,3 @@
-use std::ffi;
 use std::fmt;
 use std::io::Write;
 use std::io;
@@ -6,6 +5,7 @@ use std::process;
 use std::str;
 
 use failure;
+use predicates;
 
 /// Extend `Command` with a helper to pass a buffer to `stdin`
 pub trait CommandStdInExt {
@@ -467,9 +467,9 @@ impl Assert {
     /// Command::main_binary()
     ///     .env("exit", "42")
     ///     .assert()
-    ///     .code(predicates::predicate::eq(42));
+    ///     .code(predicates::ord::eq(42));
     /// ```
-    pub fn code(self, pred: &predicates::predicate::Predicate<Item = i32>) -> Self {
+    pub fn code(self, pred: &predicates::Predicate<i32>) -> Self {
         let actual_code = self.output
             .status
             .code()
@@ -493,9 +493,9 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stdout(predicates::predicate::eq(b"hello"));
+    ///     .stdout(predicates::ord::eq(b"hello"));
     /// ```
-    pub fn stdout(self, pred: &predicates::predicate::Predicate<Item = Vec<u8>>) -> Self {
+    pub fn stdout(self, pred: &predicates::Predicate<Vec<u8>>) -> Self {
         {
             let actual = &self.output.stdout;
             if !pred.eval(actual) {
@@ -518,9 +518,9 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stderr(predicates::predicate::eq(b"world"));
+    ///     .stderr(predicates::ord::eq(b"world"));
     /// ```
-    pub fn stderr(self, pred: &predicates::predicate::Predicate<Item = Vec<u8>>) -> Self {
+    pub fn stderr(self, pred: &predicates::Predicate<Vec<u8>>) -> Self {
         {
             let actual = &self.output.stderr;
             if !pred.eval(actual) {
