@@ -4,7 +4,7 @@ use std::str;
 use errors::OutputError;
 use errors::OutputResult;
 
-/// Extends `std::process::Output` with methods to to convert it to an `OutputResult`.
+/// Extends `std::process::Output` with methods to convert it to an `OutputResult`.
 pub trait OutputOkExt
 where
     Self: ::std::marker::Sized,
