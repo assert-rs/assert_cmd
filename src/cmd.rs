@@ -104,7 +104,7 @@ impl<'c> OutputOkExt for &'c mut process::Command {
 }
 
 pub(crate) fn dump_buffer(buffer: &[u8]) -> String {
-    if let Ok(buffer) = str::from_utf8(&buffer) {
+    if let Ok(buffer) = str::from_utf8(buffer) {
         format!("{}", buffer)
     } else {
         format!("{:?}", buffer)

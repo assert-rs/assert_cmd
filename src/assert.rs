@@ -212,7 +212,7 @@ impl fmt::Display for Assert {
             writeln!(f, "command=`{}`", cmd)?;
         }
         if let Some(ref stdin) = self.stdin {
-            if let Ok(stdin) = str::from_utf8(&stdin) {
+            if let Ok(stdin) = str::from_utf8(stdin) {
                 writeln!(f, "stdin=```{}```", stdin)?;
             } else {
                 writeln!(f, "stdin=```{:?}```", stdin)?;
