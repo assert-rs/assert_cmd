@@ -15,10 +15,10 @@ pub trait CommandStdInExt {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// ```rust
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::new("cat")
     ///     .with_stdin("42")

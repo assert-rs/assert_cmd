@@ -13,10 +13,10 @@ where
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// ```rust
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::new("echo")
     ///     .args(&["42"])
@@ -29,10 +29,10 @@ where
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// ```rust
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::new("echo")
     ///     .args(&["42"])
@@ -49,10 +49,10 @@ where
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// ```rust
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::new("non_existent_command")
     ///     .args(&["42"])

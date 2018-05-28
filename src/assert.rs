@@ -10,12 +10,13 @@ use errors::output_fmt;
 ///
 /// # Examples
 ///
-/// ```rust,ignore
-/// extern crate assert_cli;
+/// ```rust
+/// use assert_cmd::*;
+///
 /// use std::process::Command;
-/// use assert_cli::cmd::*;
 ///
 /// Command::main_binary()
+///     .unwrap()
 ///     .assert()
 ///     .success();
 /// ```
@@ -85,12 +86,13 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// ```rust
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::main_binary()
+    ///     .unwrap()
     ///     .assert()
     ///     .success();
     /// ```
@@ -105,13 +107,14 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// ```rust
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::main_binary()
-    ///     .env("exit", 1)
+    ///     .unwrap()
+    ///     .env("exit", "1")
     ///     .assert()
     ///     .failure();
     /// ```
@@ -135,11 +138,12 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::main_binary()
+    ///     .unwrap()
     ///     .env("exit", "42")
     ///     .assert()
     ///     .code(predicates::ord::eq(42));
@@ -160,11 +164,12 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::main_binary()
+    ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
@@ -185,11 +190,12 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// extern crate assert_cli;
+    /// use assert_cmd::*;
+    ///
     /// use std::process::Command;
-    /// use assert_cli::cmd::*;
     ///
     /// Command::main_binary()
+    ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
