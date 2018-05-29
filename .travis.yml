@@ -34,6 +34,7 @@ script:
 - cargo check --verbose
 - cargo check --verbose --no-default-features
 - cargo check --verbose --all-features
+- rm -rf target/debug/deps/*assert_cmd*  # Avoid docmatic problems
 - cargo test  --verbose --all-features
 
 branches:

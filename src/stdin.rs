@@ -1,13 +1,13 @@
-use std::io::Write;
 use std::io;
+use std::io::Write;
 use std::process;
 
 use assert::Assert;
 use assert::OutputAssertExt;
-use errors::OutputError;
-use errors::OutputResult;
 use cmd::OutputOkExt;
 use cmd::dump_buffer;
+use errors::OutputError;
+use errors::OutputResult;
 
 /// Extend `Command` with a helper to pass a buffer to `stdin`
 pub trait CommandStdInExt {

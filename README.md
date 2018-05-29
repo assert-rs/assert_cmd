@@ -17,6 +17,35 @@ Add to your `Cargo.toml`:
 assert_cmd = "0.1"
 ```
 
+## Example
+
+Here's a trivial example:
+
+```rust,ignore
+extern crate assert_cmd;
+
+use std::process::Command;
+use assert_cmd::prelude::*;
+
+Command::main_binary()
+    .unwrap()
+    .assert()
+    .success();
+```
+
+## Relevant crates
+
+Other crates that might be useful in testing command line programs.
+* [duct][duct] for orchestrating multiple processes.
+* [assert_fs[assert_fs] for filesystem fixtures and assertions.
+* [dir-diff][dir-diff] for testing file side-effects.
+* [tempfile][tempfile] for scratchpad directories.
+
+[dir-diff]: https://crates.io/crates/dir-diff
+[tempfile]: https://crates.io/crates/tempfile
+[duct]: https://crates.io/crates/duct
+[assert_fs]: https://crates.io/crates/assert_fs
+
 ## License
 
 Licensed under either of

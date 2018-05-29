@@ -2,8 +2,8 @@ use std::ffi;
 use std::path;
 use std::process;
 
-use failure;
 use escargot;
+use failure;
 
 /// Extend `Command` with helpers for running the current crate's binaries.
 pub trait CommandCargoExt
