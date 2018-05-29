@@ -146,6 +146,12 @@ impl Assert {
     ///     .unwrap()
     ///     .env("exit", "42")
     ///     .assert()
+    ///     .code(42);
+    /// // which is equivalent to
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("exit", "42")
+    ///     .assert()
     ///     .code(predicates::ord::eq(42));
     /// ```
     pub fn code(self, pred: &predicates::Predicate<i32>) -> Self {
@@ -225,5 +231,29 @@ impl fmt::Display for Assert {
             }
         }
         output_fmt(&self.output, f)
+    }
+}
+
+/// Convert to a predicate for testing a program's exit code.
+pub trait IntoCodePredicate<P>
+where
+    P: predicates::Predicate<i32>,
+{
+    /// Convert to a predicate for testing a program's exit code.
+    fn into_code(self) -> P;
+}
+
+impl<P> IntoCodePredicate<P> for P
+where
+    P: predicates::Predicate<i32>,
+{
+    fn into_code(self) -> P {
+        self
+    }
+}
+
+impl IntoCodePredicate<predicates::ord::EqPredicate<i32>> for i32 {
+    fn into_code(self) -> predicates::ord::EqPredicate<i32> {
+        predicates::ord::eq(self)
     }
 }
