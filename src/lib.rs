@@ -25,7 +25,7 @@
 //!
 //! Other crates that might be useful in testing command line programs.
 //! * [duct][duct] for orchestrating multiple processes.
-//! * [assert_fs][assert_fs] for filesystem fixtures and assertions.
+//! * [`assert_fs`][assert_fs] for filesystem fixtures and assertions.
 //! * [dir-diff][dir-diff] for testing file side-effects.
 //! * [tempfile][tempfile] for scratchpad directories.
 //!
