@@ -17,7 +17,7 @@ name = "bin_fixture"
 [dependencies]
 failure = "0.1"
 failure_derive = "0.1"
-predicates = "0.4"
+predicates = "0.5"
 escargot = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 
