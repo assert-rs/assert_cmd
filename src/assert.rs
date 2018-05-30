@@ -154,7 +154,15 @@ impl Assert {
     ///     .assert()
     ///     .code(predicates::ord::eq(42));
     /// ```
-    pub fn code(self, pred: &predicates::Predicate<i32>) -> Self {
+    pub fn code<I, P>(self, pred: I) -> Self
+    where
+        I: IntoCodePredicate<P>,
+        P: predicates::Predicate<i32>,
+    {
+        self.code_impl(&pred.into_code())
+    }
+
+    fn code_impl(self, pred: &predicates::Predicate<i32>) -> Self {
         let actual_code = self.output
             .status
             .code()
