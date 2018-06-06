@@ -37,10 +37,12 @@ Command::main_binary()
 
 Other crates that might be useful in testing command line programs.
 * [duct][duct] for orchestrating multiple processes.
+* [rexpect][rexpect] for testing interactive programs.
 * [`assert_fs`][assert_fs] for filesystem fixtures and assertions.
 * [dir-diff][dir-diff] for testing file side-effects.
 * [tempfile][tempfile] for scratchpad directories.
 
+[rexpect]: https://crates.io/crates/rexpect
 [dir-diff]: https://crates.io/crates/dir-diff
 [tempfile]: https://crates.io/crates/tempfile
 [duct]: https://crates.io/crates/duct
