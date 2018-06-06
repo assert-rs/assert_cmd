@@ -189,7 +189,7 @@ impl Assert {
     ///     .assert()
     ///     .stdout(predicates::ord::eq(b"hello"));
     /// ```
-    pub fn stdout(self, pred: &predicates::Predicate<Vec<u8>>) -> Self {
+    pub fn stdout(self, pred: &predicates::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stdout;
             if !pred.eval(actual) {
@@ -215,7 +215,7 @@ impl Assert {
     ///     .assert()
     ///     .stderr(predicates::ord::eq(b"world"));
     /// ```
-    pub fn stderr(self, pred: &predicates::Predicate<Vec<u8>>) -> Self {
+    pub fn stderr(self, pred: &predicates::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stderr;
             if !pred.eval(actual) {
