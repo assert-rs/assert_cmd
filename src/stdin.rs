@@ -9,14 +9,14 @@ use cmd::dump_buffer;
 use errors::OutputError;
 use errors::OutputResult;
 
-/// Extend `Command` with a helper to pass a buffer to `stdin`
+/// Write to `stdin` of a `Command`.
 pub trait CommandStdInExt {
     /// Write `buffer` to `stdin` when the command is run.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
@@ -41,7 +41,21 @@ impl CommandStdInExt for process::Command {
     }
 }
 
-/// `std::process::Command` with a `stdin` buffer.
+/// `Command` that carries the `stdin` buffer.
+///
+/// Create a `StdInCommand` through the `CommandStdInExt` trait.
+///
+/// # Examples
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// Command::new("cat")
+///     .with_stdin("42")
+///     .unwrap();
+/// ```
 #[derive(Debug)]
 pub struct StdInCommand {
     cmd: process::Command,

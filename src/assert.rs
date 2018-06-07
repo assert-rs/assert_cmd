@@ -6,12 +6,12 @@ use predicates;
 
 use errors::output_fmt;
 
-/// Extend `process::Output` with assertions.
+/// Assert the state of an `Output`.
 ///
 /// # Examples
 ///
 /// ```rust
-/// use assert_cmd::*;
+/// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
@@ -22,6 +22,19 @@ use errors::output_fmt;
 /// ```
 pub trait OutputAssertExt {
     /// Wrap with an interface for that provides assertions on the `process::Output`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .assert()
+    ///     .success();
+    /// ```
     fn assert(self) -> Assert;
 }
 
@@ -38,7 +51,22 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
     }
 }
 
-/// `process::Output` assertions.
+/// Assert the state of an `Output`.
+///
+/// Create an `Assert` through the `OutputAssertExt` trait.
+///
+/// # Examples
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .assert()
+///     .success();
+/// ```
 #[derive(Debug)]
 pub struct Assert {
     output: process::Output,
@@ -47,7 +75,7 @@ pub struct Assert {
 }
 
 impl Assert {
-    /// Convert `std::process::Output` into a `Fail`.
+    /// Create an `Assert` for a given `Output`.
     pub fn new(output: process::Output) -> Self {
         Self {
             output,
@@ -87,7 +115,7 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
@@ -108,7 +136,7 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
@@ -138,7 +166,7 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
@@ -178,7 +206,7 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
@@ -204,7 +232,7 @@ impl Assert {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
@@ -242,7 +270,27 @@ impl fmt::Display for Assert {
     }
 }
 
-/// Convert to a predicate for testing a program's exit code.
+/// Used by `Assert::code` to convert `Self` into the needed `Predicate<i32>`.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .env("exit", "42")
+///     .assert()
+///     .code(42);
+/// // which is equivalent to
+/// Command::main_binary()
+///     .unwrap()
+///     .env("exit", "42")
+///     .assert()
+///     .code(predicates::ord::eq(42));
+/// ```
 pub trait IntoCodePredicate<P>
 where
     P: predicates::Predicate<i32>,
