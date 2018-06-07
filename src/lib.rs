@@ -2,7 +2,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! assert_cmd = "0.2"
+//! assert_cmd = "0.3"
 //! ```
 //!
 //! ## Example

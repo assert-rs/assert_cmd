@@ -1,3 +1,15 @@
+<a name="0.3.0"></a>
+## 0.3.0 (2018-06-07)
+
+### Features
+
+* Attempted to improve the documentation.
+
+### Breaking Changes
+
+* Moved all cargo stuff under `cargo` module.
+
+
 <a name="0.2.0"></a>
 ## 0.2.0 (2018-06-06)
 
