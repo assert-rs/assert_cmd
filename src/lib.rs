@@ -47,8 +47,7 @@ extern crate serde;
 
 mod assert;
 pub use assert::*;
-mod cargo;
-pub use cargo::*;
+pub mod cargo;
 mod cmd;
 pub use cmd::*;
 mod stdin;

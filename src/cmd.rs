@@ -4,7 +4,20 @@ use std::str;
 use errors::OutputError;
 use errors::OutputResult;
 
-/// Extends `std::process::Output` with methods to convert it to an `OutputResult`.
+/// Convert an `Output` to a `OutputResult`.
+///
+/// # Examples
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// let result = Command::new("echo")
+///     .args(&["42"])
+///     .ok();
+/// assert!(result.is_ok());
+/// ```
 pub trait OutputOkExt
 where
     Self: ::std::marker::Sized,
@@ -14,14 +27,14 @@ where
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::new("echo")
+    /// let result = Command::new("echo")
     ///     .args(&["42"])
-    ///     .ok()
-    ///     .unwrap();
+    ///     .ok();
+    /// assert!(result.is_ok());
     /// ```
     fn ok(self) -> OutputResult;
 
@@ -30,11 +43,11 @@ where
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::new("echo")
+    /// let output = Command::new("echo")
     ///     .args(&["42"])
     ///     .unwrap();
     /// ```
@@ -50,12 +63,13 @@ where
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::*;
+    /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::new("non_existent_command")
-    ///     .args(&["42"])
+    /// let err = Command::main_binary()
+    ///     .unwrap()
+    ///     .env("exit", "42")
     ///     .unwrap_err();
     /// ```
     fn unwrap_err(self) -> OutputError {

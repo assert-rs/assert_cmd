@@ -5,9 +5,35 @@ use std::str;
 use failure;
 
 /// `std::process::Output` represented as a `Result`.
+///
+/// # Examples
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// let result = Command::new("echo")
+///     .args(&["42"])
+///     .ok();
+/// assert!(result.is_ok());
+/// ```
 pub type OutputResult = Result<process::Output, OutputError>;
 
-/// `std::process::Output` as a `Fail`.
+/// `Command` error.
+///
+/// # Examples
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// let err = Command::main_binary()
+///     .unwrap()
+///     .env("exit", "42")
+///     .unwrap_err();
+/// ```
 #[derive(Fail, Debug)]
 pub struct OutputError {
     cmd: Option<String>,
@@ -43,13 +69,30 @@ impl OutputError {
         self
     }
 
-    /// Add the `stdn` for additional context.
+    /// Add the `stdin` for additional context.
     pub fn set_stdin(mut self, stdin: Vec<u8>) -> Self {
         self.stdin = Some(stdin);
         self
     }
 
     /// Access the contained `std::process::Output`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// let err = Command::main_binary()
+    ///     .unwrap()
+    ///     .env("exit", "42")
+    ///     .unwrap_err();
+    /// let output = err
+    ///     .as_output()
+    ///     .unwrap();
+    /// assert_eq!(Some(42), output.status.code());
+    /// ```
     pub fn as_output(&self) -> Option<&process::Output> {
         match self.cause {
             OutputCause::Expected(ref e) => Some(&e.output),

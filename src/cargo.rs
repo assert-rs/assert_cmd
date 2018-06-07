@@ -1,3 +1,17 @@
+//! Simplify running `bin`s in a Cargo project.
+//!
+//! # Examples
+//!
+//! ```rust
+//! use assert_cmd::prelude::*;
+//!
+//! use std::process::Command;
+//!
+//! Command::main_binary()
+//!     .unwrap()
+//!     .unwrap();
+//! ```
+
 use std::ffi;
 use std::path;
 use std::process;
@@ -5,12 +19,14 @@ use std::process;
 use escargot;
 use failure;
 
-/// Extend `Command` with helpers for running the current crate's binaries.
+/// Create a `Command` for a `bin` in the Cargo project.
 pub trait CommandCargoExt
 where
     Self: Sized,
 {
     /// Create a `Command` to run the crate's main binary.
+    ///
+    /// Note: only works if there one bin in the crate.
     ///
     /// # Examples
     ///
@@ -57,21 +73,16 @@ where
 }
 
 impl CommandCargoExt for process::Command {
-    /// Run the crate's main binary.
-    ///
-    /// Note: only works if there one bin in the crate.
     fn main_binary() -> Result<Self, failure::Error> {
         let cmd = main_binary_path()?;
         Ok(process::Command::new(&cmd))
     }
 
-    /// Run a specific binary of the current crate.
     fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, failure::Error> {
         let cmd = cargo_bin_path(name)?;
         Ok(process::Command::new(&cmd))
     }
 
-    /// Run a specific example of the current crate.
     fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, failure::Error> {
         let cmd = cargo_example_path(name)?;
         Ok(process::Command::new(&cmd))
