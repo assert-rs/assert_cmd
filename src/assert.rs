@@ -3,6 +3,7 @@ use std::process;
 use std::str;
 
 use predicates;
+use predicates::str::PredicateStrExt;
 
 use errors::output_fmt;
 
@@ -217,7 +218,15 @@ impl Assert {
     ///     .assert()
     ///     .stdout(predicates::ord::eq(b"hello"));
     /// ```
-    pub fn stdout(self, pred: &predicates::Predicate<[u8]>) -> Self {
+    pub fn stdout<I, P>(self, pred: I) -> Self
+    where
+        I: IntoOutputPredicate<P>,
+        P: predicates::Predicate<[u8]>,
+    {
+        self.stdout_impl(&pred.into_output())
+    }
+
+    fn stdout_impl(self, pred: &predicates::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stdout;
             if !pred.eval(actual) {
@@ -243,7 +252,15 @@ impl Assert {
     ///     .assert()
     ///     .stderr(predicates::ord::eq(b"world"));
     /// ```
-    pub fn stderr(self, pred: &predicates::Predicate<[u8]>) -> Self {
+    pub fn stderr<I, P>(self, pred: I) -> Self
+    where
+        I: IntoOutputPredicate<P>,
+        P: predicates::Predicate<[u8]>,
+    {
+        self.stderr_impl(&pred.into_output())
+    }
+
+    fn stderr_impl(self, pred: &predicates::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stderr;
             if !pred.eval(actual) {
@@ -311,5 +328,32 @@ where
 impl IntoCodePredicate<predicates::ord::EqPredicate<i32>> for i32 {
     fn into_code(self) -> predicates::ord::EqPredicate<i32> {
         predicates::ord::eq(self)
+    }
+}
+
+/// Used by `Assert` to convert Self into the needed `Predicate<[u8]>`.
+pub trait IntoOutputPredicate<P>
+where
+    P: predicates::Predicate<[u8]>,
+{
+    /// Convert to a predicate for testing a path.
+    fn into_output(self) -> P;
+}
+
+impl<P> IntoOutputPredicate<P> for P
+where
+    P: predicates::Predicate<[u8]>,
+{
+    fn into_output(self) -> P {
+        self
+    }
+}
+
+impl<P> IntoOutputPredicate<predicates::str::Utf8Predicate<P>> for P
+where
+    P: predicates::Predicate<str>,
+{
+    fn into_output(self) -> predicates::str::Utf8Predicate<P> {
+        self.from_utf8()
     }
 }
