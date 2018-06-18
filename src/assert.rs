@@ -154,7 +154,7 @@ impl Assert {
         self
     }
 
-    /// Ensure the command returned the expected code.
+    /// Ensure the command aborted before returning a code.
     pub fn interrupted(self) -> Self {
         if self.output.status.code().is_some() {
             panic!("Unexpected completion\n{}", self);
@@ -166,7 +166,7 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -176,12 +176,6 @@ impl Assert {
     ///     .env("exit", "42")
     ///     .assert()
     ///     .code(42);
-    /// // which is equivalent to
-    /// Command::main_binary()
-    ///     .unwrap()
-    ///     .env("exit", "42")
-    ///     .assert()
-    ///     .code(predicates::ord::eq(42));
     /// ```
     pub fn code<I, P>(self, pred: I) -> Self
     where
@@ -206,7 +200,7 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -216,7 +210,7 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stdout(predicates::ord::eq(b"hello"));
+    ///     .stdout("hello\n");
     /// ```
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
@@ -240,7 +234,7 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -250,7 +244,7 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stderr(predicates::ord::eq(b"world"));
+    ///     .stderr("world\n");
     /// ```
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
@@ -349,11 +343,12 @@ where
     }
 }
 
-impl<P> IntoOutputPredicate<predicates::str::Utf8Predicate<P>> for P
-where
-    P: predicates::Predicate<str>,
+impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>>>
+    for &'static str
 {
-    fn into_output(self) -> predicates::str::Utf8Predicate<P> {
-        self.from_utf8()
+    fn into_output(
+        self,
+    ) -> predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>> {
+        predicates::ord::eq(self).from_utf8()
     }
 }
