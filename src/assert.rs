@@ -5,6 +5,7 @@ use std::str;
 use predicates;
 use predicates::str::PredicateStrExt;
 
+use cmd::dump_buffer;
 use errors::output_fmt;
 
 /// Assert the state of an `Output`.
@@ -127,7 +128,19 @@ impl Assert {
     /// ```
     pub fn success(self) -> Self {
         if !self.output.status.success() {
-            panic!("Unexpected failure\n{}", self);
+            let actual_code = self.output.status.code().unwrap_or_else(|| {
+                panic!(
+                    "Unexpected failure.\ncode=<interrupted>\nstderr=```{}```\n{}",
+                    dump_buffer(&self.output.stderr),
+                    self
+                )
+            });
+            panic!(
+                "Unexpected failure.\ncode-{}\nstderr=```{}```\n{}",
+                actual_code,
+                dump_buffer(&self.output.stderr),
+                self
+            );
         }
         self
     }
@@ -149,7 +162,11 @@ impl Assert {
     /// ```
     pub fn failure(self) -> Self {
         if self.output.status.success() {
-            panic!("Unexpected success\n{}", self);
+            panic!(
+                "Unexpected success\nstdout=```{}```\n{}",
+                dump_buffer(&self.output.stdout),
+                self
+            );
         }
         self
     }
@@ -157,7 +174,11 @@ impl Assert {
     /// Ensure the command aborted before returning a code.
     pub fn interrupted(self) -> Self {
         if self.output.status.code().is_some() {
-            panic!("Unexpected completion\n{}", self);
+            panic!(
+                "Unexpected completion\nstdout=```{}```\n{}",
+                dump_buffer(&self.output.stdout),
+                self
+            );
         }
         self
     }
@@ -186,12 +207,20 @@ impl Assert {
     }
 
     fn code_impl(self, pred: &predicates::Predicate<i32>) -> Self {
-        let actual_code = self.output
-            .status
-            .code()
-            .unwrap_or_else(|| panic!("Command interrupted\n{}", self));
+        let actual_code = self.output.status.code().unwrap_or_else(|| {
+            panic!(
+                "Command interrupted\nstderr=```{}```\n{}",
+                dump_buffer(&self.output.stderr),
+                self
+            )
+        });
         if !pred.eval(&actual_code) {
-            panic!("Unexpected return code\n{}", self);
+            panic!(
+                "Unexpected return code\nstdout=```{}```\nstderr=```{}```\n{}",
+                dump_buffer(&self.output.stdout),
+                dump_buffer(&self.output.stderr),
+                self
+            );
         }
         self
     }
