@@ -381,3 +381,54 @@ impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::ord::EqPredi
         predicates::ord::eq(self).from_utf8()
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    use predicates::prelude::*;
+
+    // Since IntoCodePredicate exists solely for conversion, test it under that scenario to ensure
+    // it works as expected.
+    fn convert_code<I, P>(pred: I) -> P
+    where
+        I: IntoCodePredicate<P>,
+        P: predicates::Predicate<i32>,
+    {
+        pred.into_code()
+    }
+
+    #[test]
+    fn into_code_from_pred() {
+        let pred = convert_code(predicate::eq(10));
+        assert!(pred.eval(&10));
+    }
+
+    #[test]
+    fn into_code_from_i32() {
+        let pred = convert_code(10);
+        assert!(pred.eval(&10));
+    }
+
+    // Since IntoOutputPredicate exists solely for conversion, test it under that scenario to ensure
+    // it works as expected.
+    fn convert_output<I, P>(pred: I) -> P
+    where
+        I: IntoOutputPredicate<P>,
+        P: predicates::Predicate<[u8]>,
+    {
+        pred.into_output()
+    }
+
+    #[test]
+    fn into_output_from_pred() {
+        let pred = convert_output(predicate::eq(b"Hello" as &[u8]));
+        assert!(pred.eval(b"Hello" as &[u8]));
+    }
+
+    #[test]
+    fn into_output_from_str() {
+        let pred = convert_output("Hello");
+        assert!(pred.eval(b"Hello" as &[u8]));
+    }
+}
