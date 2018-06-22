@@ -335,6 +335,9 @@ pub trait IntoCodePredicate<P>
 where
     P: predicates::Predicate<i32>,
 {
+    /// The type of the predicate being returned.
+    type Predicate;
+
     /// Convert to a predicate for testing a program's exit code.
     fn into_code(self) -> P;
 }
@@ -343,13 +346,17 @@ impl<P> IntoCodePredicate<P> for P
 where
     P: predicates::Predicate<i32>,
 {
-    fn into_code(self) -> P {
+    type Predicate = P;
+
+    fn into_code(self) -> Self::Predicate {
         self
     }
 }
 
 impl IntoCodePredicate<predicates::ord::EqPredicate<i32>> for i32 {
-    fn into_code(self) -> predicates::ord::EqPredicate<i32> {
+    type Predicate = predicates::ord::EqPredicate<i32>;
+
+    fn into_code(self) -> Self::Predicate {
         predicates::ord::eq(self)
     }
 }
@@ -359,6 +366,9 @@ pub trait IntoOutputPredicate<P>
 where
     P: predicates::Predicate<[u8]>,
 {
+    /// The type of the predicate being returned.
+    type Predicate;
+
     /// Convert to a predicate for testing a path.
     fn into_output(self) -> P;
 }
@@ -367,7 +377,9 @@ impl<P> IntoOutputPredicate<P> for P
 where
     P: predicates::Predicate<[u8]>,
 {
-    fn into_output(self) -> P {
+    type Predicate = P;
+
+    fn into_output(self) -> Self::Predicate {
         self
     }
 }
@@ -375,9 +387,9 @@ where
 impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>>>
     for &'static str
 {
-    fn into_output(
-        self,
-    ) -> predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>> {
+    type Predicate = predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>>;
+
+    fn into_output(self) -> Self::Predicate {
         predicates::ord::eq(self).from_utf8()
     }
 }
