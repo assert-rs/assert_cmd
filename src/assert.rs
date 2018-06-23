@@ -335,6 +335,9 @@ pub trait IntoCodePredicate<P>
 where
     P: predicates::Predicate<i32>,
 {
+    /// The type of the predicate being returned.
+    type Predicate;
+
     /// Convert to a predicate for testing a program's exit code.
     fn into_code(self) -> P;
 }
@@ -343,14 +346,34 @@ impl<P> IntoCodePredicate<P> for P
 where
     P: predicates::Predicate<i32>,
 {
-    fn into_code(self) -> P {
+    type Predicate = P;
+
+    fn into_code(self) -> Self::Predicate {
         self
     }
 }
 
 impl IntoCodePredicate<predicates::ord::EqPredicate<i32>> for i32 {
-    fn into_code(self) -> predicates::ord::EqPredicate<i32> {
+    type Predicate = predicates::ord::EqPredicate<i32>;
+
+    fn into_code(self) -> Self::Predicate {
         predicates::ord::eq(self)
+    }
+}
+
+impl IntoCodePredicate<predicates::iter::InPredicate<i32>> for Vec<i32> {
+    type Predicate = predicates::iter::InPredicate<i32>;
+
+    fn into_code(self) -> Self::Predicate {
+        predicates::iter::in_iter(self)
+    }
+}
+
+impl IntoCodePredicate<predicates::iter::InPredicate<i32>> for &'static [i32] {
+    type Predicate = predicates::iter::InPredicate<i32>;
+
+    fn into_code(self) -> Self::Predicate {
+        predicates::iter::in_iter(self.iter().cloned())
     }
 }
 
@@ -359,6 +382,9 @@ pub trait IntoOutputPredicate<P>
 where
     P: predicates::Predicate<[u8]>,
 {
+    /// The type of the predicate being returned.
+    type Predicate;
+
     /// Convert to a predicate for testing a path.
     fn into_output(self) -> P;
 }
@@ -367,17 +393,96 @@ impl<P> IntoOutputPredicate<P> for P
 where
     P: predicates::Predicate<[u8]>,
 {
-    fn into_output(self) -> P {
+    type Predicate = P;
+
+    fn into_output(self) -> Self::Predicate {
         self
     }
 }
 
-impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>>>
+impl IntoOutputPredicate<predicates::ord::EqPredicate<&'static [u8]>> for &'static [u8] {
+    type Predicate = predicates::ord::EqPredicate<&'static [u8]>;
+
+    fn into_output(self) -> Self::Predicate {
+        predicates::ord::eq(self)
+    }
+}
+
+impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>>
     for &'static str
 {
-    fn into_output(
-        self,
-    ) -> predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>> {
-        predicates::ord::eq(self).from_utf8()
+    type Predicate = predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>;
+
+    fn into_output(self) -> Self::Predicate {
+        predicates::str::similar(self).from_utf8()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    use predicates::prelude::*;
+
+    // Since IntoCodePredicate exists solely for conversion, test it under that scenario to ensure
+    // it works as expected.
+    fn convert_code<I, P>(pred: I) -> P
+    where
+        I: IntoCodePredicate<P>,
+        P: predicates::Predicate<i32>,
+    {
+        pred.into_code()
+    }
+
+    #[test]
+    fn into_code_from_pred() {
+        let pred = convert_code(predicate::eq(10));
+        assert!(pred.eval(&10));
+    }
+
+    #[test]
+    fn into_code_from_i32() {
+        let pred = convert_code(10);
+        assert!(pred.eval(&10));
+    }
+
+    #[test]
+    fn into_code_from_vec() {
+        let pred = convert_code(vec![3, 10]);
+        assert!(pred.eval(&10));
+    }
+
+    #[test]
+    fn into_code_from_array() {
+        let pred = convert_code(&[3, 10] as &[i32]);
+        assert!(pred.eval(&10));
+    }
+
+    // Since IntoOutputPredicate exists solely for conversion, test it under that scenario to ensure
+    // it works as expected.
+    fn convert_output<I, P>(pred: I) -> P
+    where
+        I: IntoOutputPredicate<P>,
+        P: predicates::Predicate<[u8]>,
+    {
+        pred.into_output()
+    }
+
+    #[test]
+    fn into_output_from_pred() {
+        let pred = convert_output(predicate::eq(b"Hello" as &[u8]));
+        assert!(pred.eval(b"Hello" as &[u8]));
+    }
+
+    #[test]
+    fn into_output_from_bytes() {
+        let pred = convert_output(b"Hello" as &[u8]);
+        assert!(pred.eval(b"Hello" as &[u8]));
+    }
+
+    #[test]
+    fn into_output_from_str() {
+        let pred = convert_output("Hello");
+        assert!(pred.eval(b"Hello" as &[u8]));
     }
 }
