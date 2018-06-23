@@ -400,6 +400,14 @@ where
     }
 }
 
+impl IntoOutputPredicate<predicates::ord::EqPredicate<&'static [u8]>> for &'static [u8] {
+    type Predicate = predicates::ord::EqPredicate<&'static [u8]>;
+
+    fn into_output(self) -> Self::Predicate {
+        predicates::ord::eq(self)
+    }
+}
+
 impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>>
     for &'static str
 {
@@ -463,6 +471,12 @@ mod test {
     #[test]
     fn into_output_from_pred() {
         let pred = convert_output(predicate::eq(b"Hello" as &[u8]));
+        assert!(pred.eval(b"Hello" as &[u8]));
+    }
+
+    #[test]
+    fn into_output_from_bytes() {
+        let pred = convert_output(b"Hello" as &[u8]);
         assert!(pred.eval(b"Hello" as &[u8]));
     }
 
