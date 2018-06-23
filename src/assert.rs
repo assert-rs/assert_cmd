@@ -400,13 +400,13 @@ where
     }
 }
 
-impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>>>
+impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>>
     for &'static str
 {
-    type Predicate = predicates::str::Utf8Predicate<predicates::ord::EqPredicate<&'static str>>;
+    type Predicate = predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>;
 
     fn into_output(self) -> Self::Predicate {
-        predicates::ord::eq(self).from_utf8()
+        predicates::str::similar(self).from_utf8()
     }
 }
 
