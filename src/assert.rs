@@ -361,6 +361,22 @@ impl IntoCodePredicate<predicates::ord::EqPredicate<i32>> for i32 {
     }
 }
 
+impl IntoCodePredicate<predicates::iter::InPredicate<i32>> for Vec<i32> {
+    type Predicate = predicates::iter::InPredicate<i32>;
+
+    fn into_code(self) -> Self::Predicate {
+        predicates::iter::in_iter(self)
+    }
+}
+
+impl IntoCodePredicate<predicates::iter::InPredicate<i32>> for &'static [i32] {
+    type Predicate = predicates::iter::InPredicate<i32>;
+
+    fn into_code(self) -> Self::Predicate {
+        predicates::iter::in_iter(self.iter().cloned())
+    }
+}
+
 /// Used by `Assert` to convert Self into the needed `Predicate<[u8]>`.
 pub trait IntoOutputPredicate<P>
 where
@@ -419,6 +435,18 @@ mod test {
     #[test]
     fn into_code_from_i32() {
         let pred = convert_code(10);
+        assert!(pred.eval(&10));
+    }
+
+    #[test]
+    fn into_code_from_vec() {
+        let pred = convert_code(vec![3, 10]);
+        assert!(pred.eval(&10));
+    }
+
+    #[test]
+    fn into_code_from_array() {
+        let pred = convert_code(&[3, 10] as &[i32]);
         assert!(pred.eval(&10));
     }
 
