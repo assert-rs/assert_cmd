@@ -1,8 +1,7 @@
+use std::error::Error;
 use std::fmt;
 use std::process;
 use std::str;
-
-use failure;
 
 /// `std::process::Output` represented as a `Result`.
 ///
@@ -34,7 +33,7 @@ pub type OutputResult = Result<process::Output, OutputError>;
 ///     .env("exit", "42")
 ///     .unwrap_err();
 /// ```
-#[derive(Fail, Debug)]
+#[derive(Debug)]
 pub struct OutputError {
     cmd: Option<String>,
     stdin: Option<Vec<u8>>,
@@ -42,7 +41,7 @@ pub struct OutputError {
 }
 
 impl OutputError {
-    /// Convert `std::process::Output` into a `Fail`.
+    /// Convert `std::process::Output` into an `Error`.
     pub fn new(output: process::Output) -> Self {
         Self {
             cmd: None,
@@ -54,12 +53,12 @@ impl OutputError {
     /// For errors that happen in creating a `std::process::Output`.
     pub fn with_cause<E>(cause: E) -> Self
     where
-        E: Into<failure::Error>,
+        E: Error + Send + Sync + 'static,
     {
         Self {
             cmd: None,
             stdin: None,
-            cause: OutputCause::Unexpected(cause.into()),
+            cause: OutputCause::Unexpected(Box::new(cause)),
         }
     }
 
@@ -101,6 +100,19 @@ impl OutputError {
     }
 }
 
+impl Error for OutputError {
+    fn description(&self) -> &str {
+        "Command failed."
+    }
+
+    fn cause(&self) -> Option<&Error> {
+        if let &OutputCause::Unexpected(ref err) = &self.cause {
+            Some(err.as_ref())
+        } else {
+            None
+        }
+    }
+}
 impl fmt::Display for OutputError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(ref cmd) = self.cmd {
@@ -120,7 +132,7 @@ impl fmt::Display for OutputError {
 #[derive(Debug)]
 enum OutputCause {
     Expected(Output),
-    Unexpected(failure::Error),
+    Unexpected(Box<Error + Send + Sync + 'static>),
 }
 
 impl fmt::Display for OutputCause {
@@ -133,7 +145,7 @@ impl fmt::Display for OutputCause {
 }
 
 /// Wrap `Output` to be `Dislay`able.
-#[derive(Fail, Debug)]
+#[derive(Debug)]
 struct Output {
     output: process::Output,
 }
