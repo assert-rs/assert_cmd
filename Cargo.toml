@@ -15,10 +15,8 @@ keywords = ["cli", "test", "assert", "command", "duct"]
 name = "bin_fixture"
 
 [dependencies]
-failure = "0.1"
-failure_derive = "0.1"
 predicates = "0.5.1"
-escargot = "0.1"
+escargot = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]
