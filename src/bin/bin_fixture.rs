@@ -1,13 +1,10 @@
-extern crate failure;
-
 use std::env;
+use std::error::Error;
 use std::io;
 use std::io::Write;
 use std::process;
 
-use failure::ResultExt;
-
-fn run() -> Result<(), failure::Error> {
+fn run() -> Result<(), Box<Error>> {
     if let Ok(text) = env::var("stdout") {
         println!("{}", text);
     }
@@ -18,8 +15,7 @@ fn run() -> Result<(), failure::Error> {
     let code = env::var("exit")
         .ok()
         .map(|v| v.parse::<i32>())
-        .map_or(Ok(None), |r| r.map(Some))
-        .context("Invalid exit code")?
+        .map_or(Ok(None), |r| r.map(Some))?
         .unwrap_or(0);
     process::exit(code);
 }

@@ -12,12 +12,13 @@
 //!     .unwrap();
 //! ```
 
+use std::error::Error;
 use std::ffi;
+use std::fmt;
 use std::path;
 use std::process;
 
 use escargot;
-use failure;
 
 /// Create a `Command` for a `bin` in the Cargo project.
 pub trait CommandCargoExt
@@ -39,7 +40,7 @@ where
     ///     .unwrap()
     ///     .unwrap();
     /// ```
-    fn main_binary() -> Result<Self, failure::Error>;
+    fn main_binary() -> Result<Self, CargoError>;
 
     /// Create a `Command` to run a specific binary of the current crate.
     ///
@@ -54,7 +55,7 @@ where
     ///     .unwrap()
     ///     .unwrap();
     /// ```
-    fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, failure::Error>;
+    fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
 
     /// Create a `Command` to run a specific example of the current crate.
     ///
@@ -69,21 +70,21 @@ where
     ///     .unwrap()
     ///     .unwrap();
     /// ```
-    fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, failure::Error>;
+    fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
 }
 
 impl CommandCargoExt for process::Command {
-    fn main_binary() -> Result<Self, failure::Error> {
+    fn main_binary() -> Result<Self, CargoError> {
         let cmd = main_binary_path()?;
         Ok(process::Command::new(&cmd))
     }
 
-    fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, failure::Error> {
+    fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError> {
         let cmd = cargo_bin_path(name)?;
         Ok(process::Command::new(&cmd))
     }
 
-    fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, failure::Error> {
+    fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError> {
         let cmd = cargo_example_path(name)?;
         Ok(process::Command::new(&cmd))
     }
@@ -126,25 +127,30 @@ fn extract_filenames(msg: &escargot::Message, kind: &str) -> Option<path::PathBu
 /// Get the path to the crate's main binary.
 ///
 /// Note: only works if there one bin in the crate.
-pub fn main_binary_path() -> Result<path::PathBuf, failure::Error> {
+pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
     let cargo = escargot::Cargo::new().build().current_release();
     let bins: Vec<_> = cargo
-        .exec()?
+        .exec()
+        .map_err(|e| CargoError::with_cause(e))?
         .filter_map(|m| extract_filenames(&m, "bin"))
         .collect();
     if bins.is_empty() {
-        bail!("No binaries in crate");
+        return Err(CargoError::with_context("No binaries in crate"));
     } else if bins.len() != 1 {
-        bail!("Ambiguous which binary is intended: {:?}", bins);
+        return Err(CargoError::with_context(format!(
+            "Ambiguous which binary is intended: {:?}",
+            bins
+        )));
     }
     Ok(bins.into_iter().next().expect("already validated"))
 }
 
 /// Get the path to the specified binary of the current crate.
-pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, failure::Error> {
+pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
     let cargo = escargot::Cargo::new().build().bin(name).current_release();
     let bins: Vec<_> = cargo
-        .exec()?
+        .exec()
+        .map_err(|e| CargoError::with_cause(e))?
         .filter_map(|m| extract_filenames(&m, "bin"))
         .collect();
     assert_eq!(bins.len(), 1);
@@ -152,15 +158,72 @@ pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, fa
 }
 
 /// Get the path to the specified example of the current crate.
-pub fn cargo_example_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, failure::Error> {
+pub fn cargo_example_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
     let cargo = escargot::Cargo::new()
         .build()
         .example(name)
         .current_release();
     let bins: Vec<_> = cargo
-        .exec()?
+        .exec()
+        .map_err(|e| CargoError::with_cause(e))?
         .filter_map(|m| extract_filenames(&m, "example"))
         .collect();
     assert_eq!(bins.len(), 1);
     Ok(bins.into_iter().next().expect("already validated"))
+}
+
+/// Error when finding crate binary.
+#[derive(Debug)]
+pub struct CargoError {
+    context: Option<String>,
+    cause: Option<Box<Error + Send + Sync + 'static>>,
+}
+
+impl CargoError {
+    fn with_context<S>(context: S) -> Self
+    where
+        S: Into<String>,
+    {
+        let context = context.into();
+        Self {
+            context: Some(context),
+            cause: None,
+        }
+    }
+
+    fn with_cause<E>(cause: E) -> Self
+    where
+        E: Error + Send + Sync + 'static,
+    {
+        let cause = Box::new(cause);
+        Self {
+            context: None,
+            cause: Some(cause),
+        }
+    }
+}
+
+impl Error for CargoError {
+    fn description(&self) -> &str {
+        "Cargo command failed."
+    }
+
+    fn cause(&self) -> Option<&Error> {
+        self.cause.as_ref().map(|c| {
+            let c: &Error = c.as_ref();
+            c
+        })
+    }
+}
+
+impl fmt::Display for CargoError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if let Some(ref context) = self.context {
+            writeln!(f, "{}", context)?;
+        }
+        if let Some(ref cause) = self.cause {
+            writeln!(f, "Cause: {}", cause)?;
+        }
+        Ok(())
+    }
 }

@@ -37,10 +37,6 @@
 #![warn(missing_docs)]
 
 extern crate escargot;
-#[macro_use]
-extern crate failure;
-#[macro_use]
-extern crate failure_derive;
 extern crate predicates;
 #[macro_use]
 extern crate serde;
