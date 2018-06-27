@@ -4,8 +4,8 @@ use std::process;
 
 use assert::Assert;
 use assert::OutputAssertExt;
-use cmd::OutputOkExt;
 use cmd::dump_buffer;
+use cmd::OutputOkExt;
 use errors::OutputError;
 use errors::OutputResult;
 

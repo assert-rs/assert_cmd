@@ -45,8 +45,9 @@ extern crate predicates;
 #[macro_use]
 extern crate serde;
 
-mod assert;
-pub use assert::*;
+pub mod assert;
+pub use assert::Assert;
+pub use assert::OutputAssertExt;
 pub mod cargo;
 mod cmd;
 pub use cmd::*;

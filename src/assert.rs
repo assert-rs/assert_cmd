@@ -1,3 +1,5 @@
+//! `process::Output` assertions.
+
 use std::fmt;
 use std::process;
 use std::str;
@@ -400,21 +402,69 @@ where
     }
 }
 
-impl IntoOutputPredicate<predicates::ord::EqPredicate<&'static [u8]>> for &'static [u8] {
-    type Predicate = predicates::ord::EqPredicate<&'static [u8]>;
+// Keep `predicates` concrete Predicates out of our public API.
+/// Predicate used by `IntoOutputPredicate` for bytes
+#[derive(Debug)]
+pub struct BytesContentOutputPredicate(predicates::ord::EqPredicate<&'static [u8]>);
 
-    fn into_output(self) -> Self::Predicate {
-        predicates::ord::eq(self)
+impl BytesContentOutputPredicate {
+    pub(crate) fn new(value: &'static [u8]) -> Self {
+        let pred = predicates::ord::eq(value);
+        BytesContentOutputPredicate(pred)
     }
 }
 
-impl IntoOutputPredicate<predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>>
-    for &'static str
-{
-    type Predicate = predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>;
+impl predicates::Predicate<[u8]> for BytesContentOutputPredicate {
+    fn eval(&self, item: &[u8]) -> bool {
+        self.0.eval(item)
+    }
+}
+
+impl fmt::Display for BytesContentOutputPredicate {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl IntoOutputPredicate<BytesContentOutputPredicate> for &'static [u8] {
+    type Predicate = BytesContentOutputPredicate;
 
     fn into_output(self) -> Self::Predicate {
-        predicates::str::similar(self).from_utf8()
+        Self::Predicate::new(self)
+    }
+}
+
+// Keep `predicates` concrete Predicates out of our public API.
+/// Predicate used by `IntoOutputPredicate` for `str`
+#[derive(Debug, Clone)]
+pub struct StrContentOutputPredicate(
+    predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>,
+);
+
+impl StrContentOutputPredicate {
+    pub(crate) fn new(value: &'static str) -> Self {
+        let pred = predicates::str::similar(value).from_utf8();
+        StrContentOutputPredicate(pred)
+    }
+}
+
+impl predicates::Predicate<[u8]> for StrContentOutputPredicate {
+    fn eval(&self, item: &[u8]) -> bool {
+        self.0.eval(item)
+    }
+}
+
+impl fmt::Display for StrContentOutputPredicate {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
+    type Predicate = StrContentOutputPredicate;
+
+    fn into_output(self) -> Self::Predicate {
+        Self::Predicate::new(self)
     }
 }
 
