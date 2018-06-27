@@ -107,7 +107,8 @@ struct MessageFilter<'a> {
 
 fn extract_filenames(msg: &escargot::Message, kind: &str) -> Option<path::PathBuf> {
     let filter: MessageFilter = msg.convert().ok()?;
-    if filter.reason != "compiler-artifact" || filter.target.crate_types != ["bin"]
+    if filter.reason != "compiler-artifact"
+        || filter.target.crate_types != ["bin"]
         || filter.target.kind != [kind]
     {
         None
