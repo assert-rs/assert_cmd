@@ -1,3 +1,23 @@
+<a name="0.4.0"></a>
+## 0.4.0 (2018-06-28)
+
+
+#### Features
+
+* **assert:** Short-hand output predicates
+  *  `stdout()`/`stderr()` accept `str`([43eceba0](https://github.com/assert-rs/assert_cmd/commit/43eceba04ad0d612f417fc46d140795115895204), closes [#2](https://github.com/assert-rs/assert_cmd/issues/2))
+  *  `stdout()`/`stderr()` accept byte slices ([111abca9](https://github.com/assert-rs/assert_cmd/commit/111abca91db0e1d6ea6a6b94566f7b3425131a64))
+  *  `code()` accept a set. ([72dca8d0](https://github.com/assert-rs/assert_cmd/commit/72dca8d00d8084a6b9fd2c5566c1e9543db58b83))
+* **assert:** Context on status failures ([af52e9c5](https://github.com/assert-rs/assert_cmd/commit/af52e9c52edf3684db0f5ce23cbaa4650d0118a1), closes [#16](https://github.com/assert-rs/assert_cmd/issues/16))
+
+#### Breaking Changes
+
+* **assert:** Short-hand output predicates changed assert signatures ([43eceba0](https://github.com/assert-rs/assert_cmd/commit/43eceba04ad0d612f417fc46d140795115895204), closes [#2](https://github.com/assert-rs/assert_cmd/issues/2))
+* Switch OutputError from Fail ([1061baa0](https://github.com/assert-rs/assert_cmd/commit/1061baa03fadc70924a2bf2d0640ef679dc7178d))
+* **cargo:**  Define a CargoError ([7bd71a8a](https://github.com/assert-rs/assert_cmd/commit/7bd71a8a67c5a29a35f3876ef49204681eca1ef6))
+
+
+
 <a name="0.3.0"></a>
 ## 0.3.0 (2018-06-07)
 
