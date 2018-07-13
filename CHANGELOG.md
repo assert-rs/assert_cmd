@@ -1,3 +1,17 @@
+<a name="0.5.0"></a>
+## 0.5.0 (2018-07-13)
+
+
+#### Features
+
+* **with_stdin**: Work with chained APIs ([#23](https://github.com/assert-rs/assert_cmd/pull/23))
+
+#### Breaking Changes
+
+* **with_stdin**: Work with chained APIs ([#23](https://github.com/assert-rs/assert_cmd/pull/23))
+
+
+
 <a name="0.4.0"></a>
 ## 0.4.0 (2018-06-28)
 

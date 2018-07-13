@@ -14,7 +14,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-assert_cmd = "0.4"
+assert_cmd = "0.5"
 ```
 
 ## Example
