@@ -21,16 +21,17 @@ pub trait CommandStdInExt {
     /// use std::process::Command;
     ///
     /// Command::new("cat")
+    ///     .arg("-A")
     ///     .with_stdin("42")
     ///     .unwrap();
     /// ```
-    fn with_stdin<S>(self, buffer: S) -> StdInCommand
+    fn with_stdin<S>(&mut self, buffer: S) -> StdInCommand
     where
         S: Into<Vec<u8>>;
 }
 
 impl CommandStdInExt for process::Command {
-    fn with_stdin<S>(self, buffer: S) -> StdInCommand
+    fn with_stdin<S>(&mut self, buffer: S) -> StdInCommand
     where
         S: Into<Vec<u8>>,
     {
@@ -57,12 +58,12 @@ impl CommandStdInExt for process::Command {
 ///     .unwrap();
 /// ```
 #[derive(Debug)]
-pub struct StdInCommand {
-    cmd: process::Command,
+pub struct StdInCommand<'a> {
+    cmd: &'a mut process::Command,
     stdin: Vec<u8>,
 }
 
-impl StdInCommand {
+impl<'a> StdInCommand<'a> {
     /// Executes the command as a child process, waiting for it to finish and collecting all of its
     /// output.
     ///
@@ -97,7 +98,7 @@ impl StdInCommand {
     }
 }
 
-impl<'c> OutputOkExt for &'c mut StdInCommand {
+impl<'c, 'a> OutputOkExt for &'c mut StdInCommand<'a> {
     fn ok(self) -> OutputResult {
         let output = self.output().map_err(OutputError::with_cause)?;
         if output.status.success() {
@@ -123,7 +124,7 @@ impl<'c> OutputOkExt for &'c mut StdInCommand {
     }
 }
 
-impl<'c> OutputAssertExt for &'c mut StdInCommand {
+impl<'c> OutputAssertExt for &'c mut StdInCommand<'c> {
     fn assert(self) -> Assert {
         let output = self.output().unwrap();
         Assert::new(output)
