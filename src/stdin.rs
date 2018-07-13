@@ -21,6 +21,7 @@ pub trait CommandStdInExt {
     /// use std::process::Command;
     ///
     /// Command::new("cat")
+    ///     .arg("-A")
     ///     .with_stdin("42")
     ///     .unwrap();
     /// ```
