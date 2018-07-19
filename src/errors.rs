@@ -106,7 +106,7 @@ impl Error for OutputError {
     }
 
     fn cause(&self) -> Option<&Error> {
-        if let &OutputCause::Unexpected(ref err) = &self.cause {
+        if let OutputCause::Unexpected(ref err) = self.cause {
             Some(err.as_ref())
         } else {
             None

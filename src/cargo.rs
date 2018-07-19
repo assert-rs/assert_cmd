@@ -131,7 +131,7 @@ pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
     let cargo = escargot::Cargo::new().build().current_release();
     let bins: Vec<_> = cargo
         .exec()
-        .map_err(|e| CargoError::with_cause(e))?
+        .map_err(CargoError::with_cause)?
         .filter_map(|m| extract_filenames(&m, "bin"))
         .collect();
     if bins.is_empty() {
@@ -150,7 +150,7 @@ pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, Ca
     let cargo = escargot::Cargo::new().build().bin(name).current_release();
     let bins: Vec<_> = cargo
         .exec()
-        .map_err(|e| CargoError::with_cause(e))?
+        .map_err(CargoError::with_cause)?
         .filter_map(|m| extract_filenames(&m, "bin"))
         .collect();
     assert_eq!(bins.len(), 1);
@@ -165,7 +165,7 @@ pub fn cargo_example_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf
         .current_release();
     let bins: Vec<_> = cargo
         .exec()
-        .map_err(|e| CargoError::with_cause(e))?
+        .map_err(CargoError::with_cause)?
         .filter_map(|m| extract_filenames(&m, "example"))
         .collect();
     assert_eq!(bins.len(), 1);
