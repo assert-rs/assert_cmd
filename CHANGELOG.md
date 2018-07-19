@@ -1,4 +1,18 @@
 <a name="0.5.0"></a>
+## 0.6.0 (2018-07-18)
+
+
+#### Features
+
+* **with_stdin**: Accept files ([#24](https://github.com/assert-rs/assert_cmd/pull/24))
+
+#### Breaking Changes
+
+* **with_stdin**: Accept files ([#24](https://github.com/assert-rs/assert_cmd/pull/24))
+
+
+
+<a name="0.5.0"></a>
 ## 0.5.0 (2018-07-13)
 
 
