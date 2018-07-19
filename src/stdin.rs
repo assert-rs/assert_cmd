@@ -1,5 +1,8 @@
+use std::fs;
 use std::io;
+use std::io::Read;
 use std::io::Write;
+use std::path;
 use std::process;
 
 use assert::Assert;
@@ -22,23 +25,80 @@ pub trait CommandStdInExt {
     ///
     /// Command::new("cat")
     ///     .arg("-A")
-    ///     .with_stdin("42")
+    ///     .with_stdin()
+    ///     .buffer("42")
     ///     .unwrap();
     /// ```
-    fn with_stdin<S>(&mut self, buffer: S) -> StdInCommand
-    where
-        S: Into<Vec<u8>>;
+    fn with_stdin(&mut self) -> StdInCommandBuilder;
 }
 
 impl CommandStdInExt for process::Command {
-    fn with_stdin<S>(&mut self, buffer: S) -> StdInCommand
+    fn with_stdin(&mut self) -> StdInCommandBuilder {
+        StdInCommandBuilder { cmd: self }
+    }
+}
+
+/// For adding a stdin to a `Command`.
+#[derive(Debug)]
+pub struct StdInCommandBuilder<'a> {
+    cmd: &'a mut process::Command,
+}
+
+impl<'a> StdInCommandBuilder<'a> {
+    /// Write `buffer` to `stdin` when the command is run.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// Command::new("cat")
+    ///     .arg("-A")
+    ///     .with_stdin()
+    ///     .buffer("42")
+    ///     .unwrap();
+    /// ```
+    pub fn buffer<S>(&mut self, buffer: S) -> StdInCommand
     where
         S: Into<Vec<u8>>,
     {
         StdInCommand {
-            cmd: self,
+            cmd: self.cmd,
             stdin: buffer.into(),
         }
+    }
+
+    /// Write `path`s content to `stdin` when the command is run.
+    ///
+    /// Paths are relative to the `env::current_dir` and not `Command::current_dir`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// Command::new("cat")
+    ///     .arg("-A")
+    ///     .with_stdin()
+    ///     .path("Cargo.toml")
+    ///     .unwrap()
+    ///     .unwrap();
+    /// ```
+    pub fn path<P>(&mut self, file: P) -> io::Result<StdInCommand>
+    where
+        P: AsRef<path::Path>,
+    {
+        let file = file.as_ref();
+        let mut buffer = Vec::new();
+        fs::File::open(file)?.read_to_end(&mut buffer)?;
+        Ok(StdInCommand {
+            cmd: self.cmd,
+            stdin: buffer,
+        })
     }
 }
 
@@ -54,7 +114,8 @@ impl CommandStdInExt for process::Command {
 /// use std::process::Command;
 ///
 /// Command::new("cat")
-///     .with_stdin("42")
+///     .with_stdin()
+///     .buffer("42")
 ///     .unwrap();
 /// ```
 #[derive(Debug)]
