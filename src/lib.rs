@@ -33,6 +33,19 @@
 //! [tempfile]: https://crates.io/crates/tempfile
 //! [duct]: https://crates.io/crates/duct
 //! [assert_fs]: https://crates.io/crates/assert_fs
+//!
+//! ## Migrating from `assert_cli` v0.6
+//!
+//! `assert_cli` is the successor to `assert_cli`:
+//! - More flexible, reusable assertions (also used by `assert_fs`).
+//! - Can integrate with other process-management crates, like `duct`.
+//! - Addresses several architectural problems.
+//!
+//! Key points in migrating from `assert_cli`:
+//! - `std::prcoess::Command` is extended with traits rather than being wrapping in custom logic.
+//! - The command-under-test is run eagerly, with assertions happening immediately.
+//! - `success()` is not implicit and requires being explicitly called.
+//! - `stdout`/`stderr` aren't automatically trimmed before being passed to the `Predicate`.
 
 #![warn(missing_docs)]
 

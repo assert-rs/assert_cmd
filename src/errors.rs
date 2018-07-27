@@ -162,16 +162,47 @@ pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter) -> fm
     } else {
         writeln!(f, "code=<interrupted>")?;
     }
-    if let Ok(stdout) = str::from_utf8(&output.stdout) {
-        writeln!(f, "stdout=```{}```", stdout)?;
-    } else {
-        writeln!(f, "stdout=```{:?}```", output.stdout)?;
-    }
-    if let Ok(stderr) = str::from_utf8(&output.stderr) {
-        writeln!(f, "stderr=```{}```", stderr)?;
-    } else {
-        writeln!(f, "stderr=```{:?}```", output.stderr)?;
-    }
+
+    write!(f, "stdout=```")?;
+    write_buffer(&output.stdout, f)?;
+    writeln!(f, "```")?;
+
+    write!(f, "stderr=```")?;
+    write_buffer(&output.stderr, f)?;
+    writeln!(f, "```")?;
 
     Ok(())
+}
+
+pub(crate) fn dump_buffer(buffer: &[u8]) -> String {
+    if let Ok(buffer) = str::from_utf8(buffer) {
+        buffer.to_string()
+    } else {
+        format!("{:?}", buffer)
+    }
+}
+
+pub(crate) fn write_buffer(buffer: &[u8], f: &mut fmt::Formatter) -> fmt::Result {
+    if let Ok(buffer) = str::from_utf8(buffer) {
+        write!(f, "{}", buffer)
+    } else {
+        write!(f, "{:?}", buffer)
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct DebugBuffer {
+    buffer: Vec<u8>,
+}
+
+impl DebugBuffer {
+    pub(crate) fn new(buffer: Vec<u8>) -> Self {
+        DebugBuffer { buffer }
+    }
+}
+
+impl fmt::Display for DebugBuffer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write_buffer(&self.buffer, f)
+    }
 }

@@ -1,6 +1,6 @@
 use std::process;
-use std::str;
 
+use errors::dump_buffer;
 use errors::OutputError;
 use errors::OutputResult;
 
@@ -114,13 +114,5 @@ impl<'c> OutputOkExt for &'c mut process::Command {
             ),
             Err(err) => err,
         }
-    }
-}
-
-pub(crate) fn dump_buffer(buffer: &[u8]) -> String {
-    if let Ok(buffer) = str::from_utf8(buffer) {
-        buffer.to_string()
-    } else {
-        format!("{:?}", buffer)
     }
 }
