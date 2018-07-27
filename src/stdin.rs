@@ -7,8 +7,9 @@ use std::process;
 
 use assert::Assert;
 use assert::OutputAssertExt;
-use cmd::dump_buffer;
 use cmd::OutputOkExt;
+use errors::dump_buffer;
+use errors::DebugBuffer;
 use errors::OutputError;
 use errors::OutputResult;
 
@@ -189,7 +190,7 @@ impl<'c> OutputAssertExt for &'c mut StdInCommand<'c> {
     fn assert(self) -> Assert {
         let output = self.output().unwrap();
         Assert::new(output)
-            .set_cmd(format!("{:?}", self.cmd))
-            .set_stdin(self.stdin.clone())
+            .append_context("command", format!("{:?}", self.cmd))
+            .append_context("stdin", DebugBuffer::new(self.stdin.clone()))
     }
 }

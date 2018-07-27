@@ -7,7 +7,7 @@ use std::str;
 use predicates;
 use predicates::str::PredicateStrExt;
 
-use cmd::dump_buffer;
+use errors::dump_buffer;
 use errors::output_fmt;
 
 /// Assert the state of an `Output`.
@@ -51,7 +51,7 @@ impl OutputAssertExt for process::Output {
 impl<'c> OutputAssertExt for &'c mut process::Command {
     fn assert(self) -> Assert {
         let output = self.output().unwrap();
-        Assert::new(output).set_cmd(format!("{:?}", self))
+        Assert::new(output).append_context("command", format!("{:?}", self))
     }
 }
 
@@ -71,11 +71,9 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
 ///     .assert()
 ///     .success();
 /// ```
-#[derive(Debug)]
 pub struct Assert {
     output: process::Output,
-    cmd: Option<String>,
-    stdin: Option<Vec<u8>>,
+    context: Vec<(&'static str, Box<fmt::Display>)>,
 }
 
 impl Assert {
@@ -83,20 +81,16 @@ impl Assert {
     pub fn new(output: process::Output) -> Self {
         Self {
             output,
-            cmd: None,
-            stdin: None,
+            context: vec![],
         }
     }
 
-    /// Add the command line for additional context.
-    pub fn set_cmd(mut self, cmd: String) -> Self {
-        self.cmd = Some(cmd);
-        self
-    }
-
-    /// Add the `stdn` for additional context.
-    pub fn set_stdin(mut self, stdin: Vec<u8>) -> Self {
-        self.stdin = Some(stdin);
+    /// Clarify failures with additional context.
+    pub fn append_context<D>(mut self, name: &'static str, context: D) -> Self
+    where
+        D: fmt::Display + 'static,
+    {
+        self.context.push((name, Box::new(context)));
         self
     }
 
@@ -298,17 +292,18 @@ impl Assert {
 
 impl fmt::Display for Assert {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if let Some(ref cmd) = self.cmd {
-            writeln!(f, "command=`{}`", cmd)?;
-        }
-        if let Some(ref stdin) = self.stdin {
-            if let Ok(stdin) = str::from_utf8(stdin) {
-                writeln!(f, "stdin=```{}```", stdin)?;
-            } else {
-                writeln!(f, "stdin=```{:?}```", stdin)?;
-            }
+        for &(ref name, ref context) in &self.context {
+            writeln!(f, "{}=`{}`", name, context)?;
         }
         output_fmt(&self.output, f)
+    }
+}
+
+impl fmt::Debug for Assert {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Assert")
+            .field("output", &self.output)
+            .finish()
     }
 }
 
