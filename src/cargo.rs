@@ -1,6 +1,12 @@
 //! Simplify running `bin`s in a Cargo project.
 //!
-//! # Examples
+//! `CommandCargoExt` is an extension trait for `std::process::Command` to easily launch a crate's
+//! binaries.
+//!
+//! In addition, the underlying functions for looking up the crate's binaries are exposed to allow
+//! for optimizations, if needed.
+//!
+//! # Simple Example
 //!
 //! ```rust
 //! use assert_cmd::prelude::*;
@@ -11,6 +17,22 @@
 //!     .unwrap()
 //!     .unwrap();
 //! ```
+//!
+//! # Caching Example
+//!
+//! ```rust
+//! use assert_cmd::prelude::*;
+//!
+//! use std::process::Command;
+//!
+//! let bin_under_test = assert_cmd::cargo::main_binary_path().unwrap();
+//! Command::new(&bin_under_test)
+//!     .unwrap();
+//! ```
+//!
+//! Tip: Use [`lazy_static][lazy_static] to cache `bin_under_test` across test functions.
+//!
+//! [lazy_static]: https://crates.io/crates/lazy_static
 
 use std::error::Error;
 use std::ffi;
