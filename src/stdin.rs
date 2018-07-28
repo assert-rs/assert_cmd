@@ -13,7 +13,9 @@ use errors::DebugBuffer;
 use errors::OutputError;
 use errors::OutputResult;
 
-/// Write to `stdin` of a `Command`.
+/// Write to `stdin` of a [`Command`][Command].
+///
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
 pub trait CommandStdInExt {
     /// Write `buffer` to `stdin` when the command is run.
     ///
@@ -39,14 +41,16 @@ impl CommandStdInExt for process::Command {
     }
 }
 
-/// For adding a stdin to a `Command`.
+/// For adding a stdin to a [`Command`][Command].
+///
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
 #[derive(Debug)]
 pub struct StdInCommandBuilder<'a> {
     cmd: &'a mut process::Command,
 }
 
 impl<'a> StdInCommandBuilder<'a> {
-    /// Write `buffer` to `stdin` when the command is run.
+    /// Write `buffer` to `stdin` when the [`Command`][Command] is run.
     ///
     /// # Examples
     ///
@@ -61,6 +65,8 @@ impl<'a> StdInCommandBuilder<'a> {
     ///     .buffer("42")
     ///     .unwrap();
     /// ```
+    ///
+    /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
     pub fn buffer<S>(&mut self, buffer: S) -> StdInCommand
     where
         S: Into<Vec<u8>>,
@@ -71,9 +77,10 @@ impl<'a> StdInCommandBuilder<'a> {
         }
     }
 
-    /// Write `path`s content to `stdin` when the command is run.
+    /// Write `path`s content to `stdin` when the [`Command`][Command] is run.
     ///
-    /// Paths are relative to the `env::current_dir` and not `Command::current_dir`.
+    /// Paths are relative to the [`env::current_dir`][env_current_dir] and not
+    /// [`Command::current_dir`][Command_current_dir].
     ///
     /// # Examples
     ///
@@ -89,6 +96,10 @@ impl<'a> StdInCommandBuilder<'a> {
     ///     .unwrap()
     ///     .unwrap();
     /// ```
+    ///
+    /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+    /// [env_current_dir]: https://doc.rust-lang.org/std/env/fn.current_dir.html
+    /// [Command_current_dir]: https://doc.rust-lang.org/std/process/struct.Command.html#method.current_dir
     pub fn path<P>(&mut self, file: P) -> io::Result<StdInCommand>
     where
         P: AsRef<path::Path>,
@@ -103,9 +114,9 @@ impl<'a> StdInCommandBuilder<'a> {
     }
 }
 
-/// `Command` that carries the `stdin` buffer.
+/// [`Command`][Command] that carries the `stdin` buffer.
 ///
-/// Create a `StdInCommand` through the `CommandStdInExt` trait.
+/// Create a `StdInCommand` through the [`CommandStdInExt`][CommandStdInExt] trait.
 ///
 /// # Examples
 ///
@@ -119,6 +130,9 @@ impl<'a> StdInCommandBuilder<'a> {
 ///     .buffer("42")
 ///     .unwrap();
 /// ```
+///
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+/// [CommandStdInExt]: trait.CommandStdInExt.html
 #[derive(Debug)]
 pub struct StdInCommand<'a> {
     cmd: &'a mut process::Command,
@@ -126,23 +140,21 @@ pub struct StdInCommand<'a> {
 }
 
 impl<'a> StdInCommand<'a> {
-    /// Executes the command as a child process, waiting for it to finish and collecting all of its
+    /// Executes the [`Command`][Command] as a child process, waiting for it to finish and collecting all of its
     /// output.
     ///
     /// By default, stdout and stderr are captured (and used to provide the resulting output).
     /// Stdin is not inherited from the parent and any attempt by the child process to read from
     /// the stdin stream will result in the stream immediately closing.
     ///
-    /// *(mirrors `std::process::Command::output`**
+    /// *(mirrors [`Command::output`][Command_output])*
+    ///
+    /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+    /// [Command_output]: https://doc.rust-lang.org/std/process/struct.Command.html#method.output
     pub fn output(&mut self) -> io::Result<process::Output> {
         self.spawn()?.wait_with_output()
     }
 
-    /// Executes the command as a child process, returning a handle to it.
-    ///
-    /// By default, stdin, stdout and stderr are inherited from the parent.
-    ///
-    /// *(mirrors `std::process::Command::spawn`**
     fn spawn(&mut self) -> io::Result<process::Child> {
         // stdout/stderr should only be piped for `output` according to `process::Command::new`.
         self.cmd.stdin(process::Stdio::piped());

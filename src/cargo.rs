@@ -1,12 +1,14 @@
 //! Simplify running `bin`s in a Cargo project.
 //!
-//! `CommandCargoExt` is an extension trait for `std::process::Command` to easily launch a crate's
+//! [`CommandCargoExt`][CommandCargoExt] is an extension trait for [`Command`][Command] to easily launch a crate's
 //! binaries.
 //!
 //! In addition, the underlying functions for looking up the crate's binaries are exposed to allow
 //! for optimizations, if needed.
 //!
-//! # Simple Example
+//! # Examples
+//!
+//! Simple case:
 //!
 //! ```rust
 //! use assert_cmd::prelude::*;
@@ -18,7 +20,7 @@
 //!     .unwrap();
 //! ```
 //!
-//! # Caching Example
+//! Caching the binary's location:
 //!
 //! ```rust
 //! use assert_cmd::prelude::*;
@@ -30,9 +32,11 @@
 //!     .unwrap();
 //! ```
 //!
-//! Tip: Use [`lazy_static][lazy_static] to cache `bin_under_test` across test functions.
+//! Tip: Use [`lazy_static`][lazy_static] to cache `bin_under_test` across test functions.
 //!
 //! [lazy_static]: https://crates.io/crates/lazy_static
+//! [CommandCargoExt]: trait.CommandCargoExt.html
+//! [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
 
 use std::error::Error;
 use std::ffi;
@@ -42,12 +46,14 @@ use std::process;
 
 use escargot;
 
-/// Create a `Command` for a `bin` in the Cargo project.
+/// Create a [`Command`][Command] for a `bin` in the Cargo project.
+///
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
 pub trait CommandCargoExt
 where
     Self: Sized,
 {
-    /// Create a `Command` to run the crate's main binary.
+    /// Create a [`Command`][Command] to run the crate's main binary.
     ///
     /// Note: only works if there one bin in the crate.
     ///
@@ -62,9 +68,11 @@ where
     ///     .unwrap()
     ///     .unwrap();
     /// ```
+    ///
+    /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
     fn main_binary() -> Result<Self, CargoError>;
 
-    /// Create a `Command` to run a specific binary of the current crate.
+    /// Create a [`Command`][Command] to run a specific binary of the current crate.
     ///
     /// # Examples
     ///
@@ -77,9 +85,11 @@ where
     ///     .unwrap()
     ///     .unwrap();
     /// ```
+    ///
+    /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
     fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
 
-    /// Create a `Command` to run a specific example of the current crate.
+    /// Create a [`Command`][Command] to run a specific example of the current crate.
     ///
     /// # Examples
     ///
@@ -92,6 +102,8 @@ where
     ///     .unwrap()
     ///     .unwrap();
     /// ```
+    ///
+    /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
     fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
 }
 

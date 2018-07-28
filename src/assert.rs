@@ -1,4 +1,6 @@
-//! `process::Output` assertions.
+//! [`Output`][Output] assertions.
+//!
+//! [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
 
 use std::fmt;
 use std::process;
@@ -10,7 +12,7 @@ use predicates::str::PredicateStrExt;
 use errors::dump_buffer;
 use errors::output_fmt;
 
-/// Assert the state of an `Output`.
+/// Assert the state of an [`Output`][Output].
 ///
 /// # Examples
 ///
@@ -24,8 +26,10 @@ use errors::output_fmt;
 ///     .assert()
 ///     .success();
 /// ```
+///
+/// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
 pub trait OutputAssertExt {
-    /// Wrap with an interface for that provides assertions on the `process::Output`.
+    /// Wrap with an interface for that provides assertions on the [`Output`][Output].
     ///
     /// # Examples
     ///
@@ -39,6 +43,8 @@ pub trait OutputAssertExt {
     ///     .assert()
     ///     .success();
     /// ```
+    ///
+    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
     fn assert(self) -> Assert;
 }
 
@@ -55,9 +61,9 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
     }
 }
 
-/// Assert the state of an `Output`.
+/// Assert the state of an [`Output`][Output].
 ///
-/// Create an `Assert` through the `OutputAssertExt` trait.
+/// Create an `Assert` through the [`OutputAssertExt`][OutputAssertExt] trait.
 ///
 /// # Examples
 ///
@@ -71,13 +77,18 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
 ///     .assert()
 ///     .success();
 /// ```
+///
+/// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
+/// [OutputAssertExt]: trait.OutputAssertExt.html
 pub struct Assert {
     output: process::Output,
     context: Vec<(&'static str, Box<fmt::Display>)>,
 }
 
 impl Assert {
-    /// Create an `Assert` for a given `Output`.
+    /// Create an `Assert` for a given [`Output`][Output].
+    ///
+    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
     pub fn new(output: process::Output) -> Self {
         Self {
             output,
@@ -94,7 +105,9 @@ impl Assert {
         self
     }
 
-    /// Access the contained `std::process::Output`.
+    /// Access the contained [`Output`][Output].
+    ///
+    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
     pub fn get_output(&self) -> &process::Output {
         &self.output
     }
@@ -307,7 +320,8 @@ impl fmt::Debug for Assert {
     }
 }
 
-/// Used by `Assert::code` to convert `Self` into the needed `Predicate<i32>`.
+/// Used by [`Assert::code`][Assert_code] to convert `Self` into the needed
+/// [`Predicate<i32>`][Predicate].
 ///
 /// # Examples
 ///
@@ -328,6 +342,9 @@ impl fmt::Debug for Assert {
 ///     .assert()
 ///     .code(predicates::ord::eq(42));
 /// ```
+///
+/// [Assert_code]: struct.Assert.html#method.code
+/// [Predicate]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
 pub trait IntoCodePredicate<P>
 where
     P: predicates::Predicate<i32>,
@@ -374,7 +391,12 @@ impl IntoCodePredicate<predicates::iter::InPredicate<i32>> for &'static [i32] {
     }
 }
 
-/// Used by `Assert` to convert Self into the needed `Predicate<[u8]>`.
+/// Used by [`Assert::stdout`][Assert_stdout] and [`Assert::stderr`][Assert_stderr] to convert Self
+/// into the needed [`Predicate<[u8]>`][Predicate].
+///
+/// [Assert_stdout]: struct.Assert.html#method.stdout
+/// [Assert_stderr]: struct.Assert.html#method.stderr
+/// [Predicate]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
 pub trait IntoOutputPredicate<P>
 where
     P: predicates::Predicate<[u8]>,
@@ -398,7 +420,10 @@ where
 }
 
 // Keep `predicates` concrete Predicates out of our public API.
-/// Predicate used by `IntoOutputPredicate` for bytes
+/// [Predicate][Predicate] used by [`IntoOutputPredicate`][IntoOutputPredicate] for bytes.
+///
+/// [IntoOutputPredicate]: trait.IntoOutputPredicate.html
+/// [Predicate]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
 #[derive(Debug)]
 pub struct BytesContentOutputPredicate(predicates::ord::EqPredicate<&'static [u8]>);
 
@@ -430,7 +455,10 @@ impl IntoOutputPredicate<BytesContentOutputPredicate> for &'static [u8] {
 }
 
 // Keep `predicates` concrete Predicates out of our public API.
-/// Predicate used by `IntoOutputPredicate` for `str`
+/// [Predicate][Predicate] used by [`IntoOutputPredicate`][IntoOutputPredicate] for `str`.
+///
+/// [IntoOutputPredicate]: trait.IntoOutputPredicate.html
+/// [Predicate]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
 #[derive(Debug, Clone)]
 pub struct StrContentOutputPredicate(
     predicates::str::Utf8Predicate<predicates::str::DifferencePredicate>,
