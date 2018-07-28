@@ -4,7 +4,7 @@ use errors::dump_buffer;
 use errors::OutputError;
 use errors::OutputResult;
 
-/// Convert an `Output` to a `OutputResult`.
+/// Convert an [`Output`][Output] to an [`OutputResult`][OutputResult].
 ///
 /// # Examples
 ///
@@ -18,11 +18,14 @@ use errors::OutputResult;
 ///     .ok();
 /// assert!(result.is_ok());
 /// ```
+///
+/// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
+/// [OutputResult]: type.OutputResult.html
 pub trait OutputOkExt
 where
     Self: ::std::marker::Sized,
 {
-    /// Convert an `std::process::Output` into an `OutputResult`.
+    /// Convert an [`Output`][Output] to an [`OutputResult`][OutputResult].
     ///
     /// # Examples
     ///
@@ -36,9 +39,12 @@ where
     ///     .ok();
     /// assert!(result.is_ok());
     /// ```
+    ///
+    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
+    /// [OutputResult]: type.OutputResult.html
     fn ok(self) -> OutputResult;
 
-    /// Unwrap a `std::process::Output` but with a prettier message than `.ok().unwrap()`.
+    /// Unwrap a [`Output`][Output] but with a prettier message than `.ok().unwrap()`.
     ///
     /// # Examples
     ///
@@ -51,6 +57,8 @@ where
     ///     .args(&["42"])
     ///     .unwrap();
     /// ```
+    ///
+    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
     fn unwrap(self) -> process::Output {
         match self.ok() {
             Ok(output) => output,
@@ -58,7 +66,7 @@ where
         }
     }
 
-    /// Unwrap a `std::process::Output` but with a prettier message than `.ok().unwrap()`.
+    /// Unwrap a [`Output`][Output] but with a prettier message than `ok().err().unwrap()`.
     ///
     /// # Examples
     ///
@@ -72,6 +80,8 @@ where
     ///     .env("exit", "42")
     ///     .unwrap_err();
     /// ```
+    ///
+    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
     fn unwrap_err(self) -> OutputError {
         match self.ok() {
             Ok(output) => panic!(
