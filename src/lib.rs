@@ -31,7 +31,7 @@
 //!
 //! ## Migrating from `assert_cli` v0.6
 //!
-//! `assert_cli` is the successor to `assert_cli`:
+//! `assert_cmd` is the successor to `assert_cli`:
 //! - More flexible, reusable assertions (also used by [`assert_fs`][assert_fs]).
 //! - Can integrate with other process-management crates, like `duct`.
 //! - Addresses several architectural problems.
