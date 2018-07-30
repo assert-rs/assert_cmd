@@ -97,6 +97,20 @@ impl Assert {
     }
 
     /// Clarify failures with additional context.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .assert()
+    ///     .append_context("main", "no args")
+    ///     .success();
+    /// ```
     pub fn append_context<D>(mut self, name: &'static str, context: D) -> Self
     where
         D: fmt::Display + 'static,
