@@ -3,9 +3,9 @@ use std::fmt;
 use std::process;
 use std::str;
 
-/// [`Output`][Output] represented as a [`Result`][Result].
+/// [`Output`] represented as a [`Result`].
 ///
-/// Generally produced by [`OutputOkExt`][OutputOkExt].
+/// Generally produced by [`OutputOkExt`].
 ///
 /// # Examples
 ///
@@ -20,14 +20,14 @@ use std::str;
 /// assert!(result.is_ok());
 /// ```
 ///
-/// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
-/// [Result]: https://doc.rust-lang.org/std/result/enum.Result.html
-/// [OutputOkExt]: trait.OutputOkExt.html
+/// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
+/// [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html
+/// [`OutputOkExt`]: trait.OutputOkExt.html
 pub type OutputResult = Result<process::Output, OutputError>;
 
-/// [`Command`][Command] error.
+/// [`Command`] error.
 ///
-/// Generally produced by [`OutputOkExt`][OutputOkExt].
+/// Generally produced by [`OutputOkExt`].
 ///
 /// # Examples
 ///
@@ -42,8 +42,8 @@ pub type OutputResult = Result<process::Output, OutputError>;
 ///     .unwrap_err();
 /// ```
 ///
-/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
-/// [OutputOkExt]: trait.OutputOkExt.html
+/// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+/// [`OutputOkExt`]: trait.OutputOkExt.html
 #[derive(Debug)]
 pub struct OutputError {
     cmd: Option<String>,
@@ -52,10 +52,10 @@ pub struct OutputError {
 }
 
 impl OutputError {
-    /// Convert [`Output`][Output] into an [`Error`][Error].
+    /// Convert [`Output`] into an [`Error`].
     ///
-    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
-    /// [Error]: https://doc.rust-lang.org/std/error/trait.Error.html
+    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
+    /// [`Error`]: https://doc.rust-lang.org/std/error/trait.Error.html
     pub fn new(output: process::Output) -> Self {
         Self {
             cmd: None,
@@ -64,9 +64,9 @@ impl OutputError {
         }
     }
 
-    /// For errors that happen in creating a [`Output`][Output].
+    /// For errors that happen in creating a [`Output`].
     ///
-    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
+    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
     pub fn with_cause<E>(cause: E) -> Self
     where
         E: Error + Send + Sync + 'static,
@@ -90,7 +90,7 @@ impl OutputError {
         self
     }
 
-    /// Access the contained [`Output`][Output].
+    /// Access the contained [`Output`].
     ///
     /// # Examples
     ///
@@ -109,7 +109,7 @@ impl OutputError {
     /// assert_eq!(Some(42), output.status.code());
     /// ```
     ///
-    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
+    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
     pub fn as_output(&self) -> Option<&process::Output> {
         match self.cause {
             OutputCause::Expected(ref e) => Some(&e.output),

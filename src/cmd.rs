@@ -4,7 +4,9 @@ use errors::dump_buffer;
 use errors::OutputError;
 use errors::OutputResult;
 
-/// Convert an [`Output`][Output] to an [`OutputResult`][OutputResult].
+/// Converts a type to an [`OutputResult`].
+///
+/// This is for example implemented on [`std::process::Output`].
 ///
 /// # Examples
 ///
@@ -19,8 +21,8 @@ use errors::OutputResult;
 /// assert!(result.is_ok());
 /// ```
 ///
-/// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
-/// [OutputResult]: type.OutputResult.html
+/// [`std::process::Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
+/// [`OutputResult`]: type.OutputResult.html
 pub trait OutputOkExt
 where
     Self: ::std::marker::Sized,
