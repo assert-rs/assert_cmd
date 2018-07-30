@@ -31,8 +31,8 @@
 //!
 //! ## Migrating from `assert_cli` v0.6
 //!
-//! `assert_cmd` is the successor to `assert_cli`:
 //! - More flexible, reusable assertions (also used by [`assert_fs`][assert_fs]).
+//! `assert_cmd` is the successor to [the original `assert_cli`][assert_cli]:
 //! - Can integrate with other process-management crates, like `duct`.
 //! - Addresses several architectural problems.
 //!
@@ -42,6 +42,7 @@
 //! - [`success()`][success] is not implicit and requires being explicitly called.
 //! - `stdout`/`stderr` aren't automatically trimmed before being passed to the `Predicate`.
 //!
+//! [assert_cli]: https://crates.io/crates/assert_cli/0.6.3
 //! [dir-diff]: https://crates.io/crates/dir-diff
 //! [tempfile]: https://crates.io/crates/tempfile
 //! [duct]: https://crates.io/crates/duct
