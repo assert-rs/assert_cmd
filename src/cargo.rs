@@ -65,8 +65,8 @@ where
     /// use std::process::Command;
     ///
     /// Command::main_binary()
-    ///     .unwrap()
-    ///     .unwrap();
+    ///     .unwrap()  // get cargo binary
+    ///     .unwrap(); // run it
     /// ```
     ///
     /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
