@@ -8,6 +8,8 @@ use std::str;
 
 use predicates;
 use predicates::str::PredicateStrExt;
+use predicates_core;
+use predicates_tree::CaseTreeExt;
 
 use errors::dump_buffer;
 use errors::output_fmt;
@@ -185,11 +187,7 @@ impl Assert {
     /// ```
     pub fn failure(self) -> Self {
         if self.output.status.success() {
-            panic!(
-                "Unexpected success\nstdout=```{}```\n{}",
-                dump_buffer(&self.output.stdout),
-                self
-            );
+            panic!("Unexpected success\n{}", self);
         }
         self
     }
@@ -197,11 +195,7 @@ impl Assert {
     /// Ensure the command aborted before returning a code.
     pub fn interrupted(self) -> Self {
         if self.output.status.code().is_some() {
-            panic!(
-                "Unexpected completion\nstdout=```{}```\n{}",
-                dump_buffer(&self.output.stdout),
-                self
-            );
+            panic!("Unexpected completion\n{}", self);
         }
         self
     }
@@ -224,12 +218,12 @@ impl Assert {
     pub fn code<I, P>(self, pred: I) -> Self
     where
         I: IntoCodePredicate<P>,
-        P: predicates::Predicate<i32>,
+        P: predicates_core::Predicate<i32>,
     {
         self.code_impl(&pred.into_code())
     }
 
-    fn code_impl(self, pred: &predicates::Predicate<i32>) -> Self {
+    fn code_impl(self, pred: &predicates_core::Predicate<i32>) -> Self {
         let actual_code = self.output.status.code().unwrap_or_else(|| {
             panic!(
                 "Command interrupted\nstderr=```{}```\n{}",
@@ -237,13 +231,8 @@ impl Assert {
                 self
             )
         });
-        if !pred.eval(&actual_code) {
-            panic!(
-                "Unexpected return code\nstdout=```{}```\nstderr=```{}```\n{}",
-                dump_buffer(&self.output.stdout),
-                dump_buffer(&self.output.stderr),
-                self
-            );
+        if let Some(case) = pred.find_case(false, &actual_code) {
+            panic!("Unexpected return code, failed {}\n{}", case.tree(), self);
         }
         self
     }
@@ -267,16 +256,16 @@ impl Assert {
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
-        P: predicates::Predicate<[u8]>,
+        P: predicates_core::Predicate<[u8]>,
     {
         self.stdout_impl(&pred.into_output())
     }
 
-    fn stdout_impl(self, pred: &predicates::Predicate<[u8]>) -> Self {
+    fn stdout_impl(self, pred: &predicates_core::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stdout;
-            if !pred.eval(actual) {
-                panic!("Unexpected stdout\n{}", self);
+            if let Some(case) = pred.find_case(false, &actual) {
+                panic!("Unexpected stdout, failed {}\n{}", case.tree(), self);
             }
         }
         self
@@ -301,16 +290,16 @@ impl Assert {
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
-        P: predicates::Predicate<[u8]>,
+        P: predicates_core::Predicate<[u8]>,
     {
         self.stderr_impl(&pred.into_output())
     }
 
-    fn stderr_impl(self, pred: &predicates::Predicate<[u8]>) -> Self {
+    fn stderr_impl(self, pred: &predicates_core::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stderr;
-            if !pred.eval(actual) {
-                panic!("Unexpected stderr\n{}", self);
+            if let Some(case) = pred.find_case(false, &actual) {
+                panic!("Unexpected stderr, failed {}\n\n{}", case.tree(), self);
             }
         }
         self
@@ -358,10 +347,10 @@ impl fmt::Debug for Assert {
 /// ```
 ///
 /// [`Assert::code`]: struct.Assert.html#method.code
-/// [`Predicate<i32>`]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
+/// [`Predicate<i32>`]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
 pub trait IntoCodePredicate<P>
 where
-    P: predicates::Predicate<i32>,
+    P: predicates_core::Predicate<i32>,
 {
     /// The type of the predicate being returned.
     type Predicate;
@@ -372,7 +361,7 @@ where
 
 impl<P> IntoCodePredicate<P> for P
 where
-    P: predicates::Predicate<i32>,
+    P: predicates_core::Predicate<i32>,
 {
     type Predicate = P;
 
@@ -410,10 +399,10 @@ impl IntoCodePredicate<predicates::iter::InPredicate<i32>> for &'static [i32] {
 ///
 /// [`Assert::stdout`]: struct.Assert.html#method.stdout
 /// [`Assert::stderr`]: struct.Assert.html#method.stderr
-/// [`Predicate<[u8]>`]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
+/// [`Predicate<[u8]>`]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
 pub trait IntoOutputPredicate<P>
 where
-    P: predicates::Predicate<[u8]>,
+    P: predicates_core::Predicate<[u8]>,
 {
     /// The type of the predicate being returned.
     type Predicate;
@@ -424,7 +413,7 @@ where
 
 impl<P> IntoOutputPredicate<P> for P
 where
-    P: predicates::Predicate<[u8]>,
+    P: predicates_core::Predicate<[u8]>,
 {
     type Predicate = P;
 
@@ -437,7 +426,7 @@ where
 /// [Predicate] used by [`IntoOutputPredicate`] for bytes.
 ///
 /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
-/// [Predicate]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
+/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
 #[derive(Debug)]
 pub struct BytesContentOutputPredicate(predicates::ord::EqPredicate<&'static [u8]>);
 
@@ -448,9 +437,30 @@ impl BytesContentOutputPredicate {
     }
 }
 
-impl predicates::Predicate<[u8]> for BytesContentOutputPredicate {
+impl predicates_core::reflection::PredicateReflection for BytesContentOutputPredicate {
+    fn parameters<'a>(
+        &'a self,
+    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+        self.0.parameters()
+    }
+
+    /// Nested `Predicate`s of the current `Predicate`.
+    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+        self.0.children()
+    }
+}
+
+impl predicates_core::Predicate<[u8]> for BytesContentOutputPredicate {
     fn eval(&self, item: &[u8]) -> bool {
         self.0.eval(item)
+    }
+
+    fn find_case<'a>(
+        &'a self,
+        expected: bool,
+        variable: &[u8],
+    ) -> Option<predicates_core::reflection::Case<'a>> {
+        self.0.find_case(expected, variable)
     }
 }
 
@@ -472,7 +482,7 @@ impl IntoOutputPredicate<BytesContentOutputPredicate> for &'static [u8] {
 /// [Predicate] used by [`IntoOutputPredicate`] for [`str`].
 ///
 /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
-/// [Predicate]: https://docs.rs/predicates/0.5.2/predicates/trait.Predicate.html
+/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
 /// [`str`]: https://doc.rust-lang.org/std/primitive.str.html
 #[derive(Debug, Clone)]
 pub struct StrContentOutputPredicate(
@@ -486,9 +496,30 @@ impl StrContentOutputPredicate {
     }
 }
 
-impl predicates::Predicate<[u8]> for StrContentOutputPredicate {
+impl predicates_core::reflection::PredicateReflection for StrContentOutputPredicate {
+    fn parameters<'a>(
+        &'a self,
+    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+        self.0.parameters()
+    }
+
+    /// Nested `Predicate`s of the current `Predicate`.
+    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+        self.0.children()
+    }
+}
+
+impl predicates_core::Predicate<[u8]> for StrContentOutputPredicate {
     fn eval(&self, item: &[u8]) -> bool {
         self.0.eval(item)
+    }
+
+    fn find_case<'a>(
+        &'a self,
+        expected: bool,
+        variable: &[u8],
+    ) -> Option<predicates_core::reflection::Case<'a>> {
+        self.0.find_case(expected, variable)
     }
 }
 
@@ -517,7 +548,7 @@ mod test {
     fn convert_code<I, P>(pred: I) -> P
     where
         I: IntoCodePredicate<P>,
-        P: predicates::Predicate<i32>,
+        P: predicates_core::Predicate<i32>,
     {
         pred.into_code()
     }
@@ -551,7 +582,7 @@ mod test {
     fn convert_output<I, P>(pred: I) -> P
     where
         I: IntoOutputPredicate<P>,
-        P: predicates::Predicate<[u8]>,
+        P: predicates_core::Predicate<[u8]>,
     {
         pred.into_output()
     }
