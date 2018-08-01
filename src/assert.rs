@@ -204,17 +204,29 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
+    /// use predicates::prelude::*;
     ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("exit", "42")
+    ///     .assert()
+    ///     .code(predicate::eq(42));
+    ///
+    /// // which can be shortened to:
     /// Command::main_binary()
     ///     .unwrap()
     ///     .env("exit", "42")
     ///     .assert()
     ///     .code(42);
     /// ```
+    ///
+    /// See [`IntoCodePredicate`] for other built-in conversions.
+    ///
+    /// [IntoCodePredicate]: trait.IntoCodePredicate.html
     pub fn code<I, P>(self, pred: I) -> Self
     where
         I: IntoCodePredicate<P>,
@@ -241,11 +253,20 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
+    /// use predicates::prelude::*;
     ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("stdout", "hello")
+    ///     .env("stderr", "world")
+    ///     .assert()
+    ///     .stdout(predicate::str::similar("hello\n").from_utf8());
+    ///
+    /// // which can be shortened to:
     /// Command::main_binary()
     ///     .unwrap()
     ///     .env("stdout", "hello")
@@ -253,6 +274,10 @@ impl Assert {
     ///     .assert()
     ///     .stdout("hello\n");
     /// ```
+    ///
+    /// See [`IntoOutputPredicate`] for other built-in conversions.
+    ///
+    /// [IntoOutputPredicate]: trait.IntoOutputPredicate.html
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -275,11 +300,20 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
+    /// use predicates::prelude::*;
     ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("stdout", "hello")
+    ///     .env("stderr", "world")
+    ///     .assert()
+    ///     .stderr(predicate::str::similar("world\n").from_utf8());
+    ///
+    /// // which can be shortened to:
     /// Command::main_binary()
     ///     .unwrap()
     ///     .env("stdout", "hello")
@@ -287,6 +321,10 @@ impl Assert {
     ///     .assert()
     ///     .stderr("world\n");
     /// ```
+    ///
+    /// See [`IntoOutputPredicate`] for other built-in conversions.
+    ///
+    /// [IntoOutputPredicate]: trait.IntoOutputPredicate.html
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -332,18 +370,20 @@ impl fmt::Debug for Assert {
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
+/// use predicates::prelude::*;
 ///
 /// Command::main_binary()
 ///     .unwrap()
 ///     .env("exit", "42")
 ///     .assert()
-///     .code(42);
-/// // which is equivalent to
+///     .code(predicate::eq(42));
+///
+/// // which can be shortened to:
 /// Command::main_binary()
 ///     .unwrap()
 ///     .env("exit", "42")
 ///     .assert()
-///     .code(predicates::ord::eq(42));
+///     .code(42);
 /// ```
 ///
 /// [`Assert::code`]: struct.Assert.html#method.code
@@ -396,6 +436,30 @@ impl IntoCodePredicate<predicates::iter::InPredicate<i32>> for &'static [i32] {
 
 /// Used by [`Assert::stdout`] and [`Assert::stderr`] to convert Self
 /// into the needed [`Predicate<[u8]>`].
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+/// use predicates::prelude::*;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .env("stdout", "hello")
+///     .env("stderr", "world")
+///     .assert()
+///     .stdout(predicate::str::similar("hello\n").from_utf8());
+///
+/// // which can be shortened to:
+/// Command::main_binary()
+///     .unwrap()
+///     .env("stdout", "hello")
+///     .env("stderr", "world")
+///     .assert()
+///     .stdout("hello\n");
+/// ```
 ///
 /// [`Assert::stdout`]: struct.Assert.html#method.stdout
 /// [`Assert::stderr`]: struct.Assert.html#method.stderr

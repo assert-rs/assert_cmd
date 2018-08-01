@@ -12,11 +12,48 @@ fn code_example() {
         .unwrap()
         .env("exit", "42")
         .assert()
-        .code(42);
-    // which is equivalent to
+        .code(predicate::eq(42));
+
+    // which can be shortened to:
     Command::main_binary()
         .unwrap()
         .env("exit", "42")
         .assert()
-        .code(predicate::eq(42));
+        .code(42);
+}
+
+#[test]
+fn stdout_example() {
+    Command::main_binary()
+        .unwrap()
+        .env("stdout", "hello")
+        .env("stderr", "world")
+        .assert()
+        .stdout(predicate::str::similar("hello\n").from_utf8());
+
+    // which can be shortened to:
+    Command::main_binary()
+        .unwrap()
+        .env("stdout", "hello")
+        .env("stderr", "world")
+        .assert()
+        .stdout("hello\n");
+}
+
+#[test]
+fn stderr_example() {
+    Command::main_binary()
+        .unwrap()
+        .env("stdout", "hello")
+        .env("stderr", "world")
+        .assert()
+        .stderr(predicate::str::similar("world\n").from_utf8());
+
+    // which can be shortened to:
+    Command::main_binary()
+        .unwrap()
+        .env("stdout", "hello")
+        .env("stderr", "world")
+        .assert()
+        .stderr("world\n");
 }
