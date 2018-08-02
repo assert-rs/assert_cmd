@@ -218,7 +218,7 @@ impl Assert {
     /// - See [`predicates::prelude`] for more predicates.
     /// - See [`IntoCodePredicate`] for other built-in conversions.
     ///
-    /// [`predicates::predicates`]: https://docs.rs/predicates/0.9.0/predicates/prelude
+    /// [`predicates::prelude`]: https://docs.rs/predicates/0.9.0/predicates/prelude
     /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
     pub fn code<I, P>(self, pred: I) -> Self
     where
@@ -268,7 +268,7 @@ impl Assert {
     /// - See [`predicates::prelude`] for more predicates.
     /// - See [`IntoOutputPredicate`] for other built-in conversions.
     ///
-    /// [`predicates::predicates`]: https://docs.rs/predicates/0.9.0/predicates/prelude
+    /// [`predicates::prelude`]: https://docs.rs/predicates/0.9.0/predicates/prelude
     /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
@@ -317,8 +317,8 @@ impl Assert {
     /// - See [`predicates::prelude`] for more predicates.
     /// - See [`IntoOutputPredicate`] for other built-in conversions.
     ///
-    /// [`predicates::predicates`]: https://docs.rs/predicates/0.9.0/predicates/prelude
-    /// [IntoOutputPredicate]: trait.IntoOutputPredicate.html
+    /// [`predicates::prelude`]: https://docs.rs/predicates/0.9.0/predicates/prelude
+    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
