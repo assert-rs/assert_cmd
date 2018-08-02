@@ -1,3 +1,26 @@
+<a name="0.9.0"></a>
+## 0.9.0 (2018-08-02)
+
+
+#### Breaking Changes
+
+* **assert:**
+  *  Upgrade to predicates-core 0.9.0 ([e089a32d](https://github.com/assert-rs/assert_cmd/commit/e089a32d4fe1351a4a1958bd844ab49dccfbd826), closes [#1](https://github.com/assert-rs/assert_cmd/issues/1))
+  *  Change set_stdin to clarify intent ([624a7988](https://github.com/assert-rs/assert_cmd/commit/624a7988a7527661cd821d7603fe18f5c1b49265), closes [#29](https://github.com/assert-rs/assert_cmd/issues/29))
+
+#### Bug Fixes
+
+* **assert:**
+  * Change set_stdin to clarify intent ([624a7988](https://github.com/assert-rs/assert_cmd/commit/624a7988a7527661cd821d7603fe18f5c1b49265), closes [#29](https://github.com/assert-rs/assert_cmd/issues/29))
+  * Reduced duplicate information being reported in failure message.
+* Improve documentation to better jump start users.
+
+#### Features
+
+* **assert:**  Show cause of assert ([e089a32d](https://github.com/assert-rs/assert_cmd/commit/e089a32d4fe1351a4a1958bd844ab49dccfbd826), closes [#1](https://github.com/assert-rs/assert_cmd/issues/1))
+
+
+
 <a name="0.5.0"></a>
 ## 0.6.0 (2018-07-18)
 
@@ -68,9 +91,9 @@
 
 #### Bug Fixes
 
-*  Simplify stdout/stderr str predicates ([8cdfb91e](https://github.com/assert-rs/assert_cmd/commit/8cdfb91e0f7a535d3d2b9fbb21f0df5d236a0f0a), closes [#11](https://github.com/assert-rs/assert_cmd/issues/11), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+*  Simplify stdout/stderr str predicates ([8cdfb91e](https://github.com/assert-rs/assert_cmd/commit/8cdfb91e0f7a535d3d2b9fbb21f0df5d236a0f0a), closes [#11](https://github.com/assert-rs/assert_cmd/issues/11))
 
 #### Breaking Changes
 
-*   Change to predicates v0.5.0 ([5fa02435](https://github.com/assert-rs/assert_cmd/commit/5fa02435ffee0a3fb5f94fa374437ae71201f7d7), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
-*   Simplify stdout/stderr str predicates ([8cdfb91e](https://github.com/assert-rs/assert_cmd/commit/8cdfb91e0f7a535d3d2b9fbb21f0df5d236a0f0a), closes [#11](https://github.com/assert-rs/assert_cmd/issues/11), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+*   Change to predicates v0.5.0 ([5fa02435](https://github.com/assert-rs/assert_cmd/commit/5fa02435ffee0a3fb5f94fa374437ae71201f7d7))
+*   Simplify stdout/stderr str predicates ([8cdfb91e](https://github.com/assert-rs/assert_cmd/commit/8cdfb91e0f7a535d3d2b9fbb21f0df5d236a0f0a), closes [#11](https://github.com/assert-rs/assert_cmd/issues/11))
