@@ -1,5 +1,9 @@
 //! **Assert [`Command`][Command]** - Easy command initialization and assertions.
 //!
+//! `assert_cmd` includes support for:
+//! - Setting up your program-under-test (see [`CommandCargoExt`], [`CommandStdInExt`]).
+//! - Verifying your program-under-test (see [`OutputOkExt`], [`OutputAssertExt`]).
+//!
 //! ```toml
 //! [dependencies]
 //! assert_cmd = "0.6"
@@ -49,6 +53,10 @@
 //! [assert_fs]: https://crates.io/crates/assert_fs
 //! [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 //! [`success()`]: struct.Assert.html#method.success
+//! [`CommandCargoExt`]: cargo/trait.CommandCargoExt.html
+//! [`CommandStdInExt`]: trait.CommandStdInExt.html
+//! [`OutputOkExt`]: trait.OutputOkExt.html
+//! [`OutputAssertExt`]: assert/trait.OutputAssertExt.html
 
 #![warn(missing_docs)]
 
@@ -63,6 +71,7 @@ pub mod assert;
 pub use assert::Assert;
 pub use assert::OutputAssertExt;
 pub mod cargo;
+pub use cargo::CommandCargoExt;
 mod cmd;
 pub use cmd::*;
 mod stdin;
