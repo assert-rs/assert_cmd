@@ -128,15 +128,6 @@ impl Assert {
         &self.output
     }
 
-    // How does user interact with assertion API?
-    // - On Assert class, using error chaining
-    //   - "Builder" or not?  If yes, then do we extend Result?
-    //   - How do we give a helpful unwrap?
-    // - Build up assertion data and "execute" it, like assert_cli used to?  But that was mostly
-    //   from building up before executing the command happened.  Now we're doing it
-    //   after-the-fact.
-    // - Immediately panic in each assertion? Let's give that a try.
-
     /// Ensure the command succeeded.
     ///
     /// # Examples
@@ -224,9 +215,11 @@ impl Assert {
     ///     .code(42);
     /// ```
     ///
-    /// See [`IntoCodePredicate`] for other built-in conversions.
+    /// - See [`predicates::prelude`] for more predicates.
+    /// - See [`IntoCodePredicate`] for other built-in conversions.
     ///
-    /// [IntoCodePredicate]: trait.IntoCodePredicate.html
+    /// [`predicates::predicates`]: https://docs.rs/predicates/0.9.0/predicates/prelude
+    /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
     pub fn code<I, P>(self, pred: I) -> Self
     where
         I: IntoCodePredicate<P>,
@@ -236,13 +229,10 @@ impl Assert {
     }
 
     fn code_impl(self, pred: &predicates_core::Predicate<i32>) -> Self {
-        let actual_code = self.output.status.code().unwrap_or_else(|| {
-            panic!(
-                "Command interrupted\nstderr=```{}```\n{}",
-                dump_buffer(&self.output.stderr),
-                self
-            )
-        });
+        let actual_code = self.output
+            .status
+            .code()
+            .unwrap_or_else(|| panic!("Command interrupted\n{}", self));
         if let Some(case) = pred.find_case(false, &actual_code) {
             panic!("Unexpected return code, failed {}\n{}", case.tree(), self);
         }
@@ -275,9 +265,11 @@ impl Assert {
     ///     .stdout("hello\n");
     /// ```
     ///
-    /// See [`IntoOutputPredicate`] for other built-in conversions.
+    /// - See [`predicates::prelude`] for more predicates.
+    /// - See [`IntoOutputPredicate`] for other built-in conversions.
     ///
-    /// [IntoOutputPredicate]: trait.IntoOutputPredicate.html
+    /// [`predicates::predicates`]: https://docs.rs/predicates/0.9.0/predicates/prelude
+    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -322,8 +314,10 @@ impl Assert {
     ///     .stderr("world\n");
     /// ```
     ///
-    /// See [`IntoOutputPredicate`] for other built-in conversions.
+    /// - See [`predicates::prelude`] for more predicates.
+    /// - See [`IntoOutputPredicate`] for other built-in conversions.
     ///
+    /// [`predicates::predicates`]: https://docs.rs/predicates/0.9.0/predicates/prelude
     /// [IntoOutputPredicate]: trait.IntoOutputPredicate.html
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
