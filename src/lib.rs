@@ -1,4 +1,4 @@
-//! **Assert [`Command`][Command]** - Easy command initialization and assertions.
+//! **Assert [`Command`]** - Easy command initialization and assertions.
 //!
 //! `assert_cmd` includes support for:
 //! - Setting up your program-under-test (see [`CommandCargoExt`], [`CommandStdInExt`]).
