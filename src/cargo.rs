@@ -20,15 +20,21 @@
 //!     .unwrap();
 //! ```
 //!
-//! Caching the binary's location:
+//! For caching to minimize cargo overhead or customize the build process, see [`escargot`].
 //!
-//! ```rust
+//! ```rust,ignore
 //! use assert_cmd::prelude::*;
+//! use escargot;
 //!
 //! use std::process::Command;
 //!
-//! let bin_under_test = assert_cmd::cargo::main_binary_path().unwrap();
-//! Command::new(&bin_under_test)
+//! let bin_under_test = escargot::CargoBuild::new()
+//!     .bin("bin_fixture")
+//!     .current_release()
+//!     .current_target()
+//!     .run()
+//!     .unwrap();
+//! bin_under_test.command()
 //!     .unwrap();
 //! ```
 //!
@@ -37,6 +43,7 @@
 //! [`lazy_static`]: https://crates.io/crates/lazy_static
 //! [`CommandCargoExt`]: trait.CommandCargoExt.html
 //! [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+//! [`escargot`]: https://docs.rs/escargot/
 
 use std::error::Error;
 use std::ffi;
@@ -128,18 +135,29 @@ where
 
 impl CommandCargoExt for process::Command {
     fn main_binary() -> Result<Self, CargoError> {
-        let cmd = main_binary_path()?;
-        Ok(process::Command::new(&cmd))
+        let runner = escargot::CargoBuild::new()
+            .current_release()
+            .run()
+            .map_err(CargoError::with_cause)?;
+        Ok(runner.command())
     }
 
     fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError> {
-        let cmd = cargo_bin_path(name)?;
-        Ok(process::Command::new(&cmd))
+        let runner = escargot::CargoBuild::new()
+            .bin(name)
+            .current_release()
+            .run()
+            .map_err(CargoError::with_cause)?;
+        Ok(runner.command())
     }
 
     fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError> {
-        let cmd = cargo_example_path(name)?;
-        Ok(process::Command::new(&cmd))
+        let runner = escargot::CargoBuild::new()
+            .example(name)
+            .current_release()
+            .run()
+            .map_err(CargoError::with_cause)?;
+        Ok(runner.command())
     }
 }
 
@@ -160,9 +178,9 @@ impl CommandCargoExt for process::Command {
 /// Command::new(&bin_under_test)
 ///     .unwrap();
 /// ```
+#[deprecated(since = "0.9.1", note = "For caching, using escargot directly.")]
 pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
-    let runner = escargot::Cargo::new()
-        .build()
+    let runner = escargot::CargoBuild::new()
         .current_release()
         .run()
         .map_err(CargoError::with_cause)?;
@@ -184,9 +202,9 @@ pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
 /// Command::new(&bin_under_test)
 ///     .unwrap();
 /// ```
+#[deprecated(since = "0.9.1", note = "For caching, using escargot directly.")]
 pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
-    let runner = escargot::Cargo::new()
-        .build()
+    let runner = escargot::CargoBuild::new()
         .bin(name)
         .current_release()
         .run()
@@ -209,9 +227,9 @@ pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, Ca
 /// Command::new(&bin_under_test)
 ///     .unwrap();
 /// ```
+#[deprecated(since = "0.9.1", note = "For caching, using escargot directly.")]
 pub fn cargo_example_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
-    let runner = escargot::Cargo::new()
-        .build()
+    let runner = escargot::CargoBuild::new()
         .example(name)
         .current_release()
         .run()
