@@ -1,3 +1,13 @@
+<a name="0.9.1"></a>
+## 0.9.1 (2018-08-09)
+
+
+#### Bug Fixes
+
+* **cargo:**  Point people to escargot ([2e32822c](https://github.com/assert-rs/assert_cmd/commit/2e32822ca22b4299a2a07a46ea431835c8f50401), closes [#44](https://github.com/assert-rs/assert_cmd/issues/44))
+
+
+
 <a name="0.9.0"></a>
 ## 0.9.0 (2018-08-02)
 
