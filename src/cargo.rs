@@ -143,40 +143,6 @@ impl CommandCargoExt for process::Command {
     }
 }
 
-#[derive(Deserialize)]
-struct MessageTarget<'a> {
-    #[serde(borrow)]
-    crate_types: Vec<&'a str>,
-    #[serde(borrow)]
-    kind: Vec<&'a str>,
-}
-
-#[derive(Deserialize)]
-struct MessageFilter<'a> {
-    #[serde(borrow)]
-    reason: &'a str,
-    target: MessageTarget<'a>,
-    filenames: Vec<path::PathBuf>,
-}
-
-fn extract_filenames(msg: &escargot::Message, kind: &str) -> Option<path::PathBuf> {
-    let filter: MessageFilter = msg.convert().ok()?;
-    if filter.reason != "compiler-artifact"
-        || filter.target.crate_types != ["bin"]
-        || filter.target.kind != [kind]
-    {
-        None
-    } else {
-        Some(
-            filter
-                .filenames
-                .into_iter()
-                .next()
-                .expect("files must exist"),
-        )
-    }
-}
-
 /// Get the path to the crate's main binary.
 ///
 /// Intended for caching the location, reducing the cargo overhead.
@@ -195,21 +161,12 @@ fn extract_filenames(msg: &escargot::Message, kind: &str) -> Option<path::PathBu
 ///     .unwrap();
 /// ```
 pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
-    let cargo = escargot::Cargo::new().build().current_release();
-    let bins: Vec<_> = cargo
-        .exec()
-        .map_err(CargoError::with_cause)?
-        .filter_map(|m| extract_filenames(&m, "bin"))
-        .collect();
-    if bins.is_empty() {
-        return Err(CargoError::with_context("No binaries in crate"));
-    } else if bins.len() != 1 {
-        return Err(CargoError::with_context(format!(
-            "Ambiguous which binary is intended: {:?}",
-            bins
-        )));
-    }
-    Ok(bins.into_iter().next().expect("already validated"))
+    let runner = escargot::Cargo::new()
+        .build()
+        .current_release()
+        .run()
+        .map_err(CargoError::with_cause)?;
+    Ok(runner.path().to_owned())
 }
 
 /// Get the path to the specified binary of the current crate.
@@ -228,14 +185,13 @@ pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
 ///     .unwrap();
 /// ```
 pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
-    let cargo = escargot::Cargo::new().build().bin(name).current_release();
-    let bins: Vec<_> = cargo
-        .exec()
-        .map_err(CargoError::with_cause)?
-        .filter_map(|m| extract_filenames(&m, "bin"))
-        .collect();
-    assert_eq!(bins.len(), 1);
-    Ok(bins.into_iter().next().expect("already validated"))
+    let runner = escargot::Cargo::new()
+        .build()
+        .bin(name)
+        .current_release()
+        .run()
+        .map_err(CargoError::with_cause)?;
+    Ok(runner.path().to_owned())
 }
 
 /// Get the path to the specified example of the current crate.
@@ -254,47 +210,28 @@ pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, Ca
 ///     .unwrap();
 /// ```
 pub fn cargo_example_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
-    let cargo = escargot::Cargo::new()
+    let runner = escargot::Cargo::new()
         .build()
         .example(name)
-        .current_release();
-    let bins: Vec<_> = cargo
-        .exec()
-        .map_err(CargoError::with_cause)?
-        .filter_map(|m| extract_filenames(&m, "example"))
-        .collect();
-    assert_eq!(bins.len(), 1);
-    Ok(bins.into_iter().next().expect("already validated"))
+        .current_release()
+        .run()
+        .map_err(CargoError::with_cause)?;
+    Ok(runner.path().to_owned())
 }
 
 /// Error when finding crate binary.
 #[derive(Debug)]
 pub struct CargoError {
-    context: Option<String>,
     cause: Option<Box<Error + Send + Sync + 'static>>,
 }
 
 impl CargoError {
-    fn with_context<S>(context: S) -> Self
-    where
-        S: Into<String>,
-    {
-        let context = context.into();
-        Self {
-            context: Some(context),
-            cause: None,
-        }
-    }
-
     fn with_cause<E>(cause: E) -> Self
     where
         E: Error + Send + Sync + 'static,
     {
         let cause = Box::new(cause);
-        Self {
-            context: None,
-            cause: Some(cause),
-        }
+        Self { cause: Some(cause) }
     }
 }
 
@@ -313,9 +250,6 @@ impl Error for CargoError {
 
 impl fmt::Display for CargoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if let Some(ref context) = self.context {
-            writeln!(f, "{}", context)?;
-        }
         if let Some(ref cause) = self.cause {
             writeln!(f, "Cause: {}", cause)?;
         }
