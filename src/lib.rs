@@ -64,8 +64,6 @@ extern crate escargot;
 extern crate predicates;
 extern crate predicates_core;
 extern crate predicates_tree;
-#[macro_use]
-extern crate serde;
 
 pub mod assert;
 pub use assert::Assert;
