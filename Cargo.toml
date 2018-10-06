@@ -15,9 +15,9 @@ keywords = ["cli", "test", "assert", "command", "duct"]
 name = "bin_fixture"
 
 [dependencies]
-predicates = "0.9.0"
-predicates-core = "0.9.0"
-predicates-tree = "0.9.0"
+predicates = { version = "1.0", default-features = false, features = ["difference"] }
+predicates-core = "1.0"
+predicates-tree = "1.0"
 escargot = "0.3"
 
 [dev-dependencies]
