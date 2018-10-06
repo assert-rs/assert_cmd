@@ -11,10 +11,10 @@ use std::process;
 
 use assert::Assert;
 use assert::OutputAssertExt;
-use cmd::OutputOkExt;
 use cmd::dump_buffer;
 use cmd::DebugBuffer;
 use cmd::OutputError;
+use cmd::OutputOkExt;
 use cmd::OutputResult;
 
 /// Write to `stdin` of a [`Command`][Command].

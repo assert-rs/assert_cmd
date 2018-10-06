@@ -178,7 +178,10 @@ impl CommandCargoExt for process::Command {
 /// Command::new(&bin_under_test)
 ///     .unwrap();
 /// ```
-#[deprecated(since = "0.9.1", note = "For caching, using escargot directly.")]
+#[deprecated(
+    since = "0.9.1",
+    note = "For caching, using escargot directly."
+)]
 pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
     let runner = escargot::CargoBuild::new()
         .current_release()
@@ -202,7 +205,10 @@ pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
 /// Command::new(&bin_under_test)
 ///     .unwrap();
 /// ```
-#[deprecated(since = "0.9.1", note = "For caching, using escargot directly.")]
+#[deprecated(
+    since = "0.9.1",
+    note = "For caching, using escargot directly."
+)]
 pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
     let runner = escargot::CargoBuild::new()
         .bin(name)
@@ -227,7 +233,10 @@ pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, Ca
 /// Command::new(&bin_under_test)
 ///     .unwrap();
 /// ```
-#[deprecated(since = "0.9.1", note = "For caching, using escargot directly.")]
+#[deprecated(
+    since = "0.9.1",
+    note = "For caching, using escargot directly."
+)]
 pub fn cargo_example_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
     let runner = escargot::CargoBuild::new()
         .example(name)

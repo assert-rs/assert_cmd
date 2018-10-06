@@ -229,7 +229,8 @@ impl Assert {
     }
 
     fn code_impl(self, pred: &predicates_core::Predicate<i32>) -> Self {
-        let actual_code = self.output
+        let actual_code = self
+            .output
             .status
             .code()
             .unwrap_or_else(|| panic!("Command interrupted\n{}", self));
@@ -469,7 +470,7 @@ impl IntoCodePredicate<EqCodePredicate> for i32 {
 pub struct InCodePredicate(predicates::iter::InPredicate<i32>);
 
 impl InCodePredicate {
-    pub(crate) fn new<I:IntoIterator<Item=i32>>(value: I) -> Self {
+    pub(crate) fn new<I: IntoIterator<Item = i32>>(value: I) -> Self {
         let pred = predicates::iter::in_iter(value);
         InCodePredicate(pred)
     }
@@ -697,13 +698,13 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
 /// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
 #[derive(Debug, Clone)]
-pub struct StrOutputPredicate<P: predicates_core::Predicate<str>>
-(
+pub struct StrOutputPredicate<P: predicates_core::Predicate<str>>(
     predicates::str::Utf8Predicate<P>,
 );
 
 impl<P> StrOutputPredicate<P>
-where P: predicates_core::Predicate<str>
+where
+    P: predicates_core::Predicate<str>,
 {
     pub(crate) fn new(pred: P) -> Self {
         let pred = pred.from_utf8();
@@ -712,7 +713,8 @@ where P: predicates_core::Predicate<str>
 }
 
 impl<P> predicates_core::reflection::PredicateReflection for StrOutputPredicate<P>
-where P: predicates_core::Predicate<str>
+where
+    P: predicates_core::Predicate<str>,
 {
     fn parameters<'a>(
         &'a self,
@@ -727,7 +729,8 @@ where P: predicates_core::Predicate<str>
 }
 
 impl<P> predicates_core::Predicate<[u8]> for StrOutputPredicate<P>
-where P: predicates_core::Predicate<str>
+where
+    P: predicates_core::Predicate<str>,
 {
     fn eval(&self, item: &[u8]) -> bool {
         self.0.eval(item)
@@ -743,7 +746,8 @@ where P: predicates_core::Predicate<str>
 }
 
 impl<P> fmt::Display for StrOutputPredicate<P>
-where P: predicates_core::Predicate<str>
+where
+    P: predicates_core::Predicate<str>,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.0.fmt(f)
@@ -751,7 +755,8 @@ where P: predicates_core::Predicate<str>
 }
 
 impl<P> IntoOutputPredicate<StrOutputPredicate<P>> for P
-where P: predicates_core::Predicate<str>
+where
+    P: predicates_core::Predicate<str>,
 {
     type Predicate = StrOutputPredicate<P>;
 
