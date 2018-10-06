@@ -11,8 +11,8 @@ use predicates::str::PredicateStrExt;
 use predicates_core;
 use predicates_tree::CaseTreeExt;
 
-use errors::dump_buffer;
-use errors::output_fmt;
+use cmd::dump_buffer;
+use cmd::output_fmt;
 
 /// Assert the state of an [`Output`].
 ///

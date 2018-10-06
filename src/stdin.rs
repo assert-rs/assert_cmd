@@ -1,3 +1,7 @@
+//! Write to `stdin` of a [`Command`][Command].
+//!
+//! [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+
 use std::fs;
 use std::io;
 use std::io::Read;
@@ -8,10 +12,10 @@ use std::process;
 use assert::Assert;
 use assert::OutputAssertExt;
 use cmd::OutputOkExt;
-use errors::dump_buffer;
-use errors::DebugBuffer;
-use errors::OutputError;
-use errors::OutputResult;
+use cmd::dump_buffer;
+use cmd::DebugBuffer;
+use cmd::OutputError;
+use cmd::OutputResult;
 
 /// Write to `stdin` of a [`Command`][Command].
 ///

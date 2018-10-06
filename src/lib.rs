@@ -66,16 +66,9 @@ extern crate predicates_core;
 extern crate predicates_tree;
 
 pub mod assert;
-pub use assert::Assert;
-pub use assert::OutputAssertExt;
 pub mod cargo;
-pub use cargo::CommandCargoExt;
-mod cmd;
-pub use cmd::*;
-mod stdin;
-pub use stdin::*;
-mod errors;
-pub use errors::*;
+pub mod cmd;
+pub mod stdin;
 
 /// Extension traits that are useful to have available.
 pub mod prelude {
