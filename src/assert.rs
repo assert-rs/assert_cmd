@@ -405,7 +405,7 @@ where
 }
 
 // Keep `predicates` concrete Predicates out of our public API.
-/// [Predicate] used by [`IntoCodePredicate`] for bytes.
+/// [Predicate] used by [`IntoCodePredicate`] for code.
 ///
 /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
 /// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
@@ -461,7 +461,7 @@ impl IntoCodePredicate<EqCodePredicate> for i32 {
 }
 
 // Keep `predicates` concrete Predicates out of our public API.
-/// [Predicate] used by [`IntoCodePredicate`] for bytes.
+/// [Predicate] used by [`IntoCodePredicate`] for iterables of codes.
 ///
 /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
 /// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
@@ -685,6 +685,75 @@ impl fmt::Display for StrContentOutputPredicate {
 
 impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
     type Predicate = StrContentOutputPredicate;
+
+    fn into_output(self) -> Self::Predicate {
+        Self::Predicate::new(self)
+    }
+}
+
+// Keep `predicates` concrete Predicates out of our public API.
+/// [Predicate] used by [`IntoOutputPredicate`] for [`Predicate<str>`].
+///
+/// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
+/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+#[derive(Debug, Clone)]
+pub struct StrOutputPredicate<P: predicates_core::Predicate<str>>
+(
+    predicates::str::Utf8Predicate<P>,
+);
+
+impl<P> StrOutputPredicate<P>
+where P: predicates_core::Predicate<str>
+{
+    pub(crate) fn new(pred: P) -> Self {
+        let pred = pred.from_utf8();
+        StrOutputPredicate(pred)
+    }
+}
+
+impl<P> predicates_core::reflection::PredicateReflection for StrOutputPredicate<P>
+where P: predicates_core::Predicate<str>
+{
+    fn parameters<'a>(
+        &'a self,
+    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+        self.0.parameters()
+    }
+
+    /// Nested `Predicate`s of the current `Predicate`.
+    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+        self.0.children()
+    }
+}
+
+impl<P> predicates_core::Predicate<[u8]> for StrOutputPredicate<P>
+where P: predicates_core::Predicate<str>
+{
+    fn eval(&self, item: &[u8]) -> bool {
+        self.0.eval(item)
+    }
+
+    fn find_case<'a>(
+        &'a self,
+        expected: bool,
+        variable: &[u8],
+    ) -> Option<predicates_core::reflection::Case<'a>> {
+        self.0.find_case(expected, variable)
+    }
+}
+
+impl<P> fmt::Display for StrOutputPredicate<P>
+where P: predicates_core::Predicate<str>
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl<P> IntoOutputPredicate<StrOutputPredicate<P>> for P
+where P: predicates_core::Predicate<str>
+{
+    type Predicate = StrOutputPredicate<P>;
 
     fn into_output(self) -> Self::Predicate {
         Self::Predicate::new(self)
