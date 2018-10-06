@@ -1,7 +1,7 @@
 sudo: false
 language: rust
 rust:
-- 1.22.0  # Two releases back
+- 1.27.0  # Oldest compatible version
 - stable
 - beta
 - nightly
