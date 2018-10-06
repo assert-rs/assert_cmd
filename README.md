@@ -21,7 +21,7 @@ assert_cmd = "0.9"
 
 Here's a trivial example:
 
-```rust,ignore
+```rust
 extern crate assert_cmd;
 
 use std::process::Command;

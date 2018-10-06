@@ -195,7 +195,10 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// extern crate assert_cmd;
+    /// extern crate predicates;
+    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -206,8 +209,14 @@ impl Assert {
     ///     .env("exit", "42")
     ///     .assert()
     ///     .code(predicate::eq(42));
+    /// ```
     ///
-    /// // which can be shortened to:
+    /// Shortcuts are also provided:
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
     /// Command::main_binary()
     ///     .unwrap()
     ///     .env("exit", "42")
@@ -244,7 +253,10 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// extern crate assert_cmd;
+    /// extern crate predicates;
+    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -256,8 +268,14 @@ impl Assert {
     ///     .env("stderr", "world")
     ///     .assert()
     ///     .stdout(predicate::str::similar("hello\n").from_utf8());
+    /// ```
     ///
-    /// // which can be shortened to:
+    /// Shortcuts are also provided:
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
     /// Command::main_binary()
     ///     .unwrap()
     ///     .env("stdout", "hello")
@@ -293,7 +311,10 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// extern crate assert_cmd;
+    /// extern crate predicates;
+    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -305,8 +326,14 @@ impl Assert {
     ///     .env("stderr", "world")
     ///     .assert()
     ///     .stderr(predicate::str::similar("world\n").from_utf8());
+    /// ```
     ///
-    /// // which can be shortened to:
+    /// Shortcuts are also provided:
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
     /// Command::main_binary()
     ///     .unwrap()
     ///     .env("stdout", "hello")
@@ -361,7 +388,10 @@ impl fmt::Debug for Assert {
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
+/// extern crate assert_cmd;
+/// extern crate predicates;
+///
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
@@ -530,7 +560,10 @@ impl IntoCodePredicate<InCodePredicate> for &'static [i32] {
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
+/// extern crate assert_cmd;
+/// extern crate predicates;
+///
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;

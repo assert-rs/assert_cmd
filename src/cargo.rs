@@ -22,7 +22,10 @@
 //!
 //! For caching to minimize cargo overhead or customize the build process, see [`escargot`].
 //!
-//! ```rust,ignore
+//! ```rust
+//! extern crate assert_cmd;
+//! extern crate escargot;
+//!
 //! use assert_cmd::prelude::*;
 //! use escargot;
 //!

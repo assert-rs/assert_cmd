@@ -13,7 +13,7 @@
 //!
 //! Here's a trivial example:
 //!
-//! ```rust,ignore
+//! ```rust
 //! extern crate assert_cmd;
 //!
 //! use std::process::Command;
