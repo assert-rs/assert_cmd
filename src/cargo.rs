@@ -51,7 +51,6 @@
 use std::error::Error;
 use std::ffi;
 use std::fmt;
-use std::path;
 use std::process;
 
 use escargot;
@@ -162,91 +161,6 @@ impl CommandCargoExt for process::Command {
             .map_err(CargoError::with_cause)?;
         Ok(runner.command())
     }
-}
-
-/// Get the path to the crate's main binary.
-///
-/// Intended for caching the location, reducing the cargo overhead.
-///
-/// Note: only works if there one bin in the crate.
-///
-/// # Examples
-///
-/// ```rust
-/// use assert_cmd::prelude::*;
-///
-/// use std::process::Command;
-///
-/// let bin_under_test = assert_cmd::cargo::main_binary_path().unwrap();
-/// Command::new(&bin_under_test)
-///     .unwrap();
-/// ```
-#[deprecated(
-    since = "0.9.1",
-    note = "For caching, using escargot directly."
-)]
-pub fn main_binary_path() -> Result<path::PathBuf, CargoError> {
-    let runner = escargot::CargoBuild::new()
-        .current_release()
-        .run()
-        .map_err(CargoError::with_cause)?;
-    Ok(runner.path().to_owned())
-}
-
-/// Get the path to the specified binary of the current crate.
-///
-/// Intended for caching the location, reducing the cargo overhead.
-///
-/// # Examples
-///
-/// ```rust
-/// use assert_cmd::prelude::*;
-///
-/// use std::process::Command;
-///
-/// let bin_under_test = assert_cmd::cargo::cargo_bin_path("bin_fixture").unwrap();
-/// Command::new(&bin_under_test)
-///     .unwrap();
-/// ```
-#[deprecated(
-    since = "0.9.1",
-    note = "For caching, using escargot directly."
-)]
-pub fn cargo_bin_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
-    let runner = escargot::CargoBuild::new()
-        .bin(name)
-        .current_release()
-        .run()
-        .map_err(CargoError::with_cause)?;
-    Ok(runner.path().to_owned())
-}
-
-/// Get the path to the specified example of the current crate.
-///
-/// Intended for caching the location, reducing the cargo overhead.
-///
-/// # Examples
-///
-/// ```rust
-/// use assert_cmd::prelude::*;
-///
-/// use std::process::Command;
-///
-/// let bin_under_test = assert_cmd::cargo::cargo_example_path("example_fixture").unwrap();
-/// Command::new(&bin_under_test)
-///     .unwrap();
-/// ```
-#[deprecated(
-    since = "0.9.1",
-    note = "For caching, using escargot directly."
-)]
-pub fn cargo_example_path<S: AsRef<ffi::OsStr>>(name: S) -> Result<path::PathBuf, CargoError> {
-    let runner = escargot::CargoBuild::new()
-        .example(name)
-        .current_release()
-        .run()
-        .map_err(CargoError::with_cause)?;
-    Ok(runner.path().to_owned())
 }
 
 /// Error when finding crate binary.
