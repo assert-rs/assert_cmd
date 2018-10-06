@@ -139,6 +139,7 @@ impl CommandCargoExt for process::Command {
     fn main_binary() -> Result<Self, CargoError> {
         let runner = escargot::CargoBuild::new()
             .current_release()
+            .current_target()
             .run()
             .map_err(CargoError::with_cause)?;
         Ok(runner.command())
@@ -148,6 +149,7 @@ impl CommandCargoExt for process::Command {
         let runner = escargot::CargoBuild::new()
             .bin(name)
             .current_release()
+            .current_target()
             .run()
             .map_err(CargoError::with_cause)?;
         Ok(runner.command())
@@ -157,6 +159,7 @@ impl CommandCargoExt for process::Command {
         let runner = escargot::CargoBuild::new()
             .example(name)
             .current_release()
+            .current_target()
             .run()
             .map_err(CargoError::with_cause)?;
         Ok(runner.command())
