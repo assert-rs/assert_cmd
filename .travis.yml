@@ -1,20 +1,20 @@
 sudo: false
 language: rust
 rust:
-- 1.22.0  # Two releases back
+- 1.27.0  # Oldest compatible version
 - stable
 - beta
 - nightly
 matrix:
   include:
   - env: RUSTFMT
-    rust: 1.27.0  # `stable`: Locking down for consistent behavior
+    rust: 1.29.1  # `stable`: Locking down for consistent behavior
     install:
       - rustup component add rustfmt-preview
     script:
-      - cargo fmt -- --write-mode=diff
+      - cargo fmt -- --check
   - env: RUSTFLAGS="-D warnings"
-    rust: 1.27.0  # `stable`: Locking down for consistent behavior
+    rust: 1.29.1  # `stable`: Locking down for consistent behavior
     install:
     script:
     - cargo check --tests --all-features
@@ -44,9 +44,11 @@ branches:
   - master
 
 cache:
-  apt: true
-  cargo: true
+  directories:
+    - /home/travis/.cargo
+# But don't cache the cargo registry
 before_cache:
+- rm -rf $HOME/.cargo/registry
 # Travis can't cache files that are not readable by "others"
 - chmod -R a+r $HOME/.cargo
 

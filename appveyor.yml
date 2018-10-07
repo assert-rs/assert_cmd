@@ -29,6 +29,7 @@ test_script:
 - cargo check --verbose
 - cargo check --verbose --no-default-features
 - cargo check --verbose --all-features
+- del target\debug\deps\*assert_cmd*  # Avoid skeptic problems
 - cargo test  --verbose --all-features
 
 branches:
@@ -39,7 +40,6 @@ branches:
 
 cache:
 - C:\Users\appveyor\.cargo\registry
-- target
 
 notifications:
 - provider: Email

@@ -13,7 +13,7 @@
 //!
 //! Here's a trivial example:
 //!
-//! ```rust,ignore
+//! ```rust
 //! extern crate assert_cmd;
 //!
 //! use std::process::Command;
@@ -29,6 +29,7 @@
 //!
 //! Other crates that might be useful in testing command line programs.
 //! - [duct] for orchestrating multiple processes.
+//! - [commandspec] for easier writing of commands
 //! - [assert_fs] for filesystem fixtures and assertions.
 //! - [dir-diff] for testing file side-effects.
 //! - [tempfile] for scratchpad directories.
@@ -46,6 +47,7 @@
 //! - [`success()`] is not implicit and requires being explicitly called.
 //! - `stdout`/`stderr` aren't automatically trimmed before being passed to the `Predicate`.
 //!
+//! [commandspec]: https://crates.io/crates/commandspec
 //! [assert_cli]: https://crates.io/crates/assert_cli/0.6.3
 //! [dir-diff]: https://crates.io/crates/dir-diff
 //! [tempfile]: https://crates.io/crates/tempfile
@@ -66,16 +68,9 @@ extern crate predicates_core;
 extern crate predicates_tree;
 
 pub mod assert;
-pub use assert::Assert;
-pub use assert::OutputAssertExt;
 pub mod cargo;
-pub use cargo::CommandCargoExt;
-mod cmd;
-pub use cmd::*;
-mod stdin;
-pub use stdin::*;
-mod errors;
-pub use errors::*;
+pub mod cmd;
+pub mod stdin;
 
 /// Extension traits that are useful to have available.
 pub mod prelude {
