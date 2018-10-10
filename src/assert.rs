@@ -23,10 +23,10 @@ use cmd::output_fmt;
 ///
 /// use std::process::Command;
 ///
-/// Command::main_binary()
-///     .unwrap()
-///     .assert()
-///     .success();
+/// let mut cmd = Command::main_binary()
+///     .unwrap();
+/// cmd.assert()
+///    .success();
 /// ```
 ///
 /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
@@ -40,10 +40,10 @@ pub trait OutputAssertExt {
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
-    ///     .unwrap()
-    ///     .assert()
-    ///     .success();
+    /// let mut cmd = Command::main_binary()
+    ///     .unwrap();
+    /// cmd.assert()
+    ///    .success();
     /// ```
     ///
     /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
@@ -74,10 +74,10 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
 ///
 /// use std::process::Command;
 ///
-/// Command::main_binary()
-///     .unwrap()
-///     .assert()
-///     .success();
+/// let mut cmd = Command::main_binary()
+///     .unwrap();
+/// cmd.assert()
+///    .success();
 /// ```
 ///
 /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
@@ -195,6 +195,7 @@ impl Assert {
     ///
     /// # Examples
     ///
+    /// Accepting a predicate:
     /// ```rust
     /// extern crate assert_cmd;
     /// extern crate predicates;
@@ -211,7 +212,7 @@ impl Assert {
     ///     .code(predicate::eq(42));
     /// ```
     ///
-    /// Shortcuts are also provided:
+    /// Accepting an exit code:
     /// ```rust
     /// use assert_cmd::prelude::*;
     ///
@@ -224,10 +225,23 @@ impl Assert {
     ///     .code(42);
     /// ```
     ///
+    /// Accepting multiple exit codes:
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("exit", "42")
+    ///     .assert()
+    ///     .code(&[2, 42] as &[i32]);
+    /// ```
+    ///
     /// - See [`predicates::prelude`] for more predicates.
     /// - See [`IntoCodePredicate`] for other built-in conversions.
     ///
-    /// [`predicates::prelude`]: https://docs.rs/predicates/0.9.0/predicates/prelude/
+    /// [`predicates::prelude`]: https://docs.rs/predicates/1.0.0/predicates/prelude/
     /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
     pub fn code<I, P>(self, pred: I) -> Self
     where
@@ -251,8 +265,17 @@ impl Assert {
 
     /// Ensure the command wrote the expected data to `stdout`.
     ///
+    /// This uses [`IntoOutputPredicate`] to provide short-hands for common cases.
+    ///
+    /// - See [`predicates::prelude`] for more predicates.
+    /// - See [`IntoOutputPredicate`] for other built-in conversions.
+    ///
+    /// [`predicates::prelude`]: https://docs.rs/predicates/1.0.0/predicates/prelude/
+    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
+    ///
     /// # Examples
     ///
+    /// Accepting a bytes predicate:
     /// ```rust
     /// extern crate assert_cmd;
     /// extern crate predicates;
@@ -267,10 +290,42 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stdout(predicate::str::similar("hello\n").from_utf8());
+    ///     .stdout(predicate::eq(b"hello\n" as &[u8]));
     /// ```
     ///
-    /// Shortcuts are also provided:
+    /// Accepting a `str` predicate:
+    /// ```rust
+    /// extern crate assert_cmd;
+    /// extern crate predicates;
+    ///
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    /// use predicates::prelude::*;
+    ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("stdout", "hello")
+    ///     .env("stderr", "world")
+    ///     .assert()
+    ///     .stdout(predicate::str::similar("hello\n"));
+    /// ```
+    ///
+    /// Accepting bytes:
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("stdout", "hello")
+    ///     .env("stderr", "world")
+    ///     .assert()
+    ///     .stdout(b"hello\n" as &[u8]);
+    /// ```
+    ///
+    /// Accepting a `str`:
     /// ```rust
     /// use assert_cmd::prelude::*;
     ///
@@ -283,12 +338,6 @@ impl Assert {
     ///     .assert()
     ///     .stdout("hello\n");
     /// ```
-    ///
-    /// - See [`predicates::prelude`] for more predicates.
-    /// - See [`IntoOutputPredicate`] for other built-in conversions.
-    ///
-    /// [`predicates::prelude`]: https://docs.rs/predicates/0.9.0/predicates/prelude/
-    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -309,8 +358,17 @@ impl Assert {
 
     /// Ensure the command wrote the expected data to `stderr`.
     ///
+    /// This uses [`IntoOutputPredicate`] to provide short-hands for common cases.
+    ///
+    /// - See [`predicates::prelude`] for more predicates.
+    /// - See [`IntoOutputPredicate`] for other built-in conversions.
+    ///
+    /// [`predicates::prelude`]: https://docs.rs/predicates/1.0.0/predicates/prelude/
+    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
+    ///
     /// # Examples
     ///
+    /// Accepting a bytes predicate:
     /// ```rust
     /// extern crate assert_cmd;
     /// extern crate predicates;
@@ -325,10 +383,42 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stderr(predicate::str::similar("world\n").from_utf8());
+    ///     .stderr(predicate::eq(b"world\n" as &[u8]));
     /// ```
     ///
-    /// Shortcuts are also provided:
+    /// Accepting a `str` predicate:
+    /// ```rust
+    /// extern crate assert_cmd;
+    /// extern crate predicates;
+    ///
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    /// use predicates::prelude::*;
+    ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("stdout", "hello")
+    ///     .env("stderr", "world")
+    ///     .assert()
+    ///     .stderr(predicate::str::similar("world\n"));
+    /// ```
+    ///
+    /// Accepting bytes:
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// Command::main_binary()
+    ///     .unwrap()
+    ///     .env("stdout", "hello")
+    ///     .env("stderr", "world")
+    ///     .assert()
+    ///     .stderr(b"world\n" as &[u8]);
+    /// ```
+    ///
+    /// Accepting a `str`:
     /// ```rust
     /// use assert_cmd::prelude::*;
     ///
@@ -341,12 +431,6 @@ impl Assert {
     ///     .assert()
     ///     .stderr("world\n");
     /// ```
-    ///
-    /// - See [`predicates::prelude`] for more predicates.
-    /// - See [`IntoOutputPredicate`] for other built-in conversions.
-    ///
-    /// [`predicates::prelude`]: https://docs.rs/predicates/0.9.0/predicates/prelude/
-    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -412,7 +496,7 @@ impl fmt::Debug for Assert {
 /// ```
 ///
 /// [`Assert::code`]: struct.Assert.html#method.code
-/// [`Predicate<i32>`]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+/// [`Predicate<i32>`]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 pub trait IntoCodePredicate<P>
 where
     P: predicates_core::Predicate<i32>,
@@ -438,8 +522,22 @@ where
 // Keep `predicates` concrete Predicates out of our public API.
 /// [Predicate] used by [`IntoCodePredicate`] for code.
 ///
+/// # Example
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .env("exit", "42")
+///     .assert()
+///     .code(42);
+/// ```
+///
 /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
-/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+/// [Predicate]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 #[derive(Debug)]
 pub struct EqCodePredicate(predicates::ord::EqPredicate<i32>);
 
@@ -494,8 +592,22 @@ impl IntoCodePredicate<EqCodePredicate> for i32 {
 // Keep `predicates` concrete Predicates out of our public API.
 /// [Predicate] used by [`IntoCodePredicate`] for iterables of codes.
 ///
+/// # Example
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .env("exit", "42")
+///     .assert()
+///     .code(&[2, 42] as &[i32]);
+/// ```
+///
 /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
-/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+/// [Predicate]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 #[derive(Debug)]
 pub struct InCodePredicate(predicates::iter::InPredicate<i32>);
 
@@ -587,7 +699,7 @@ impl IntoCodePredicate<InCodePredicate> for &'static [i32] {
 ///
 /// [`Assert::stdout`]: struct.Assert.html#method.stdout
 /// [`Assert::stderr`]: struct.Assert.html#method.stderr
-/// [`Predicate<[u8]>`]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+/// [`Predicate<[u8]>`]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 pub trait IntoOutputPredicate<P>
 where
     P: predicates_core::Predicate<[u8]>,
@@ -613,8 +725,23 @@ where
 // Keep `predicates` concrete Predicates out of our public API.
 /// [Predicate] used by [`IntoOutputPredicate`] for bytes.
 ///
+/// # Example
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .env("stdout", "hello")
+///     .env("stderr", "world")
+///     .assert()
+///     .stderr(b"world\n" as &[u8]);
+/// ```
+///
 /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
-/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+/// [Predicate]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 #[derive(Debug)]
 pub struct BytesContentOutputPredicate(predicates::ord::EqPredicate<&'static [u8]>);
 
@@ -669,8 +796,23 @@ impl IntoOutputPredicate<BytesContentOutputPredicate> for &'static [u8] {
 // Keep `predicates` concrete Predicates out of our public API.
 /// [Predicate] used by [`IntoOutputPredicate`] for [`str`].
 ///
+/// # Example
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .env("stdout", "hello")
+///     .env("stderr", "world")
+///     .assert()
+///     .stderr("world\n");
+/// ```
+///
 /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
-/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+/// [Predicate]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 /// [`str`]: https://doc.rust-lang.org/std/primitive.str.html
 #[derive(Debug, Clone)]
 pub struct StrContentOutputPredicate(
@@ -728,8 +870,27 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 // Keep `predicates` concrete Predicates out of our public API.
 /// [Predicate] used by [`IntoOutputPredicate`] for [`Predicate<str>`].
 ///
+/// # Example
+///
+/// ```rust
+/// extern crate assert_cmd;
+/// extern crate predicates;
+///
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+/// use predicates::prelude::*;
+///
+/// Command::main_binary()
+///     .unwrap()
+///     .env("stdout", "hello")
+///     .env("stderr", "world")
+///     .assert()
+///     .stderr(predicate::str::similar("world\n"));
+/// ```
+///
 /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
-/// [Predicate]: https://docs.rs/predicates-core/0.9.0/predicates_core/trait.Predicate.html
+/// [Predicate]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 #[derive(Debug, Clone)]
 pub struct StrOutputPredicate<P: predicates_core::Predicate<str>>(
     predicates::str::Utf8Predicate<P>,

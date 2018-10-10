@@ -9,10 +9,33 @@
 //! assert_cmd = "0.9"
 //! ```
 //!
-//! ## Example
+//! ## Overview
+//!
+//! Create a [`Command`]:
+//! - `Command::new(path)`, see [`Command`]
+//! - `Command::main_binary()`, see [`CommandCargoExt`]
+//! - `Command::cargo_bin(name)`, see [`CommandCargoExt`]
+//! - `Command::cargo_example(name)`, see [`CommandCargoExt`]
+//!
+//! Configure a [`Command`]:
+//! - `arg` / `args`, see [`Command`]
+//! - `current_dir`, see [`Command`]
+//! - `env` / `envs` / `env_remove` / `env_clear`, see [`Command`]
+//! - `with_stdin`, see [`CommandStdInExt`]
+//!
+//! Validate either a [`Command`] or `Output`:
+//! - `ok` / `unwrap` / `unwrap_err`, see [`OutputOkExt`]
+//! - `assert` ([`OutputAssertExt`])
+//!   - `success`, see [`Assert`]
+//!   - `failure`, see [`Assert`]
+//!   - `interrupted`, see [`Assert`]
+//!   - `code`, see [`Assert`]
+//!   - `stdout`, see [`Assert`]
+//!   - `stderr`, see [`Assert`]
+//!
+//! ## Examples
 //!
 //! Here's a trivial example:
-//!
 //! ```rust
 //! extern crate assert_cmd;
 //!
@@ -22,6 +45,29 @@
 //! fn main() {
 //!     let mut cmd = Command::main_binary().unwrap();
 //!     cmd.assert().success();
+//! }
+//! ```
+//!
+//! And a little of everything:
+//! ```rust
+//! extern crate assert_cmd;
+//!
+//! use std::process::Command;
+//! use assert_cmd::prelude::*;
+//!
+//! fn main() {
+//!     let mut cmd = Command::main_binary().unwrap();
+//!     cmd
+//!         .arg("-A")
+//!         .env("stdout", "hello")
+//!         .env("exit", "42")
+//!         .with_stdin()
+//!         .buffer("42");
+//!     let assert = cmd.assert();
+//!     assert
+//!         .failure()
+//!         .code(42)
+//!         .stdout("hello\n");
 //! }
 //! ```
 //!
@@ -54,6 +100,7 @@
 //! [duct]: https://crates.io/crates/duct
 //! [assert_fs]: https://crates.io/crates/assert_fs
 //! [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+//! [`Assert`]: struct.Assert.html
 //! [`success()`]: struct.Assert.html#method.success
 //! [`CommandCargoExt`]: cargo/trait.CommandCargoExt.html
 //! [`CommandStdInExt`]: trait.CommandStdInExt.html
