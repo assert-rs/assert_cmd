@@ -9,6 +9,30 @@
 //! assert_cmd = "0.9"
 //! ```
 //!
+//! ## Overview
+//!
+//! Create a [`Command`]:
+//! - `Command::new(path)`, see [`Command`]
+//! - `Command::main_binary()`, see [`CommandCargoExt`]
+//! - `Command::cargo_bin(name)`, see [`CommandCargoExt`]
+//! - `Command::cargo_example(name)`, see [`CommandCargoExt`]
+//!
+//! Configure a [`Command`]:
+//! - `arg` / `args`, see [`Command`]
+//! - `current_dir`, see [`Command`]
+//! - `env` / `envs` / `env_remove` / `env_clear`, see [`Command`]
+//! - `with_stdin`, see [`CommandStdInExt`]
+//!
+//! Validate either a [`Command`] or `Output`:
+//! - `ok` / `unwrap` / `unwrap_err`, see [`OutputOkExt`]
+//! - `assert` ([`OutputAssertExt`])
+//!   - `success`, see [`Assert`]
+//!   - `failure`, see [`Assert`]
+//!   - `interrupted`, see [`Assert`]
+//!   - `code`, see [`Assert`]
+//!   - `stdout`, see [`Assert`]
+//!   - `stderr`, see [`Assert`]
+//!
 //! ## Example
 //!
 //! Here's a trivial example:
@@ -54,6 +78,7 @@
 //! [duct]: https://crates.io/crates/duct
 //! [assert_fs]: https://crates.io/crates/assert_fs
 //! [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+//! [`Assert`]: struct.Assert.html
 //! [`success()`]: struct.Assert.html#method.success
 //! [`CommandCargoExt`]: cargo/trait.CommandCargoExt.html
 //! [`CommandStdInExt`]: trait.CommandStdInExt.html
