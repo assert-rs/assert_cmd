@@ -15,9 +15,9 @@
 //!
 //! use std::process::Command;
 //!
-//! Command::main_binary()
-//!     .unwrap()
+//! let mut cmd = Command::main_binary()
 //!     .unwrap();
+//! let output = cmd.unwrap();
 //! ```
 //!
 //! For caching to minimize cargo overhead or customize the build process, see [`escargot`].
@@ -37,8 +37,8 @@
 //!     .current_target()
 //!     .run()
 //!     .unwrap();
-//! bin_under_test.command()
-//!     .unwrap();
+//! let mut cmd = bin_under_test.command();
+//! let output = cmd.unwrap();
 //! ```
 //!
 //! Tip: Use [`lazy_static`] to cache `bin_under_test` across test functions.
@@ -70,9 +70,9 @@ use escargot;
 ///
 /// use std::process::Command;
 ///
-/// Command::main_binary()
-///     .unwrap()
+/// let mut cmd = Command::main_binary()
 ///     .unwrap();
+/// let output = cmd.unwrap();
 /// ```
 ///
 /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
@@ -92,9 +92,9 @@ where
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
-    ///     .unwrap()  // get cargo binary
-    ///     .unwrap(); // run it
+    /// let mut cmd = Command::main_binary()
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
     /// ```
     ///
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
@@ -109,9 +109,9 @@ where
     ///
     /// use std::process::Command;
     ///
-    /// Command::cargo_bin("bin_fixture")
-    ///     .unwrap()
+    /// let mut cmd = Command::cargo_bin("bin_fixture")
     ///     .unwrap();
+    /// let output = cmd.unwrap();
     /// ```
     ///
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
@@ -126,9 +126,9 @@ where
     ///
     /// use std::process::Command;
     ///
-    /// Command::cargo_example("example_fixture")
-    ///     .unwrap()
+    /// let mut cmd = Command::cargo_example("example_fixture")
     ///     .unwrap();
+    /// let output = cmd.unwrap();
     /// ```
     ///
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
