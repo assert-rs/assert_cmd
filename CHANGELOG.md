@@ -1,3 +1,20 @@
+<a name="0.10.0"></a>
+## 0.10.0 (2018-10-10)
+
+
+#### Breaking Changes
+
+*   Remove deprecated functions ([fa01930c](https://github.com/assert-rs/assert_cmd/commit/fa01930cb9933d8b1ac024773a8bbf7330783507), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+*   Better group API ([b1376f9a](https://github.com/assert-rs/assert_cmd/commit/b1376f9a29cbf093c17d1e3a641ee73aa5524e58), closes [#40](https://github.com/assert-rs/assert_cmd/issues/40), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+*   Use predicates 1.0 ([1e0ece83](https://github.com/assert-rs/assert_cmd/commit/1e0ece8324dccb5d02c42c62b1ab2dea8032a924), closes [#8](https://github.com/assert-rs/assert_cmd/issues/8), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+* **cargo:**  Reuse the current target ([403f612a](https://github.com/assert-rs/assert_cmd/commit/403f612ab66e7ccacc28c59ca1c52a5c230d4f9b), closes [#44](https://github.com/assert-rs/assert_cmd/issues/44), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+
+#### Features
+
+* **assert:**  Simplify passing in Predicate<str> ([ee4c45ed](https://github.com/assert-rs/assert_cmd/commit/ee4c45ede885a57a2d2e2b5fe74801b12578893a), closes [#32](https://github.com/assert-rs/assert_cmd/issues/32))
+
+
+
 <a name="0.9.1"></a>
 ## 0.9.1 (2018-08-09)
 
