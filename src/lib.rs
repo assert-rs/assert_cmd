@@ -33,10 +33,9 @@
 //!   - `stdout`, see [`Assert`]
 //!   - `stderr`, see [`Assert`]
 //!
-//! ## Example
+//! ## Examples
 //!
 //! Here's a trivial example:
-//!
 //! ```rust
 //! extern crate assert_cmd;
 //!
@@ -46,6 +45,29 @@
 //! fn main() {
 //!     let mut cmd = Command::main_binary().unwrap();
 //!     cmd.assert().success();
+//! }
+//! ```
+//!
+//! And a little of everything:
+//! ```rust
+//! extern crate assert_cmd;
+//!
+//! use std::process::Command;
+//! use assert_cmd::prelude::*;
+//!
+//! fn main() {
+//!     let mut cmd = Command::main_binary().unwrap();
+//!     cmd
+//!         .arg("-A")
+//!         .env("stdout", "hello")
+//!         .env("exit", "42")
+//!         .with_stdin()
+//!         .buffer("42");
+//!     let assert = cmd.assert();
+//!     assert
+//!         .failure()
+//!         .code(42)
+//!         .stdout("hello\n");
 //! }
 //! ```
 //!
