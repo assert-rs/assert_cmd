@@ -104,7 +104,7 @@
 //! [`success()`]: assert/struct.Assert.html#method.success
 //! [`CommandCargoExt`]: cargo/trait.CommandCargoExt.html
 //! [`CommandStdInExt`]: stdin/trait.CommandStdInExt.html
-//! [`OutputOkExt`]: cnd/trait.OutputOkExt.html
+//! [`OutputOkExt`]: cmd/trait.OutputOkExt.html
 //! [`OutputAssertExt`]: assert/trait.OutputAssertExt.html
 
 #![warn(missing_docs)]
