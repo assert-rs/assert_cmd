@@ -100,11 +100,11 @@
 //! [duct]: https://crates.io/crates/duct
 //! [assert_fs]: https://crates.io/crates/assert_fs
 //! [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-//! [`Assert`]: struct.Assert.html
-//! [`success()`]: struct.Assert.html#method.success
+//! [`Assert`]: assert/struct.Assert.html
+//! [`success()`]: assert/struct.Assert.html#method.success
 //! [`CommandCargoExt`]: cargo/trait.CommandCargoExt.html
-//! [`CommandStdInExt`]: trait.CommandStdInExt.html
-//! [`OutputOkExt`]: trait.OutputOkExt.html
+//! [`CommandStdInExt`]: stdin/trait.CommandStdInExt.html
+//! [`OutputOkExt`]: cnd/trait.OutputOkExt.html
 //! [`OutputAssertExt`]: assert/trait.OutputAssertExt.html
 
 #![warn(missing_docs)]

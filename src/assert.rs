@@ -193,6 +193,10 @@ impl Assert {
 
     /// Ensure the command returned the expected code.
     ///
+    /// This uses [`IntoCodePredicate`] to provide short-hands for common cases.
+    ///
+    /// See [`predicates`] for more predicates.
+    ///
     /// # Examples
     ///
     /// Accepting a predicate:
@@ -238,10 +242,7 @@ impl Assert {
     ///     .code(&[2, 42] as &[i32]);
     /// ```
     ///
-    /// - See [`predicates::prelude`] for more predicates.
-    /// - See [`IntoCodePredicate`] for other built-in conversions.
-    ///
-    /// [`predicates::prelude`]: https://docs.rs/predicates/1.0.0/predicates/prelude/
+    /// [`predicates`]: https://docs.rs/predicates
     /// [`IntoCodePredicate`]: trait.IntoCodePredicate.html
     pub fn code<I, P>(self, pred: I) -> Self
     where
@@ -267,11 +268,7 @@ impl Assert {
     ///
     /// This uses [`IntoOutputPredicate`] to provide short-hands for common cases.
     ///
-    /// - See [`predicates::prelude`] for more predicates.
-    /// - See [`IntoOutputPredicate`] for other built-in conversions.
-    ///
-    /// [`predicates::prelude`]: https://docs.rs/predicates/1.0.0/predicates/prelude/
-    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
+    /// See [`predicates`] for more predicates.
     ///
     /// # Examples
     ///
@@ -338,6 +335,9 @@ impl Assert {
     ///     .assert()
     ///     .stdout("hello\n");
     /// ```
+    ///
+    /// [`predicates`]: https://docs.rs/predicates
+    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -360,11 +360,7 @@ impl Assert {
     ///
     /// This uses [`IntoOutputPredicate`] to provide short-hands for common cases.
     ///
-    /// - See [`predicates::prelude`] for more predicates.
-    /// - See [`IntoOutputPredicate`] for other built-in conversions.
-    ///
-    /// [`predicates::prelude`]: https://docs.rs/predicates/1.0.0/predicates/prelude/
-    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
+    /// See [`predicates`] for more predicates.
     ///
     /// # Examples
     ///
@@ -431,6 +427,9 @@ impl Assert {
     ///     .assert()
     ///     .stderr("world\n");
     /// ```
+    ///
+    /// [`predicates`]: https://docs.rs/predicates
+    /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
