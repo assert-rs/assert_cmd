@@ -819,7 +819,12 @@ pub struct StrContentOutputPredicate(
 );
 
 impl StrContentOutputPredicate {
-    pub(crate) fn new(value: &'static str) -> Self {
+    pub(crate) fn from_str(value: &'static str) -> Self {
+        let pred = predicates::str::similar(value).from_utf8();
+        StrContentOutputPredicate(pred)
+    }
+
+    pub(crate) fn from_string(value: String) -> Self {
         let pred = predicates::str::similar(value).from_utf8();
         StrContentOutputPredicate(pred)
     }
@@ -858,11 +863,19 @@ impl fmt::Display for StrContentOutputPredicate {
     }
 }
 
+impl IntoOutputPredicate<StrContentOutputPredicate> for String {
+    type Predicate = StrContentOutputPredicate;
+
+    fn into_output(self) -> Self::Predicate {
+        Self::Predicate::from_string(self)
+    }
+}
+
 impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
     type Predicate = StrContentOutputPredicate;
 
     fn into_output(self) -> Self::Predicate {
-        Self::Predicate::new(self)
+        Self::Predicate::from_str(self)
     }
 }
 

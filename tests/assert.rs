@@ -57,3 +57,14 @@ fn stderr_example() {
         .assert()
         .stderr("world\n");
 }
+
+#[test]
+fn stdout_string() {
+    let expected = "hello\n".to_owned();
+    Command::main_binary()
+        .unwrap()
+        .env("stdout", "hello")
+        .env("stderr", "world")
+        .assert()
+        .stdout(expected);
+}
