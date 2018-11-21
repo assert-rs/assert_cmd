@@ -3,9 +3,6 @@
 //! [`CommandCargoExt`] is an extension trait for [`Command`] to easily launch a crate's
 //! binaries.
 //!
-//! In addition, the underlying functions for looking up the crate's binaries are exposed to allow
-//! for optimizations, if needed.
-//!
 //! # Examples
 //!
 //! Simple case:
@@ -20,7 +17,13 @@
 //! let output = cmd.unwrap();
 //! ```
 //!
-//! For caching to minimize cargo overhead or customize the build process, see [`escargot`].
+//! # Further customizations
+//!
+//! There are times when you might want to drop down to the underlying API, [`escargot`]:
+//! - Specifying feature flags
+//! - Workaround the [per-call cargo overhead][cargo-overhead] by caching the binary location with [`lazy_static`].
+//! - [If not using `--target <TRIPLET>`, bypass the first call overhead][first-call] by not
+//!   passing `current_target()` to [`escargot`].
 //!
 //! ```rust
 //! extern crate assert_cmd;
@@ -41,12 +44,12 @@
 //! let output = cmd.unwrap();
 //! ```
 //!
-//! Tip: Use [`lazy_static`] to cache `bin_under_test` across test functions.
-//!
 //! [`lazy_static`]: https://crates.io/crates/lazy_static
 //! [`CommandCargoExt`]: trait.CommandCargoExt.html
 //! [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 //! [`escargot`]: https://docs.rs/escargot/
+//! [cargo-overhead]: https://github.com/assert-rs/assert_cmd/issues/6
+//! [first-call]: https://github.com/assert-rs/assert_cmd/issues/57
 
 use std::error::Error;
 use std::ffi;
@@ -60,8 +63,7 @@ use escargot;
 /// `CommandCargoExt` is an extension trait for [`Command`][Command] to easily launch a crate's
 /// binaries.
 ///
-/// If the cargo overhead is too high per-call, you can cache the bin's location.  See the
-/// [`cargo`] module.
+/// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
 ///
 /// # Examples
 ///
@@ -85,6 +87,8 @@ where
     ///
     /// Note: only works if there one bin in the crate.
     ///
+    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+    ///
     /// # Examples
     ///
     /// ```rust
@@ -98,9 +102,12 @@ where
     /// ```
     ///
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+    /// [`cargo`]: index.html
     fn main_binary() -> Result<Self, CargoError>;
 
     /// Create a [`Command`] to run a specific binary of the current crate.
+    ///
+    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
     ///
     /// # Examples
     ///
@@ -115,9 +122,12 @@ where
     /// ```
     ///
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+    /// [`cargo`]: index.html
     fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
 
     /// Create a [`Command`] to run a specific example of the current crate.
+    ///
+    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
     ///
     /// # Examples
     ///
@@ -132,6 +142,7 @@ where
     /// ```
     ///
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+    /// [`cargo`]: index.html
     fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
 }
 
