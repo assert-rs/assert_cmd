@@ -1,3 +1,16 @@
+<a name="0.10.2"></a>
+## 0.10.2 (2018-11-21)
+
+
+#### Bug Fixes
+
+* **assert:**  Support Strings for easy comparison ([81035079](https://github.com/assert-rs/assert_cmd/commit/810350793df04ad4e3a7f6d760f23158432c5bb6), closes [#60](https://github.com/assert-rs/assert_cmd/issues/60))
+* **docs:**
+  * A broken link ([854f7c27](https://github.com/assert-rs/assert_cmd/commit/854f7c278b4977d3f24c47c208766f85bab81a18))
+  * List caveats for cargo support.
+
+
+
 <a name="0.10.1"></a>
 ## 0.10.1 (2018-10-10)
 
