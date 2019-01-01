@@ -18,7 +18,7 @@ name = "bin_fixture"
 predicates = { version = "1.0", default-features = false, features = ["difference"] }
 predicates-core = "1.0"
 predicates-tree = "1.0"
-escargot = "0.3"
+escargot = "0.4"
 
 [dev-dependencies]
 docmatic = "0.1"
