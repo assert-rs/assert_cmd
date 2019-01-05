@@ -144,6 +144,46 @@ where
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
     /// [`cargo`]: index.html
     fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
+
+    /// Create a [`Command`] to run a specific binary of a specific crate from workspaces.
+    ///
+    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// let mut cmd = Command::cargo_crate_bin("assert_cmd", "bin_fixture")
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// ```
+    ///
+    /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+    /// [`cargo`]: index.html
+    fn cargo_crate_bin<S: AsRef<ffi::OsStr>>(package: S, name: S) -> Result<Self, CargoError>;
+
+    /// Create a [`Command`] to run a specific example of a specific crate from workspaces.
+    ///
+    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// let mut cmd = Command::cargo_crate_example("assert_cmd", "example_fixture")
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// ```
+    ///
+    /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+    /// [`cargo`]: index.html
+    fn cargo_crate_example<S: AsRef<ffi::OsStr>>(package: S, name: S) -> Result<Self, CargoError>;
 }
 
 impl CommandCargoExt for process::Command {
@@ -168,6 +208,28 @@ impl CommandCargoExt for process::Command {
 
     fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError> {
         let runner = escargot::CargoBuild::new()
+            .example(name)
+            .current_release()
+            .current_target()
+            .run()
+            .map_err(CargoError::with_cause)?;
+        Ok(runner.command())
+    }
+
+    fn cargo_crate_bin<S: AsRef<ffi::OsStr>>(package: S, name: S) -> Result<Self, CargoError> {
+        let runner = escargot::CargoBuild::new()
+            .package(package)
+            .bin(name)
+            .current_release()
+            .current_target()
+            .run()
+            .map_err(CargoError::with_cause)?;
+        Ok(runner.command())
+    }
+
+    fn cargo_crate_example<S: AsRef<ffi::OsStr>>(package: S, name: S) -> Result<Self, CargoError> {
+        let runner = escargot::CargoBuild::new()
+            .package(package)
             .example(name)
             .current_release()
             .current_target()
