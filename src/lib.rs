@@ -103,6 +103,7 @@
 //! [`Assert`]: assert/struct.Assert.html
 //! [`success()`]: assert/struct.Assert.html#method.success
 //! [`CommandCargoExt`]: cargo/trait.CommandCargoExt.html
+//! [`CommandCargoBuildExt`]: cargo/trait.CommandCargoBuildExt.html
 //! [`CommandStdInExt`]: stdin/trait.CommandStdInExt.html
 //! [`OutputOkExt`]: cmd/trait.OutputOkExt.html
 //! [`OutputAssertExt`]: assert/trait.OutputAssertExt.html
@@ -122,6 +123,7 @@ pub mod stdin;
 /// Extension traits that are useful to have available.
 pub mod prelude {
     pub use assert::OutputAssertExt;
+    pub use cargo::CommandCargoBuildExt;
     pub use cargo::CommandCargoExt;
     pub use cmd::OutputOkExt;
     pub use stdin::CommandStdInExt;
