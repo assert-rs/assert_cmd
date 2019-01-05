@@ -32,7 +32,7 @@ pub trait CommandStdInExt {
     ///
     /// let mut cmd = Command::new("cat");
     /// cmd
-    ///     .arg("-A")
+    ///     .arg("-et")
     ///     .with_stdin()
     ///     .buffer("42");
     /// let output = cmd.unwrap();
@@ -66,7 +66,7 @@ impl<'a> StdInCommandBuilder<'a> {
     ///
     /// let mut cmd = Command::new("cat");
     /// cmd
-    ///     .arg("-A")
+    ///     .arg("-et")
     ///     .with_stdin()
     ///     .buffer("42");
     /// let output = cmd.unwrap();
@@ -97,7 +97,7 @@ impl<'a> StdInCommandBuilder<'a> {
     ///
     /// let mut cmd = Command::new("cat");
     /// cmd
-    ///     .arg("-A")
+    ///     .arg("-et")
     ///     .with_stdin()
     ///     .path("Cargo.toml")
     ///     .unwrap();
