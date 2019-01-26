@@ -7,25 +7,26 @@
 //!
 //! Simple case:
 //!
-//! ```rust
+//! ```rust,no_run
 //! use assert_cmd::prelude::*;
 //!
 //! use std::process::Command;
 //!
-//! let mut cmd = Command::main_binary()
+//! let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
 //!     .unwrap();
 //! let output = cmd.unwrap();
 //! ```
 //!
-//! # Further customizations
+//! # Limitations
 //!
-//! There are times when you might want to drop down to the underlying API, [`escargot`]:
-//! - Specifying feature flags
-//! - Workaround the [per-call cargo overhead][cargo-overhead] by caching the binary location with [`lazy_static`].
-//! - [If not using `--target <TRIPLET>`, bypass the first call overhead][first-call] by not
-//!   passing `current_target()` to [`escargot`].
+//! - Only works within the context of integration tests.  See [`escargot`] for a more
+//!   flexible API.
+//! - Only reuses your existing feature flags, targets, or build mode.
+//! - Only works with cargo binaries (`cargo test` ensures they are built).
 //!
-//! ```rust
+//! If you run into these limitations, we recommend trying out [`escargot`]:
+//!
+//! ```rust,no_run
 //! extern crate assert_cmd;
 //! extern crate escargot;
 //!
@@ -42,7 +43,14 @@
 //!     .unwrap();
 //! let mut cmd = bin_under_test.command();
 //! let output = cmd.unwrap();
+//! println!("{:?}", output);
 //! ```
+//!
+//! Notes:
+//! - There is a [noticeable per-call overhead](cargo-overhead) for `CargoBuild`.  We recommend
+//!   caching the binary location (`.path()` instead of `.command()`) with [`lazy_static`].
+//! - `.current_target()` improves platform coverage at the cost of [slower test runs if you don't
+//!   explicitly pass `--target <TRIPLET>` on the command line](first-call).
 //!
 //! [`lazy_static`]: https://crates.io/crates/lazy_static
 //! [`CommandCargoExt`]: trait.CommandCargoExt.html
@@ -51,12 +59,11 @@
 //! [cargo-overhead]: https://github.com/assert-rs/assert_cmd/issues/6
 //! [first-call]: https://github.com/assert-rs/assert_cmd/issues/57
 
+use std::env;
 use std::error::Error;
-use std::ffi;
 use std::fmt;
+use std::path;
 use std::process;
-
-use escargot;
 
 /// Create a [`Command`] for a `bin` in the Cargo project.
 ///
@@ -67,14 +74,15 @@ use escargot;
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// let mut cmd = Command::main_binary()
+/// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
 ///     .unwrap();
 /// let output = cmd.unwrap();
+/// println!("{:?}", output);
 /// ```
 ///
 /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
@@ -83,35 +91,24 @@ pub trait CommandCargoExt
 where
     Self: Sized,
 {
-    /// Create a [`Command`] to run the crate's main binary.
-    ///
-    /// Note: only works if there one bin in the crate.
-    ///
-    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use assert_cmd::prelude::*;
-    ///
-    /// use std::process::Command;
-    ///
-    /// let mut cmd = Command::main_binary()
-    ///     .unwrap();
-    /// let output = cmd.unwrap();
-    /// ```
-    ///
-    /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-    /// [`cargo`]: index.html
-    fn main_binary() -> Result<Self, CargoError>;
-
     /// Create a [`Command`] to run a specific binary of the current crate.
     ///
     /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
+    /// ```
+    ///
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -119,61 +116,22 @@ where
     /// let mut cmd = Command::cargo_bin("bin_fixture")
     ///     .unwrap();
     /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
     /// ```
     ///
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
     /// [`cargo`]: index.html
-    fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
-
-    /// Create a [`Command`] to run a specific example of the current crate.
-    ///
-    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use assert_cmd::prelude::*;
-    ///
-    /// use std::process::Command;
-    ///
-    /// let mut cmd = Command::cargo_example("example_fixture")
-    ///     .unwrap();
-    /// let output = cmd.unwrap();
-    /// ```
-    ///
-    /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-    /// [`cargo`]: index.html
-    fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError>;
+    fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError>;
 }
 
 impl CommandCargoExt for process::Command {
-    fn main_binary() -> Result<Self, CargoError> {
-        let runner = escargot::CargoBuild::new()
-            .current_release()
-            .current_target()
-            .run()
-            .map_err(CargoError::with_cause)?;
-        Ok(runner.command())
-    }
-
-    fn cargo_bin<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError> {
-        let runner = escargot::CargoBuild::new()
-            .bin(name)
-            .current_release()
-            .current_target()
-            .run()
-            .map_err(CargoError::with_cause)?;
-        Ok(runner.command())
-    }
-
-    fn cargo_example<S: AsRef<ffi::OsStr>>(name: S) -> Result<Self, CargoError> {
-        let runner = escargot::CargoBuild::new()
-            .example(name)
-            .current_release()
-            .current_target()
-            .run()
-            .map_err(CargoError::with_cause)?;
-        Ok(runner.command())
+    fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
+        let path = cargo_bin(name);
+        if path.is_file() {
+            Ok(process::Command::new(path))
+        } else {
+            Err(CargoError::with_cause(NotFoundError { path }))
+        }
     }
 }
 
@@ -184,7 +142,8 @@ pub struct CargoError {
 }
 
 impl CargoError {
-    fn with_cause<E>(cause: E) -> Self
+    /// Wrap the underlying error for passing up.
+    pub fn with_cause<E>(cause: E) -> Self
     where
         E: Error + Send + Sync + 'static,
     {
@@ -213,4 +172,50 @@ impl fmt::Display for CargoError {
         }
         Ok(())
     }
+}
+
+/// Error when finding crate binary.
+#[derive(Debug)]
+struct NotFoundError {
+    path: path::PathBuf,
+}
+
+impl Error for NotFoundError {
+    fn description(&self) -> &str {
+        "Cargo command not found."
+    }
+
+    fn cause(&self) -> Option<&Error> {
+        None
+    }
+}
+
+impl fmt::Display for NotFoundError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "Cargo command not found: {}", self.path.display())
+    }
+}
+
+// Adapted from
+// https://github.com/rust-lang/cargo/blob/485670b3983b52289a2f353d589c57fae2f60f82/tests/testsuite/support/mod.rs#L507
+fn target_dir() -> path::PathBuf {
+    env::current_exe()
+        .ok()
+        .map(|mut path| {
+            path.pop();
+            if path.ends_with("deps") {
+                path.pop();
+            }
+            path
+        })
+        .unwrap()
+}
+
+/// Look up the path to a cargo-built binary within an integration test.
+pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
+    cargo_bin_str(name.as_ref())
+}
+
+fn cargo_bin_str(name: &str) -> path::PathBuf {
+    target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX))
 }

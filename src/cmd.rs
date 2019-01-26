@@ -73,14 +73,13 @@ where
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// let err = Command::main_binary()
-    ///     .unwrap()
-    ///     .env("exit", "42")
+    /// let err = Command::new("a-command")
+    ///     .args(&["--will-fail"])
     ///     .unwrap_err();
     /// ```
     ///
@@ -158,14 +157,13 @@ pub type OutputResult = Result<process::Output, OutputError>;
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// let err = Command::main_binary()
-///     .unwrap()
-///     .env("exit", "42")
+/// let err = Command::new("a-command")
+///     .args(&["--will-fail"])
 ///     .unwrap_err();
 /// ```
 ///
@@ -221,14 +219,13 @@ impl OutputError {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// let err = Command::main_binary()
-    ///     .unwrap()
-    ///     .env("exit", "42")
+    /// let err = Command::new("a-command")
+    ///     .args(&["--will-fail"])
     ///     .unwrap_err();
     /// let output = err
     ///     .as_output()

@@ -13,9 +13,7 @@
 //!
 //! Create a [`Command`]:
 //! - `Command::new(path)`, see [`Command`]
-//! - `Command::main_binary()`, see [`CommandCargoExt`]
 //! - `Command::cargo_bin(name)`, see [`CommandCargoExt`]
-//! - `Command::cargo_example(name)`, see [`CommandCargoExt`]
 //!
 //! Configure a [`Command`]:
 //! - `arg` / `args`, see [`Command`]
@@ -36,27 +34,27 @@
 //! ## Examples
 //!
 //! Here's a trivial example:
-//! ```rust
+//! ```rust,no_run
 //! extern crate assert_cmd;
 //!
 //! use std::process::Command;
 //! use assert_cmd::prelude::*;
 //!
 //! fn main() {
-//!     let mut cmd = Command::main_binary().unwrap();
+//!     let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
 //!     cmd.assert().success();
 //! }
 //! ```
 //!
 //! And a little of everything:
-//! ```rust
+//! ```rust,no_run
 //! extern crate assert_cmd;
 //!
 //! use std::process::Command;
 //! use assert_cmd::prelude::*;
 //!
 //! fn main() {
-//!     let mut cmd = Command::main_binary().unwrap();
+//!     let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
 //!     cmd
 //!         .arg("-A")
 //!         .env("stdout", "hello")
@@ -113,6 +111,40 @@ extern crate escargot;
 extern crate predicates;
 extern crate predicates_core;
 extern crate predicates_tree;
+
+/// Allows you to pull the name from your Cargo.toml at compile time.
+///
+/// # Examples
+///
+/// ```should_panic
+/// #[macro_use]
+/// extern crate assert_cmd;
+///
+/// use std::process::Command;
+/// use assert_cmd::prelude::*;
+///
+/// fn main() {
+///     let mut cmd = Command::cargo_bin(crate_name!()).unwrap();
+///     cmd
+///         .arg("-A")
+///         .env("stdout", "hello")
+///         .env("exit", "42")
+///         .with_stdin()
+///         .buffer("42");
+///     let assert = cmd.assert();
+///     assert
+///         .failure()
+///         .code(42)
+///         .stdout("hello\n");
+/// }
+/// ```
+#[cfg(not(feature = "no_cargo"))]
+#[macro_export]
+macro_rules! crate_name {
+    () => {
+        env!("CARGO_PKG_NAME")
+    };
+}
 
 pub mod assert;
 pub mod cargo;
