@@ -21,13 +21,13 @@ assert_cmd = "0.10"
 
 Here's a trivial example:
 
-```rust
+```rust,no_run
 extern crate assert_cmd;
 
 use std::process::Command;
 use assert_cmd::prelude::*;
 
-Command::main_binary()
+Command::cargo_bin("bin_fixture")
     .unwrap()
     .assert()
     .success();

@@ -18,15 +18,15 @@ use cmd::output_fmt;
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// let mut cmd = Command::main_binary()
+/// let mut cmd = Command::cargo_bin("bin_fixture")
 ///     .unwrap();
 /// cmd.assert()
-///    .success();
+///     .success();
 /// ```
 ///
 /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
@@ -35,15 +35,15 @@ pub trait OutputAssertExt {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// let mut cmd = Command::main_binary()
+    /// let mut cmd = Command::cargo_bin("bin_fixture")
     ///     .unwrap();
     /// cmd.assert()
-    ///    .success();
+    ///     .success();
     /// ```
     ///
     /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
@@ -69,15 +69,15 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// let mut cmd = Command::main_binary()
+/// let mut cmd = Command::cargo_bin("bin_fixture")
 ///     .unwrap();
 /// cmd.assert()
-///    .success();
+///     .success();
 /// ```
 ///
 /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
@@ -102,12 +102,12 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .assert()
     ///     .append_context("main", "no args")
@@ -132,12 +132,12 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .assert()
     ///     .success();
@@ -165,12 +165,12 @@ impl Assert {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("exit", "1")
     ///     .assert()
@@ -200,7 +200,7 @@ impl Assert {
     /// # Examples
     ///
     /// Accepting a predicate:
-    /// ```rust
+    /// ```rust,no_run
     /// extern crate assert_cmd;
     /// extern crate predicates;
     ///
@@ -209,7 +209,7 @@ impl Assert {
     /// use std::process::Command;
     /// use predicates::prelude::*;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("exit", "42")
     ///     .assert()
@@ -217,12 +217,12 @@ impl Assert {
     /// ```
     ///
     /// Accepting an exit code:
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("exit", "42")
     ///     .assert()
@@ -230,12 +230,12 @@ impl Assert {
     /// ```
     ///
     /// Accepting multiple exit codes:
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("exit", "42")
     ///     .assert()
@@ -273,7 +273,7 @@ impl Assert {
     /// # Examples
     ///
     /// Accepting a bytes predicate:
-    /// ```rust
+    /// ```rust,no_run
     /// extern crate assert_cmd;
     /// extern crate predicates;
     ///
@@ -282,7 +282,7 @@ impl Assert {
     /// use std::process::Command;
     /// use predicates::prelude::*;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -291,7 +291,7 @@ impl Assert {
     /// ```
     ///
     /// Accepting a `str` predicate:
-    /// ```rust
+    /// ```rust,no_run
     /// extern crate assert_cmd;
     /// extern crate predicates;
     ///
@@ -300,7 +300,7 @@ impl Assert {
     /// use std::process::Command;
     /// use predicates::prelude::*;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -309,12 +309,12 @@ impl Assert {
     /// ```
     ///
     /// Accepting bytes:
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -323,12 +323,12 @@ impl Assert {
     /// ```
     ///
     /// Accepting a `str`:
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -365,7 +365,7 @@ impl Assert {
     /// # Examples
     ///
     /// Accepting a bytes predicate:
-    /// ```rust
+    /// ```rust,no_run
     /// extern crate assert_cmd;
     /// extern crate predicates;
     ///
@@ -374,7 +374,7 @@ impl Assert {
     /// use std::process::Command;
     /// use predicates::prelude::*;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -383,7 +383,7 @@ impl Assert {
     /// ```
     ///
     /// Accepting a `str` predicate:
-    /// ```rust
+    /// ```rust,no_run
     /// extern crate assert_cmd;
     /// extern crate predicates;
     ///
@@ -392,7 +392,7 @@ impl Assert {
     /// use std::process::Command;
     /// use predicates::prelude::*;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -401,12 +401,12 @@ impl Assert {
     /// ```
     ///
     /// Accepting bytes:
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -415,12 +415,12 @@ impl Assert {
     /// ```
     ///
     /// Accepting a `str`:
-    /// ```rust
+    /// ```rust,no_run
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
     ///
-    /// Command::main_binary()
+    /// Command::cargo_bin("bin_fixture")
     ///     .unwrap()
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
@@ -471,7 +471,7 @@ impl fmt::Debug for Assert {
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```rust,no_run
 /// extern crate assert_cmd;
 /// extern crate predicates;
 ///
@@ -480,14 +480,14 @@ impl fmt::Debug for Assert {
 /// use std::process::Command;
 /// use predicates::prelude::*;
 ///
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("exit", "42")
 ///     .assert()
 ///     .code(predicate::eq(42));
 ///
 /// // which can be shortened to:
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("exit", "42")
 ///     .assert()
@@ -523,12 +523,12 @@ where
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("exit", "42")
 ///     .assert()
@@ -593,12 +593,12 @@ impl IntoCodePredicate<EqCodePredicate> for i32 {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("exit", "42")
 ///     .assert()
@@ -671,7 +671,7 @@ impl IntoCodePredicate<InCodePredicate> for &'static [i32] {
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```rust,no_run
 /// extern crate assert_cmd;
 /// extern crate predicates;
 ///
@@ -680,7 +680,7 @@ impl IntoCodePredicate<InCodePredicate> for &'static [i32] {
 /// use std::process::Command;
 /// use predicates::prelude::*;
 ///
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("stdout", "hello")
 ///     .env("stderr", "world")
@@ -688,7 +688,7 @@ impl IntoCodePredicate<InCodePredicate> for &'static [i32] {
 ///     .stdout(predicate::str::similar("hello\n").from_utf8());
 ///
 /// // which can be shortened to:
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("stdout", "hello")
 ///     .env("stderr", "world")
@@ -726,12 +726,12 @@ where
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("stdout", "hello")
 ///     .env("stderr", "world")
@@ -797,12 +797,12 @@ impl IntoOutputPredicate<BytesContentOutputPredicate> for &'static [u8] {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,no_run
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
 ///
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("stdout", "hello")
 ///     .env("stderr", "world")
@@ -884,7 +884,7 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,no_run
 /// extern crate assert_cmd;
 /// extern crate predicates;
 ///
@@ -893,7 +893,7 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 /// use std::process::Command;
 /// use predicates::prelude::*;
 ///
-/// Command::main_binary()
+/// Command::cargo_bin("bin_fixture")
 ///     .unwrap()
 ///     .env("stdout", "hello")
 ///     .env("stderr", "world")
