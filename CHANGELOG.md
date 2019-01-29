@@ -1,3 +1,17 @@
+<a name="0.11.0"></a>
+## 0.11.0 (2019-01-29)
+
+
+#### Performance
+
+* **cargo:**  Faster bin lookup ([93791474](https://github.com/assert-rs/assert_cmd/commit/9379147429ff1eb8cb0766c696d1ae6141b66a33), closes [#6](https://github.com/assert-rs/assert_cmd/issues/6), [#57](https://github.com/assert-rs/assert_cmd/issues/57), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+
+#### Breaking Changes
+
+* **cargo:**  Faster bin lookup ([93791474](https://github.com/assert-rs/assert_cmd/commit/9379147429ff1eb8cb0766c696d1ae6141b66a33), closes [#6](https://github.com/assert-rs/assert_cmd/issues/6), [#57](https://github.com/assert-rs/assert_cmd/issues/57), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+
+
+
 <a name="0.10.2"></a>
 ## 0.10.2 (2018-11-21)
 
