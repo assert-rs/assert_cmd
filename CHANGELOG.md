@@ -9,7 +9,8 @@
 #### Breaking Changes
 
 * **cargo:**  Faster bin lookup ([93791474](https://github.com/assert-rs/assert_cmd/commit/9379147429ff1eb8cb0766c696d1ae6141b66a33), closes [#6](https://github.com/assert-rs/assert_cmd/issues/6), [#57](https://github.com/assert-rs/assert_cmd/issues/57), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
-
+  * As a side-effect, removed `cargo_example` in favor of using `escargot`.
+  * See the [`assert_cmd::cargo` docs](https://docs.rs/assert_cmd/0.11.0/assert_cmd/cargo/index.html) for trade-offs with when to use `escargot` vs `assert_cmd`
 
 
 <a name="0.10.2"></a>
