@@ -32,10 +32,12 @@ pub trait CommandStdInExt {
     ///
     /// let mut cmd = Command::new("cat");
     /// cmd
-    ///     .arg("-et")
+    ///     .arg("-et");
+    /// cmd
     ///     .with_stdin()
-    ///     .buffer("42");
-    /// let output = cmd.unwrap();
+    ///     .buffer("42")
+    ///     .assert()
+    ///     .stdout("42");
     /// ```
     fn with_stdin(&mut self) -> StdInCommandBuilder;
 }
@@ -66,10 +68,12 @@ impl<'a> StdInCommandBuilder<'a> {
     ///
     /// let mut cmd = Command::new("cat");
     /// cmd
-    ///     .arg("-et")
+    ///     .arg("-et");
+    /// cmd
     ///     .with_stdin()
-    ///     .buffer("42");
-    /// let output = cmd.unwrap();
+    ///     .buffer("42")
+    ///     .assert()
+    ///     .stdout("42");
     /// ```
     ///
     /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
@@ -97,11 +101,12 @@ impl<'a> StdInCommandBuilder<'a> {
     ///
     /// let mut cmd = Command::new("cat");
     /// cmd
-    ///     .arg("-et")
+    ///     .arg("-et");
+    /// cmd
     ///     .with_stdin()
-    ///     .path("Cargo.toml")
-    ///     .unwrap();
-    /// let output = cmd.unwrap();
+    ///     .buffer("42")
+    ///     .assert()
+    ///     .stdout("42");
     /// ```
     ///
     /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
@@ -134,9 +139,12 @@ impl<'a> StdInCommandBuilder<'a> {
 ///
 /// let mut cmd = Command::new("cat");
 /// cmd
+///     .arg("-et");
+/// cmd
 ///     .with_stdin()
-///     .buffer("42");
-/// let output = cmd.unwrap();
+///     .buffer("42")
+///     .assert()
+///     .stdout("42");
 /// ```
 ///
 /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
