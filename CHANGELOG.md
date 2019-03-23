@@ -1,3 +1,13 @@
+<a name="0.11.1"></a>
+## 0.11.1 (2019-03-23)
+
+
+#### Bug Fixes
+
+* **stdin:**  Docs didn't work ([2d4756a2](https://github.com/assert-rs/assert_cmd/commit/2d4756a2e20cafd5fa8904090eee53798a825196), closes [#71](https://github.com/assert-rs/assert_cmd/issues/71))
+
+
+
 <a name="0.11.0"></a>
 ## 0.11.0 (2019-01-29)
 
