@@ -19,6 +19,4 @@ predicates = { version = "1.0", default-features = false, features = ["differenc
 predicates-core = "1.0"
 predicates-tree = "1.0"
 escargot = "0.4"
-
-[dev-dependencies]
-docmatic = "0.1"
+doc-comment = "0.2"
