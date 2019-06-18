@@ -28,9 +28,14 @@ matrix:
     script:
       - cargo clippy --all-features
 
+env:
+  global:
+  - WHEN=0.1.0
+
 install:
 - rustc -Vv
 - cargo -V
+- if [[ `cargo-when --version` != *$WHEN ]] ; then travis_wait cargo install cargo-when --force --vers $WHEN; fi
 - export PATH=$HOME/.cargo/bin:$PATH
 
 script:
@@ -38,6 +43,7 @@ script:
 - cargo check --verbose --no-default-features
 - cargo check --verbose --all-features
 - cargo test  --verbose --all-features
+- cargo when --channel nightly bench --all
 
 branches:
   only:
