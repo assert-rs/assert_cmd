@@ -12,11 +12,7 @@ fn lib_example() {
     cmd.assert().success();
 
     let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
-    cmd.arg("-A")
-        .env("stdout", "hello")
-        .env("exit", "42")
-        .with_stdin()
-        .buffer("42");
-    let assert = cmd.assert();
+    cmd.arg("-A").env("stdout", "hello").env("exit", "42");
+    let assert = cmd.with_stdin().buffer("42").assert();
     assert.failure().code(42).stdout("hello\n");
 }
