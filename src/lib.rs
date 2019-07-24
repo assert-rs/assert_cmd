@@ -58,10 +58,11 @@
 //!     cmd
 //!         .arg("-A")
 //!         .env("stdout", "hello")
-//!         .env("exit", "42")
+//!         .env("exit", "42");
+//!     let assert = cmd
 //!         .with_stdin()
-//!         .buffer("42");
-//!     let assert = cmd.assert();
+//!         .buffer("42")
+//!         .assert();
 //!     assert
 //!         .failure()
 //!         .code(42)
