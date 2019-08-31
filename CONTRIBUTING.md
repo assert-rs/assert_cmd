@@ -36,8 +36,11 @@ commit history.  Once you let us know this is done, we can move forward with
 merging!  If you are uncomfortable with these parts of git, let us know and we
 can help.
 
-We ask that all new files have the copyright header.  Please update the
-copyright year for files you are modifying.
+For commit messages, we use [Conventional](https://www.conventionalcommits.org)
+style.  If you already wrote your commits and don't feel comfortable changing
+them, don't worry and go ahead and create your PR.  We'll work with you on the
+best route forward. You can check your branch locally with
+[`committed`](https://github.com/crate-ci/committed).
 
 As a heads up, we'll be running your PR through the following gauntlet:
 - warnings turned to compile errors
@@ -45,8 +48,7 @@ As a heads up, we'll be running your PR through the following gauntlet:
 - `rustfmt`
 - `clippy`
 - `rustdoc`
-
-Check out our [CI][travis] for more information.
+- [`committed`](https://github.com/crate-ci/committed)
 
 ## Releasing
 
