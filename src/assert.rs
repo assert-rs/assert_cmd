@@ -555,7 +555,9 @@ impl predicates_core::reflection::PredicateReflection for EqCodePredicate {
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -625,7 +627,9 @@ impl predicates_core::reflection::PredicateReflection for InCodePredicate {
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -759,7 +763,9 @@ impl predicates_core::reflection::PredicateReflection for BytesContentOutputPred
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -838,7 +844,9 @@ impl predicates_core::reflection::PredicateReflection for StrContentOutputPredic
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -929,7 +937,9 @@ where
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
