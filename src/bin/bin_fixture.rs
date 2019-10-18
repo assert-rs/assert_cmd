@@ -4,7 +4,7 @@ use std::io;
 use std::io::Write;
 use std::process;
 
-fn run() -> Result<(), Box<Error>> {
+fn run() -> Result<(), Box<dyn Error>> {
     if let Ok(text) = env::var("stdout") {
         println!("{}", text);
     }
