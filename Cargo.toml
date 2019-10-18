@@ -10,6 +10,7 @@ documentation = "http://docs.rs/assert_cmd/"
 readme = "README.md"
 categories = ["development-tools::testing"]
 keywords = ["cli", "test", "assert", "command", "duct"]
+edition = "2018"
 
 [[bin]]
 name = "bin_fixture"

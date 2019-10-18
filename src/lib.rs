@@ -108,11 +108,6 @@
 
 #![warn(missing_docs)]
 
-extern crate escargot;
-extern crate predicates;
-extern crate predicates_core;
-extern crate predicates_tree;
-
 /// Allows you to pull the name from your Cargo.toml at compile time.
 ///
 /// # Examples
@@ -154,10 +149,10 @@ pub mod stdin;
 
 /// Extension traits that are useful to have available.
 pub mod prelude {
-    pub use assert::OutputAssertExt;
-    pub use cargo::CommandCargoExt;
-    pub use cmd::OutputOkExt;
-    pub use stdin::CommandStdInExt;
+    pub use crate::assert::OutputAssertExt;
+    pub use crate::cargo::CommandCargoExt;
+    pub use crate::cmd::OutputOkExt;
+    pub use crate::stdin::CommandStdInExt;
 }
 
 #[macro_use]

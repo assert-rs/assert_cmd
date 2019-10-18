@@ -9,13 +9,13 @@ use std::io::Write;
 use std::path;
 use std::process;
 
-use assert::Assert;
-use assert::OutputAssertExt;
-use cmd::dump_buffer;
-use cmd::DebugBuffer;
-use cmd::OutputError;
-use cmd::OutputOkExt;
-use cmd::OutputResult;
+use crate::assert::Assert;
+use crate::assert::OutputAssertExt;
+use crate::cmd::dump_buffer;
+use crate::cmd::DebugBuffer;
+use crate::cmd::OutputError;
+use crate::cmd::OutputOkExt;
+use crate::cmd::OutputResult;
 
 /// Write to `stdin` of a [`Command`][Command].
 ///
@@ -39,11 +39,11 @@ pub trait CommandStdInExt {
     ///     .assert()
     ///     .stdout("42");
     /// ```
-    fn with_stdin(&mut self) -> StdInCommandBuilder;
+    fn with_stdin(&mut self) -> StdInCommandBuilder<'_>;
 }
 
 impl CommandStdInExt for process::Command {
-    fn with_stdin(&mut self) -> StdInCommandBuilder {
+    fn with_stdin(&mut self) -> StdInCommandBuilder<'_> {
         StdInCommandBuilder { cmd: self }
     }
 }
@@ -77,7 +77,7 @@ impl<'a> StdInCommandBuilder<'a> {
     /// ```
     ///
     /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
-    pub fn buffer<S>(&mut self, buffer: S) -> StdInCommand
+    pub fn buffer<S>(&mut self, buffer: S) -> StdInCommand<'_>
     where
         S: Into<Vec<u8>>,
     {
@@ -112,7 +112,7 @@ impl<'a> StdInCommandBuilder<'a> {
     /// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
     /// [env_current_dir]: https://doc.rust-lang.org/std/env/fn.current_dir.html
     /// [Command_current_dir]: https://doc.rust-lang.org/std/process/struct.Command.html#method.current_dir
-    pub fn path<P>(&mut self, file: P) -> io::Result<StdInCommand>
+    pub fn path<P>(&mut self, file: P) -> io::Result<StdInCommand<'_>>
     where
         P: AsRef<path::Path>,
     {

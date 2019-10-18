@@ -11,8 +11,8 @@ use predicates::str::PredicateStrExt;
 use predicates_core;
 use predicates_tree::CaseTreeExt;
 
-use cmd::dump_buffer;
-use cmd::output_fmt;
+use crate::cmd::dump_buffer;
+use crate::cmd::output_fmt;
 
 /// Assert the state of an [`Output`].
 ///
@@ -84,7 +84,7 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
 /// [`OutputAssertExt`]: trait.OutputAssertExt.html
 pub struct Assert {
     output: process::Output,
-    context: Vec<(&'static str, Box<fmt::Display>)>,
+    context: Vec<(&'static str, Box<dyn fmt::Display>)>,
 }
 
 impl Assert {
@@ -252,7 +252,7 @@ impl Assert {
         self.code_impl(&pred.into_code())
     }
 
-    fn code_impl(self, pred: &predicates_core::Predicate<i32>) -> Self {
+    fn code_impl(self, pred: &dyn predicates_core::Predicate<i32>) -> Self {
         let actual_code = self
             .output
             .status
@@ -346,7 +346,7 @@ impl Assert {
         self.stdout_impl(&pred.into_output())
     }
 
-    fn stdout_impl(self, pred: &predicates_core::Predicate<[u8]>) -> Self {
+    fn stdout_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stdout;
             if let Some(case) = pred.find_case(false, &actual) {
@@ -438,7 +438,7 @@ impl Assert {
         self.stderr_impl(&pred.into_output())
     }
 
-    fn stderr_impl(self, pred: &predicates_core::Predicate<[u8]>) -> Self {
+    fn stderr_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> Self {
         {
             let actual = &self.output.stderr;
             if let Some(case) = pred.find_case(false, &actual) {
@@ -450,7 +450,7 @@ impl Assert {
 }
 
 impl fmt::Display for Assert {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for &(ref name, ref context) in &self.context {
             writeln!(f, "{}=`{}`", name, context)?;
         }
@@ -459,7 +459,7 @@ impl fmt::Display for Assert {
 }
 
 impl fmt::Debug for Assert {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Assert")
             .field("output", &self.output)
             .finish()
@@ -550,12 +550,12 @@ impl EqCodePredicate {
 impl predicates_core::reflection::PredicateReflection for EqCodePredicate {
     fn parameters<'a>(
         &'a self,
-    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
         self.0.parameters()
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -575,7 +575,7 @@ impl predicates_core::Predicate<i32> for EqCodePredicate {
 }
 
 impl fmt::Display for EqCodePredicate {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
 }
@@ -620,12 +620,12 @@ impl InCodePredicate {
 impl predicates_core::reflection::PredicateReflection for InCodePredicate {
     fn parameters<'a>(
         &'a self,
-    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
         self.0.parameters()
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -645,7 +645,7 @@ impl predicates_core::Predicate<i32> for InCodePredicate {
 }
 
 impl fmt::Display for InCodePredicate {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
 }
@@ -754,12 +754,12 @@ impl BytesContentOutputPredicate {
 impl predicates_core::reflection::PredicateReflection for BytesContentOutputPredicate {
     fn parameters<'a>(
         &'a self,
-    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
         self.0.parameters()
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -779,7 +779,7 @@ impl predicates_core::Predicate<[u8]> for BytesContentOutputPredicate {
 }
 
 impl fmt::Display for BytesContentOutputPredicate {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
 }
@@ -833,12 +833,12 @@ impl StrContentOutputPredicate {
 impl predicates_core::reflection::PredicateReflection for StrContentOutputPredicate {
     fn parameters<'a>(
         &'a self,
-    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
         self.0.parameters()
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -858,7 +858,7 @@ impl predicates_core::Predicate<[u8]> for StrContentOutputPredicate {
 }
 
 impl fmt::Display for StrContentOutputPredicate {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
 }
@@ -924,12 +924,12 @@ where
 {
     fn parameters<'a>(
         &'a self,
-    ) -> Box<Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
+    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
         self.0.parameters()
     }
 
     /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(&'a self) -> Box<Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
+    fn children<'a>(&'a self) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
         self.0.children()
     }
 }
@@ -955,7 +955,7 @@ impl<P> fmt::Display for StrOutputPredicate<P>
 where
     P: predicates_core::Predicate<str>,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
 }

@@ -247,7 +247,7 @@ impl Error for OutputError {
         "Command failed."
     }
 
-    fn cause(&self) -> Option<&Error> {
+    fn cause(&self) -> Option<&dyn Error> {
         if let OutputCause::Unexpected(ref err) = self.cause {
             Some(err.as_ref())
         } else {
@@ -257,7 +257,7 @@ impl Error for OutputError {
 }
 
 impl fmt::Display for OutputError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref cmd) = self.cmd {
             writeln!(f, "command=`{}`", cmd)?;
         }
@@ -275,11 +275,11 @@ impl fmt::Display for OutputError {
 #[derive(Debug)]
 enum OutputCause {
     Expected(Output),
-    Unexpected(Box<Error + Send + Sync + 'static>),
+    Unexpected(Box<dyn Error + Send + Sync + 'static>),
 }
 
 impl fmt::Display for OutputCause {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             OutputCause::Expected(ref e) => write!(f, "{}", e),
             OutputCause::Unexpected(ref e) => write!(f, "{}", e),
@@ -293,12 +293,12 @@ struct Output {
 }
 
 impl fmt::Display for Output {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         output_fmt(&self.output, f)
     }
 }
 
-pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter) -> fmt::Result {
+pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     if let Some(code) = output.status.code() {
         writeln!(f, "code={}", code)?;
     } else {
@@ -324,7 +324,7 @@ pub(crate) fn dump_buffer(buffer: &[u8]) -> String {
     }
 }
 
-pub(crate) fn write_buffer(buffer: &[u8], f: &mut fmt::Formatter) -> fmt::Result {
+pub(crate) fn write_buffer(buffer: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Result {
     if let Ok(buffer) = str::from_utf8(buffer) {
         write!(f, "{}", buffer)
     } else {
@@ -344,7 +344,7 @@ impl DebugBuffer {
 }
 
 impl fmt::Display for DebugBuffer {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write_buffer(&self.buffer, f)
     }
 }

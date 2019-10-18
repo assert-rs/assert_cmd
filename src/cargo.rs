@@ -138,7 +138,7 @@ impl CommandCargoExt for process::Command {
 /// Error when finding crate binary.
 #[derive(Debug)]
 pub struct CargoError {
-    cause: Option<Box<Error + Send + Sync + 'static>>,
+    cause: Option<Box<dyn Error + Send + Sync + 'static>>,
 }
 
 impl CargoError {
@@ -157,16 +157,16 @@ impl Error for CargoError {
         "Cargo command failed."
     }
 
-    fn cause(&self) -> Option<&Error> {
+    fn cause(&self) -> Option<&dyn Error> {
         self.cause.as_ref().map(|c| {
-            let c: &Error = c.as_ref();
+            let c: &dyn Error = c.as_ref();
             c
         })
     }
 }
 
 impl fmt::Display for CargoError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref cause) = self.cause {
             writeln!(f, "Cause: {}", cause)?;
         }
@@ -185,13 +185,13 @@ impl Error for NotFoundError {
         "Cargo command not found."
     }
 
-    fn cause(&self) -> Option<&Error> {
+    fn cause(&self) -> Option<&dyn Error> {
         None
     }
 }
 
 impl fmt::Display for NotFoundError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "Cargo command not found: {}", self.path.display())
     }
 }

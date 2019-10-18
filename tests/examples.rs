@@ -1,7 +1,3 @@
-extern crate assert_cmd;
-extern crate escargot;
-extern crate predicates;
-
 use std::process::Command;
 
 use assert_cmd::prelude::*;
