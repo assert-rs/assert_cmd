@@ -1,41 +1,108 @@
-//! Simplify one-off runs of programs.
+//! [`std::process::Command`][Command] customized for testing.
+//!
+//! [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
 
-use std::error::Error;
-use std::fmt;
+use std::ffi;
+use std::io;
+use std::io::Write;
+use std::path;
 use std::process;
-use std::str;
 
-/// Converts a type to an [`OutputResult`].
+use crate::assert::Assert;
+use crate::assert::OutputAssertExt;
+use crate::output::dump_buffer;
+use crate::output::DebugBuffer;
+use crate::output::OutputError;
+use crate::output::OutputOkExt;
+use crate::output::OutputResult;
+
+/// [`std::process::Command`][Command] customized for testing.
 ///
-/// This is for example implemented on [`std::process::Output`].
-///
-/// # Examples
-///
-/// ```rust
-/// use assert_cmd::prelude::*;
-///
-/// use std::process::Command;
-///
-/// let result = Command::new("echo")
-///     .args(&["42"])
-///     .ok();
-/// assert!(result.is_ok());
-/// ```
-///
-/// [`std::process::Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
-/// [`OutputResult`]: type.OutputResult.html
-pub trait OutputOkExt
-where
-    Self: ::std::marker::Sized,
-{
-    /// Convert an [`Output`][Output] to an [`OutputResult`][OutputResult].
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+#[derive(Debug)]
+pub struct Command {
+    cmd: process::Command,
+    stdin: Option<Vec<u8>>,
+}
+
+impl Command {
+    /// Constructs a new `Command` from a `std` `Command`.
+    pub fn from_std(cmd: process::Command) -> Self {
+        Self { cmd, stdin: None }
+    }
+
+    /// Create a `Command` to run a specific binary of the current crate.
+    ///
+    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
+    /// ```
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::cargo_bin("bin_fixture")
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
+    /// ```
+    ///
+    /// [`cargo`]: index.html
+    pub fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, crate::cargo::CargoError> {
+        let cmd = crate::cargo::cargo_bin_cmd(name)?;
+        Ok(Self::from_std(cmd))
+    }
+
+    /// Write `buffer` to `stdin` when the `Command` is run.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::prelude::*;
+    /// use assert_cmd::Command;
     ///
-    /// use std::process::Command;
+    /// let mut cmd = Command::new("cat")
+    ///     .arg("-et")
+    ///     .write_stdin("42")
+    ///     .assert()
+    ///     .stdout("42");
+    /// ```
+    pub fn write_stdin<S>(&mut self, buffer: S) -> &mut Self
+    where
+        S: Into<Vec<u8>>,
+    {
+        self.stdin = Some(buffer.into());
+        self
+    }
+
+    /// Write `path`s content to `stdin` when the `Command` is run.
+    ///
+    /// Paths are relative to the [`env::current_dir`][env_current_dir] and not
+    /// [`Command::current_dir`][Command_current_dir].
+    ///
+    /// [env_current_dir]: https://doc.rust-lang.org/std/env/fn.current_dir.html
+    /// [Command_current_dir]: https://doc.rust-lang.org/std/process/struct.Command.html#method.current_dir
+    pub fn pipe_stdin<P>(&mut self, file: P) -> io::Result<&mut Self>
+    where
+        P: AsRef<path::Path>,
+    {
+        let buffer = std::fs::read(file)?;
+        Ok(self.write_stdin(buffer))
+    }
+
+    /// Run a `Command`, returning an [`OutputResult`][OutputResult].
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::Command;
     ///
     /// let result = Command::new("echo")
     ///     .args(&["42"])
@@ -43,40 +110,34 @@ where
     /// assert!(result.is_ok());
     /// ```
     ///
-    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
     /// [OutputResult]: type.OutputResult.html
-    fn ok(self) -> OutputResult;
+    pub fn ok(&mut self) -> OutputResult {
+        OutputOkExt::ok(self)
+    }
 
-    /// Unwrap a [`Output`][Output] but with a prettier message than `.ok().unwrap()`.
+    /// Run a `Command`, unwrapping the [`OutputResult`][OutputResult].
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use assert_cmd::prelude::*;
-    ///
-    /// use std::process::Command;
+    /// use assert_cmd::Command;
     ///
     /// let output = Command::new("echo")
     ///     .args(&["42"])
     ///     .unwrap();
     /// ```
     ///
-    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
-    fn unwrap(self) -> process::Output {
-        match self.ok() {
-            Ok(output) => output,
-            Err(err) => panic!("{}", err),
-        }
+    /// [OutputResult]: type.OutputResult.html
+    pub fn unwrap(&mut self) -> process::Output {
+        OutputOkExt::unwrap(self)
     }
 
-    /// Unwrap a [`Output`][Output] but with a prettier message than `ok().err().unwrap()`.
+    /// Run a `Command`, unwrapping the error in the [`OutputResult`][OutputResult].
     ///
     /// # Examples
     ///
     /// ```rust,no_run
-    /// use assert_cmd::prelude::*;
-    ///
-    /// use std::process::Command;
+    /// use assert_cmd::Command;
     ///
     /// let err = Command::new("a-command")
     ///     .args(&["--will-fail"])
@@ -84,267 +145,352 @@ where
     /// ```
     ///
     /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
-    fn unwrap_err(self) -> OutputError {
-        match self.ok() {
-            Ok(output) => panic!(
-                "Command completed successfully\nstdout=```{}```",
-                dump_buffer(&output.stdout)
-            ),
-            Err(err) => err,
-        }
+    pub fn unwrap_err(&mut self) -> OutputError {
+        OutputOkExt::unwrap_err(self)
+    }
+
+    /// Run a `Command` and make assertions on the [`Output`].
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::cargo_bin("bin_fixture")
+    ///     .unwrap()
+    ///     .assert()
+    ///     .success();
+    /// ```
+    ///
+    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
+    pub fn assert(&mut self) -> Assert {
+        OutputAssertExt::assert(self)
     }
 }
 
-impl OutputOkExt for process::Output {
-    fn ok(self) -> OutputResult {
-        if self.status.success() {
-            Ok(self)
-        } else {
-            let error = OutputError::new(self);
-            Err(error)
+/// Mirror [`std::process::Command`][Command]'s API
+///
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+impl Command {
+    /// Constructs a new `Command` for launching the program at
+    /// path `program`, with the following default configuration:
+    ///
+    /// * No arguments to the program
+    /// * Inherit the current process's environment
+    /// * Inherit the current process's working directory
+    /// * Inherit stdin/stdout/stderr for `spawn` or `status`, but create pipes for `output`
+    ///
+    /// Builder methods are provided to change these defaults and
+    /// otherwise configure the process.
+    ///
+    /// If `program` is not an absolute path, the `PATH` will be searched in
+    /// an OS-defined way.
+    ///
+    /// The search path to be used may be controlled by setting the
+    /// `PATH` environment variable on the Command,
+    /// but this has some implementation limitations on Windows
+    /// (see issue #37519).
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("sh").unwrap();
+    /// ```
+    pub fn new<S: AsRef<ffi::OsStr>>(program: S) -> Self {
+        let cmd = process::Command::new(program);
+        Self::from_std(cmd)
+    }
+
+    /// Adds an argument to pass to the program.
+    ///
+    /// Only one argument can be passed per use. So instead of:
+    ///
+    /// ```no_run
+    /// # assert_cmd::Command::new("sh")
+    /// .arg("-C /path/to/repo")
+    /// # ;
+    /// ```
+    ///
+    /// usage would be:
+    ///
+    /// ```no_run
+    /// # assert_cmd::Command::new("sh")
+    /// .arg("-C")
+    /// .arg("/path/to/repo")
+    /// # ;
+    /// ```
+    ///
+    /// To pass multiple arguments see [`args`].
+    ///
+    /// [`args`]: #method.args
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .arg("-l")
+    ///         .arg("-a")
+    ///         .unwrap();
+    /// ```
+    pub fn arg<S: AsRef<ffi::OsStr>>(&mut self, arg: S) -> &mut Self {
+        self.cmd.arg(arg);
+        self
+    }
+
+    /// Adds multiple arguments to pass to the program.
+    ///
+    /// To pass a single argument see [`arg`].
+    ///
+    /// [`arg`]: #method.arg
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .args(&["-l", "-a"])
+    ///         .unwrap();
+    /// ```
+    pub fn args<I, S>(&mut self, args: I) -> &mut Self
+    where
+        I: IntoIterator<Item = S>,
+        S: AsRef<ffi::OsStr>,
+    {
+        self.cmd.args(args);
+        self
+    }
+
+    /// Inserts or updates an environment variable mapping.
+    ///
+    /// Note that environment variable names are case-insensitive (but case-preserving) on Windows,
+    /// and case-sensitive on all other platforms.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .env("PATH", "/bin")
+    ///         .unwrap_err();
+    /// ```
+    pub fn env<K, V>(&mut self, key: K, val: V) -> &mut Self
+    where
+        K: AsRef<ffi::OsStr>,
+        V: AsRef<ffi::OsStr>,
+    {
+        self.cmd.env(key, val);
+        self
+    }
+
+    /// Adds or updates multiple environment variable mappings.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    /// use std::process::Stdio;
+    /// use std::env;
+    /// use std::collections::HashMap;
+    ///
+    /// let filtered_env : HashMap<String, String> =
+    ///     env::vars().filter(|&(ref k, _)|
+    ///         k == "TERM" || k == "TZ" || k == "LANG" || k == "PATH"
+    ///     ).collect();
+    ///
+    /// Command::new("printenv")
+    ///         .env_clear()
+    ///         .envs(&filtered_env)
+    ///         .unwrap();
+    /// ```
+    pub fn envs<I, K, V>(&mut self, vars: I) -> &mut Self
+    where
+        I: IntoIterator<Item = (K, V)>,
+        K: AsRef<ffi::OsStr>,
+        V: AsRef<ffi::OsStr>,
+    {
+        self.cmd.envs(vars);
+        self
+    }
+
+    /// Removes an environment variable mapping.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .env_remove("PATH")
+    ///         .unwrap_err();
+    /// ```
+    pub fn env_remove<K: AsRef<ffi::OsStr>>(&mut self, key: K) -> &mut Self {
+        self.cmd.env_remove(key);
+        self
+    }
+
+    /// Clears the entire environment map for the child process.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// use std::process::Command;;
+
+    ///
+    /// Command::new("ls")
+    ///         .env_clear()
+    ///         .unwrap_err();
+    /// ```
+    pub fn env_clear(&mut self) -> &mut Self {
+        self.cmd.env_clear();
+        self
+    }
+
+    /// Sets the working directory for the child process.
+    ///
+    /// # Platform-specific behavior
+    ///
+    /// If the program path is relative (e.g., `"./script.sh"`), it's ambiguous
+    /// whether it should be interpreted relative to the parent's working
+    /// directory or relative to `current_dir`. The behavior in this case is
+    /// platform specific and unstable, and it's recommended to use
+    /// [`canonicalize`] to get an absolute program path instead.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .current_dir("/bin")
+    ///         .unwrap();
+    /// ```
+    ///
+    /// [`canonicalize`]: ../fs/fn.canonicalize.html
+    pub fn current_dir<P: AsRef<path::Path>>(&mut self, dir: P) -> &mut Self {
+        self.cmd.current_dir(dir);
+        self
+    }
+
+    /// Executes the `Command` as a child process, waiting for it to finish and collecting all of its
+    /// output.
+    ///
+    /// By default, stdout and stderr are captured (and used to provide the resulting output).
+    /// Stdin is not inherited from the parent and any attempt by the child process to read from
+    /// the stdin stream will result in the stream immediately closing.
+    ///
+    /// # Examples
+    ///
+    /// ```should_panic
+    /// use assert_cmd::Command;
+    /// use std::io::{self, Write};
+    /// let output = Command::new("/bin/cat")
+    ///                      .arg("file.txt")
+    ///                      .output()
+    ///                      .expect("failed to execute process");
+    ///
+    /// println!("status: {}", output.status);
+    /// io::stdout().write_all(&output.stdout).unwrap();
+    /// io::stderr().write_all(&output.stderr).unwrap();
+    ///
+    /// assert!(output.status.success());
+    /// ```
+    pub fn output(&mut self) -> io::Result<process::Output> {
+        self.spawn()?.wait_with_output()
+    }
+
+    fn spawn(&mut self) -> io::Result<process::Child> {
+        // stdout/stderr should only be piped for `output` according to `process::Command::new`.
+        self.cmd.stdin(process::Stdio::piped());
+        self.cmd.stdout(process::Stdio::piped());
+        self.cmd.stderr(process::Stdio::piped());
+
+        let mut spawned = self.cmd.spawn()?;
+
+        if let Some(buffer) = self.stdin.as_ref() {
+            spawned
+                .stdin
+                .as_mut()
+                .expect("Couldn't get mut ref to command stdin")
+                .write_all(&buffer)?;
         }
+        Ok(spawned)
     }
 }
 
-impl<'c> OutputOkExt for &'c mut process::Command {
+impl From<process::Command> for Command {
+    fn from(cmd: process::Command) -> Self {
+        Command::from_std(cmd)
+    }
+}
+
+impl<'c> OutputOkExt for &'c mut Command {
     fn ok(self) -> OutputResult {
         let output = self.output().map_err(OutputError::with_cause)?;
         if output.status.success() {
             Ok(output)
         } else {
-            let error = OutputError::new(output).set_cmd(format!("{:?}", self));
+            let error = OutputError::new(output).set_cmd(format!("{:?}", self.cmd));
+            let error = if let Some(stdin) = self.stdin.as_ref() {
+                error.set_stdin(stdin.clone())
+            } else {
+                error
+            };
             Err(error)
         }
     }
 
     fn unwrap_err(self) -> OutputError {
         match self.ok() {
-            Ok(output) => panic!(
-                "Completed successfully:\ncommand=`{:?}`\nstdout=```{}```",
-                self,
-                dump_buffer(&output.stdout)
-            ),
+            Ok(output) => {
+                if let Some(stdin) = self.stdin.as_ref() {
+                    panic!(
+                        "Completed successfully:\ncommand=`{:?}`\nstdin=```{}```\nstdout=```{}```",
+                        self.cmd,
+                        dump_buffer(&stdin),
+                        dump_buffer(&output.stdout)
+                    )
+                } else {
+                    panic!(
+                        "Completed successfully:\ncommand=`{:?}`\nstdout=```{}```",
+                        self.cmd,
+                        dump_buffer(&output.stdout)
+                    )
+                }
+            }
             Err(err) => err,
         }
     }
 }
 
-/// [`Output`] represented as a [`Result`].
-///
-/// Generally produced by [`OutputOkExt`].
-///
-/// # Examples
-///
-/// ```rust
-/// use assert_cmd::prelude::*;
-///
-/// use std::process::Command;
-///
-/// let result = Command::new("echo")
-///     .args(&["42"])
-///     .ok();
-/// assert!(result.is_ok());
-/// ```
-///
-/// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
-/// [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html
-/// [`OutputOkExt`]: trait.OutputOkExt.html
-pub type OutputResult = Result<process::Output, OutputError>;
-
-/// [`Command`] error.
-///
-/// Generally produced by [`OutputOkExt`].
-///
-/// # Examples
-///
-/// ```rust,no_run
-/// use assert_cmd::prelude::*;
-///
-/// use std::process::Command;
-///
-/// let err = Command::new("a-command")
-///     .args(&["--will-fail"])
-///     .unwrap_err();
-/// ```
-///
-/// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-/// [`OutputOkExt`]: trait.OutputOkExt.html
-#[derive(Debug)]
-pub struct OutputError {
-    cmd: Option<String>,
-    stdin: Option<Vec<u8>>,
-    cause: OutputCause,
-}
-
-impl OutputError {
-    /// Convert [`Output`] into an [`Error`].
-    ///
-    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
-    /// [`Error`]: https://doc.rust-lang.org/std/error/trait.Error.html
-    pub fn new(output: process::Output) -> Self {
-        Self {
-            cmd: None,
-            stdin: None,
-            cause: OutputCause::Expected(Output { output }),
-        }
-    }
-
-    /// For errors that happen in creating a [`Output`].
-    ///
-    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
-    pub fn with_cause<E>(cause: E) -> Self
-    where
-        E: Error + Send + Sync + 'static,
-    {
-        Self {
-            cmd: None,
-            stdin: None,
-            cause: OutputCause::Unexpected(Box::new(cause)),
-        }
-    }
-
-    /// Add the command line for additional context.
-    pub fn set_cmd(mut self, cmd: String) -> Self {
-        self.cmd = Some(cmd);
-        self
-    }
-
-    /// Add the `stdin` for additional context.
-    pub fn set_stdin(mut self, stdin: Vec<u8>) -> Self {
-        self.stdin = Some(stdin);
-        self
-    }
-
-    /// Access the contained [`Output`].
-    ///
-    /// # Examples
-    ///
-    /// ```rust,no_run
-    /// use assert_cmd::prelude::*;
-    ///
-    /// use std::process::Command;
-    ///
-    /// let err = Command::new("a-command")
-    ///     .args(&["--will-fail"])
-    ///     .unwrap_err();
-    /// let output = err
-    ///     .as_output()
-    ///     .unwrap();
-    /// assert_eq!(Some(42), output.status.code());
-    /// ```
-    ///
-    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
-    pub fn as_output(&self) -> Option<&process::Output> {
-        match self.cause {
-            OutputCause::Expected(ref e) => Some(&e.output),
-            OutputCause::Unexpected(_) => None,
-        }
-    }
-}
-
-impl Error for OutputError {
-    fn description(&self) -> &str {
-        "Command failed."
-    }
-
-    fn cause(&self) -> Option<&dyn Error> {
-        if let OutputCause::Unexpected(ref err) = self.cause {
-            Some(err.as_ref())
+impl<'c> OutputAssertExt for &'c mut Command {
+    fn assert(self) -> Assert {
+        let output = self.output().unwrap();
+        let assert = Assert::new(output).append_context("command", format!("{:?}", self.cmd));
+        if let Some(stdin) = self.stdin.as_ref() {
+            assert.append_context("stdin", DebugBuffer::new(stdin.clone()))
         } else {
-            None
+            assert
         }
-    }
-}
-
-impl fmt::Display for OutputError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let Some(ref cmd) = self.cmd {
-            writeln!(f, "command=`{}`", cmd)?;
-        }
-        if let Some(ref stdin) = self.stdin {
-            if let Ok(stdin) = str::from_utf8(stdin) {
-                writeln!(f, "stdin=```{}```", stdin)?;
-            } else {
-                writeln!(f, "stdin=```{:?}```", stdin)?;
-            }
-        }
-        write!(f, "{}", self.cause)
-    }
-}
-
-#[derive(Debug)]
-enum OutputCause {
-    Expected(Output),
-    Unexpected(Box<dyn Error + Send + Sync + 'static>),
-}
-
-impl fmt::Display for OutputCause {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match *self {
-            OutputCause::Expected(ref e) => write!(f, "{}", e),
-            OutputCause::Unexpected(ref e) => write!(f, "{}", e),
-        }
-    }
-}
-
-#[derive(Debug)]
-struct Output {
-    output: process::Output,
-}
-
-impl fmt::Display for Output {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        output_fmt(&self.output, f)
-    }
-}
-
-pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    if let Some(code) = output.status.code() {
-        writeln!(f, "code={}", code)?;
-    } else {
-        writeln!(f, "code=<interrupted>")?;
-    }
-
-    write!(f, "stdout=```")?;
-    write_buffer(&output.stdout, f)?;
-    writeln!(f, "```")?;
-
-    write!(f, "stderr=```")?;
-    write_buffer(&output.stderr, f)?;
-    writeln!(f, "```")?;
-
-    Ok(())
-}
-
-pub(crate) fn dump_buffer(buffer: &[u8]) -> String {
-    if let Ok(buffer) = str::from_utf8(buffer) {
-        buffer.to_string()
-    } else {
-        format!("{:?}", buffer)
-    }
-}
-
-pub(crate) fn write_buffer(buffer: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    if let Ok(buffer) = str::from_utf8(buffer) {
-        write!(f, "{}", buffer)
-    } else {
-        write!(f, "{:?}", buffer)
-    }
-}
-
-#[derive(Debug)]
-pub(crate) struct DebugBuffer {
-    buffer: Vec<u8>,
-}
-
-impl DebugBuffer {
-    pub(crate) fn new(buffer: Vec<u8>) -> Self {
-        DebugBuffer { buffer }
-    }
-}
-
-impl fmt::Display for DebugBuffer {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write_buffer(&self.buffer, f)
     }
 }

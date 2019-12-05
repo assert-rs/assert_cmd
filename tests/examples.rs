@@ -1,6 +1,4 @@
-use std::process::Command;
-
-use assert_cmd::prelude::*;
+use assert_cmd::Command;
 
 #[test]
 fn lib_example() {
@@ -8,7 +6,11 @@ fn lib_example() {
     cmd.assert().success();
 
     let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
-    cmd.arg("-A").env("stdout", "hello").env("exit", "42");
-    let assert = cmd.with_stdin().buffer("42").assert();
+    let assert = cmd
+        .arg("-A")
+        .env("stdout", "hello")
+        .env("exit", "42")
+        .write_stdin("42")
+        .assert();
     assert.failure().code(42).stdout("hello\n");
 }
