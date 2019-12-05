@@ -1,3 +1,19 @@
+<a name="0.12.0"></a>
+## 0.12.0 (2019-12-05)
+
+
+#### Bug Fixes
+
+*   More accurately name the cmd module ([15e40f67](https://github.com/assert-rs/assert_cmd/commit/15e40f6744b174e07c4fb4bd7703eb77d6e896ee), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+* **stdin:**:  Provide a Command wrapper ([d159e875](https://github.com/assert-rs/assert_cmd/commit/d159e875aee71841198c67cd1a4e848b8bb9e465), closes [#73](https://github.com/assert-rs/assert_cmd/issues/73))
+
+#### Breaking Changes
+
+*   More accurately name the cmd module ([15e40f67](https://github.com/assert-rs/assert_cmd/commit/15e40f6744b174e07c4fb4bd7703eb77d6e896ee), breaks [#](https://github.com/assert-rs/assert_cmd/issues/))
+* **stdin:**:  Provide a Command wrapper ([d159e875](https://github.com/assert-rs/assert_cmd/commit/d159e875aee71841198c67cd1a4e848b8bb9e465), closes [#73](https://github.com/assert-rs/assert_cmd/issues/73))
+
+
+
 <a name="0.11.1"></a>
 ## 0.11.1 (2019-03-23)
 
