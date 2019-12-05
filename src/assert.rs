@@ -11,8 +11,8 @@ use predicates::str::PredicateStrExt;
 use predicates_core;
 use predicates_tree::CaseTreeExt;
 
-use crate::cmd::dump_buffer;
-use crate::cmd::output_fmt;
+use crate::output::dump_buffer;
+use crate::output::output_fmt;
 
 /// Assert the state of an [`Output`].
 ///

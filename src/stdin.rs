@@ -11,11 +11,11 @@ use std::process;
 
 use crate::assert::Assert;
 use crate::assert::OutputAssertExt;
-use crate::cmd::dump_buffer;
-use crate::cmd::DebugBuffer;
-use crate::cmd::OutputError;
-use crate::cmd::OutputOkExt;
-use crate::cmd::OutputResult;
+use crate::output::dump_buffer;
+use crate::output::DebugBuffer;
+use crate::output::OutputError;
+use crate::output::OutputOkExt;
+use crate::output::OutputResult;
 
 /// Write to `stdin` of a [`Command`][Command].
 ///

@@ -144,14 +144,14 @@ macro_rules! crate_name {
 
 pub mod assert;
 pub mod cargo;
-pub mod cmd;
+pub mod output;
 pub mod stdin;
 
 /// Extension traits that are useful to have available.
 pub mod prelude {
     pub use crate::assert::OutputAssertExt;
     pub use crate::cargo::CommandCargoExt;
-    pub use crate::cmd::OutputOkExt;
+    pub use crate::output::OutputOkExt;
     pub use crate::stdin::CommandStdInExt;
 }
 
