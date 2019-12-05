@@ -1,0 +1,496 @@
+//! [`std::process::Command`][Command] customized for testing.
+//!
+//! [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+
+use std::ffi;
+use std::io;
+use std::io::Write;
+use std::path;
+use std::process;
+
+use crate::assert::Assert;
+use crate::assert::OutputAssertExt;
+use crate::output::dump_buffer;
+use crate::output::DebugBuffer;
+use crate::output::OutputError;
+use crate::output::OutputOkExt;
+use crate::output::OutputResult;
+
+/// [`std::process::Command`][Command] customized for testing.
+///
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+#[derive(Debug)]
+pub struct Command {
+    cmd: process::Command,
+    stdin: Option<Vec<u8>>,
+}
+
+impl Command {
+    /// Constructs a new `Command` from a `std` `Command`.
+    pub fn from_std(cmd: process::Command) -> Self {
+        Self { cmd, stdin: None }
+    }
+
+    /// Create a `Command` to run a specific binary of the current crate.
+    ///
+    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
+    /// ```
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::cargo_bin("bin_fixture")
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
+    /// ```
+    ///
+    /// [`cargo`]: index.html
+    pub fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, crate::cargo::CargoError> {
+        let cmd = crate::cargo::cargo_bin_cmd(name)?;
+        Ok(Self::from_std(cmd))
+    }
+
+    /// Write `buffer` to `stdin` when the `Command` is run.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::new("cat")
+    ///     .arg("-et")
+    ///     .write_stdin("42")
+    ///     .assert()
+    ///     .stdout("42");
+    /// ```
+    pub fn write_stdin<S>(&mut self, buffer: S) -> &mut Self
+    where
+        S: Into<Vec<u8>>,
+    {
+        self.stdin = Some(buffer.into());
+        self
+    }
+
+    /// Write `path`s content to `stdin` when the `Command` is run.
+    ///
+    /// Paths are relative to the [`env::current_dir`][env_current_dir] and not
+    /// [`Command::current_dir`][Command_current_dir].
+    ///
+    /// [env_current_dir]: https://doc.rust-lang.org/std/env/fn.current_dir.html
+    /// [Command_current_dir]: https://doc.rust-lang.org/std/process/struct.Command.html#method.current_dir
+    pub fn pipe_stdin<P>(&mut self, file: P) -> io::Result<&mut Self>
+    where
+        P: AsRef<path::Path>,
+    {
+        let buffer = std::fs::read(file)?;
+        Ok(self.write_stdin(buffer))
+    }
+
+    /// Run a `Command`, returning an [`OutputResult`][OutputResult].
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::Command;
+    ///
+    /// let result = Command::new("echo")
+    ///     .args(&["42"])
+    ///     .ok();
+    /// assert!(result.is_ok());
+    /// ```
+    ///
+    /// [OutputResult]: type.OutputResult.html
+    pub fn ok(&mut self) -> OutputResult {
+        OutputOkExt::ok(self)
+    }
+
+    /// Run a `Command`, unwrapping the [`OutputResult`][OutputResult].
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use assert_cmd::Command;
+    ///
+    /// let output = Command::new("echo")
+    ///     .args(&["42"])
+    ///     .unwrap();
+    /// ```
+    ///
+    /// [OutputResult]: type.OutputResult.html
+    pub fn unwrap(&mut self) -> process::Output {
+        OutputOkExt::unwrap(self)
+    }
+
+    /// Run a `Command`, unwrapping the error in the [`OutputResult`][OutputResult].
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let err = Command::new("a-command")
+    ///     .args(&["--will-fail"])
+    ///     .unwrap_err();
+    /// ```
+    ///
+    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
+    pub fn unwrap_err(&mut self) -> OutputError {
+        OutputOkExt::unwrap_err(self)
+    }
+
+    /// Run a `Command` and make assertions on the [`Output`].
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::cargo_bin("bin_fixture")
+    ///     .unwrap()
+    ///     .assert()
+    ///     .success();
+    /// ```
+    ///
+    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
+    pub fn assert(&mut self) -> Assert {
+        OutputAssertExt::assert(self)
+    }
+}
+
+/// Mirror [`std::process::Command`][Command]'s API
+///
+/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+impl Command {
+    /// Constructs a new `Command` for launching the program at
+    /// path `program`, with the following default configuration:
+    ///
+    /// * No arguments to the program
+    /// * Inherit the current process's environment
+    /// * Inherit the current process's working directory
+    /// * Inherit stdin/stdout/stderr for `spawn` or `status`, but create pipes for `output`
+    ///
+    /// Builder methods are provided to change these defaults and
+    /// otherwise configure the process.
+    ///
+    /// If `program` is not an absolute path, the `PATH` will be searched in
+    /// an OS-defined way.
+    ///
+    /// The search path to be used may be controlled by setting the
+    /// `PATH` environment variable on the Command,
+    /// but this has some implementation limitations on Windows
+    /// (see issue #37519).
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("sh").unwrap();
+    /// ```
+    pub fn new<S: AsRef<ffi::OsStr>>(program: S) -> Self {
+        let cmd = process::Command::new(program);
+        Self::from_std(cmd)
+    }
+
+    /// Adds an argument to pass to the program.
+    ///
+    /// Only one argument can be passed per use. So instead of:
+    ///
+    /// ```no_run
+    /// # assert_cmd::Command::new("sh")
+    /// .arg("-C /path/to/repo")
+    /// # ;
+    /// ```
+    ///
+    /// usage would be:
+    ///
+    /// ```no_run
+    /// # assert_cmd::Command::new("sh")
+    /// .arg("-C")
+    /// .arg("/path/to/repo")
+    /// # ;
+    /// ```
+    ///
+    /// To pass multiple arguments see [`args`].
+    ///
+    /// [`args`]: #method.args
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .arg("-l")
+    ///         .arg("-a")
+    ///         .unwrap();
+    /// ```
+    pub fn arg<S: AsRef<ffi::OsStr>>(&mut self, arg: S) -> &mut Self {
+        self.cmd.arg(arg);
+        self
+    }
+
+    /// Adds multiple arguments to pass to the program.
+    ///
+    /// To pass a single argument see [`arg`].
+    ///
+    /// [`arg`]: #method.arg
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .args(&["-l", "-a"])
+    ///         .unwrap();
+    /// ```
+    pub fn args<I, S>(&mut self, args: I) -> &mut Self
+    where
+        I: IntoIterator<Item = S>,
+        S: AsRef<ffi::OsStr>,
+    {
+        self.cmd.args(args);
+        self
+    }
+
+    /// Inserts or updates an environment variable mapping.
+    ///
+    /// Note that environment variable names are case-insensitive (but case-preserving) on Windows,
+    /// and case-sensitive on all other platforms.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .env("PATH", "/bin")
+    ///         .unwrap_err();
+    /// ```
+    pub fn env<K, V>(&mut self, key: K, val: V) -> &mut Self
+    where
+        K: AsRef<ffi::OsStr>,
+        V: AsRef<ffi::OsStr>,
+    {
+        self.cmd.env(key, val);
+        self
+    }
+
+    /// Adds or updates multiple environment variable mappings.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    /// use std::process::Stdio;
+    /// use std::env;
+    /// use std::collections::HashMap;
+    ///
+    /// let filtered_env : HashMap<String, String> =
+    ///     env::vars().filter(|&(ref k, _)|
+    ///         k == "TERM" || k == "TZ" || k == "LANG" || k == "PATH"
+    ///     ).collect();
+    ///
+    /// Command::new("printenv")
+    ///         .env_clear()
+    ///         .envs(&filtered_env)
+    ///         .unwrap();
+    /// ```
+    pub fn envs<I, K, V>(&mut self, vars: I) -> &mut Self
+    where
+        I: IntoIterator<Item = (K, V)>,
+        K: AsRef<ffi::OsStr>,
+        V: AsRef<ffi::OsStr>,
+    {
+        self.cmd.envs(vars);
+        self
+    }
+
+    /// Removes an environment variable mapping.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .env_remove("PATH")
+    ///         .unwrap_err();
+    /// ```
+    pub fn env_remove<K: AsRef<ffi::OsStr>>(&mut self, key: K) -> &mut Self {
+        self.cmd.env_remove(key);
+        self
+    }
+
+    /// Clears the entire environment map for the child process.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// use std::process::Command;;
+
+    ///
+    /// Command::new("ls")
+    ///         .env_clear()
+    ///         .unwrap_err();
+    /// ```
+    pub fn env_clear(&mut self) -> &mut Self {
+        self.cmd.env_clear();
+        self
+    }
+
+    /// Sets the working directory for the child process.
+    ///
+    /// # Platform-specific behavior
+    ///
+    /// If the program path is relative (e.g., `"./script.sh"`), it's ambiguous
+    /// whether it should be interpreted relative to the parent's working
+    /// directory or relative to `current_dir`. The behavior in this case is
+    /// platform specific and unstable, and it's recommended to use
+    /// [`canonicalize`] to get an absolute program path instead.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```no_run
+    /// use assert_cmd::Command;
+    ///
+    /// Command::new("ls")
+    ///         .current_dir("/bin")
+    ///         .unwrap();
+    /// ```
+    ///
+    /// [`canonicalize`]: ../fs/fn.canonicalize.html
+    pub fn current_dir<P: AsRef<path::Path>>(&mut self, dir: P) -> &mut Self {
+        self.cmd.current_dir(dir);
+        self
+    }
+
+    /// Executes the `Command` as a child process, waiting for it to finish and collecting all of its
+    /// output.
+    ///
+    /// By default, stdout and stderr are captured (and used to provide the resulting output).
+    /// Stdin is not inherited from the parent and any attempt by the child process to read from
+    /// the stdin stream will result in the stream immediately closing.
+    ///
+    /// # Examples
+    ///
+    /// ```should_panic
+    /// use assert_cmd::Command;
+    /// use std::io::{self, Write};
+    /// let output = Command::new("/bin/cat")
+    ///                      .arg("file.txt")
+    ///                      .output()
+    ///                      .expect("failed to execute process");
+    ///
+    /// println!("status: {}", output.status);
+    /// io::stdout().write_all(&output.stdout).unwrap();
+    /// io::stderr().write_all(&output.stderr).unwrap();
+    ///
+    /// assert!(output.status.success());
+    /// ```
+    pub fn output(&mut self) -> io::Result<process::Output> {
+        self.spawn()?.wait_with_output()
+    }
+
+    fn spawn(&mut self) -> io::Result<process::Child> {
+        // stdout/stderr should only be piped for `output` according to `process::Command::new`.
+        self.cmd.stdin(process::Stdio::piped());
+        self.cmd.stdout(process::Stdio::piped());
+        self.cmd.stderr(process::Stdio::piped());
+
+        let mut spawned = self.cmd.spawn()?;
+
+        if let Some(buffer) = self.stdin.as_ref() {
+            spawned
+                .stdin
+                .as_mut()
+                .expect("Couldn't get mut ref to command stdin")
+                .write_all(&buffer)?;
+        }
+        Ok(spawned)
+    }
+}
+
+impl From<process::Command> for Command {
+    fn from(cmd: process::Command) -> Self {
+        Command::from_std(cmd)
+    }
+}
+
+impl<'c> OutputOkExt for &'c mut Command {
+    fn ok(self) -> OutputResult {
+        let output = self.output().map_err(OutputError::with_cause)?;
+        if output.status.success() {
+            Ok(output)
+        } else {
+            let error = OutputError::new(output).set_cmd(format!("{:?}", self.cmd));
+            let error = if let Some(stdin) = self.stdin.as_ref() {
+                error.set_stdin(stdin.clone())
+            } else {
+                error
+            };
+            Err(error)
+        }
+    }
+
+    fn unwrap_err(self) -> OutputError {
+        match self.ok() {
+            Ok(output) => {
+                if let Some(stdin) = self.stdin.as_ref() {
+                    panic!(
+                        "Completed successfully:\ncommand=`{:?}`\nstdin=```{}```\nstdout=```{}```",
+                        self.cmd,
+                        dump_buffer(&stdin),
+                        dump_buffer(&output.stdout)
+                    )
+                } else {
+                    panic!(
+                        "Completed successfully:\ncommand=`{:?}`\nstdout=```{}```",
+                        self.cmd,
+                        dump_buffer(&output.stdout)
+                    )
+                }
+            }
+            Err(err) => err,
+        }
+    }
+}
+
+impl<'c> OutputAssertExt for &'c mut Command {
+    fn assert(self) -> Assert {
+        let output = self.output().unwrap();
+        let assert = Assert::new(output).append_context("command", format!("{:?}", self.cmd));
+        if let Some(stdin) = self.stdin.as_ref() {
+            assert.append_context("stdin", DebugBuffer::new(stdin.clone()))
+        } else {
+            assert
+        }
+    }
+}

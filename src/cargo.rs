@@ -124,14 +124,24 @@ where
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError>;
 }
 
+impl CommandCargoExt for crate::cmd::Command {
+    fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
+        crate::cmd::Command::cargo_bin(name)
+    }
+}
+
 impl CommandCargoExt for process::Command {
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
-        let path = cargo_bin(name);
-        if path.is_file() {
-            Ok(process::Command::new(path))
-        } else {
-            Err(CargoError::with_cause(NotFoundError { path }))
-        }
+        cargo_bin_cmd(name)
+    }
+}
+
+pub(crate) fn cargo_bin_cmd<S: AsRef<str>>(name: S) -> Result<process::Command, CargoError> {
+    let path = cargo_bin(name);
+    if path.is_file() {
+        Ok(process::Command::new(path))
+    } else {
+        Err(CargoError::with_cause(NotFoundError { path }))
     }
 }
 

@@ -21,15 +21,10 @@ assert_cmd = "0.11"
 Here's a trivial example:
 
 ```rust,no_run
-extern crate assert_cmd;
+use assert_cmd::Command;
 
-use std::process::Command;
-use assert_cmd::prelude::*;
-
-Command::cargo_bin("bin_fixture")
-    .unwrap()
-    .assert()
-    .success();
+let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
+cmd.assert().success();
 ```
 
 ## Relevant crates
