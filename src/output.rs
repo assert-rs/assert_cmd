@@ -243,10 +243,6 @@ impl OutputError {
 }
 
 impl Error for OutputError {
-    fn description(&self) -> &str {
-        "Command failed."
-    }
-
     fn cause(&self) -> Option<&dyn Error> {
         if let OutputCause::Unexpected(ref err) = self.cause {
             Some(err.as_ref())
