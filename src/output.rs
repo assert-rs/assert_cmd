@@ -242,15 +242,7 @@ impl OutputError {
     }
 }
 
-impl Error for OutputError {
-    fn cause(&self) -> Option<&dyn Error> {
-        if let OutputCause::Unexpected(ref err) = self.cause {
-            Some(err.as_ref())
-        } else {
-            None
-        }
-    }
-}
+impl Error for OutputError {}
 
 impl fmt::Display for OutputError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
