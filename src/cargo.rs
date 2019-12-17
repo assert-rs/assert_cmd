@@ -162,14 +162,7 @@ impl CargoError {
     }
 }
 
-impl Error for CargoError {
-    fn cause(&self) -> Option<&dyn Error> {
-        self.cause.as_ref().map(|c| {
-            let c: &dyn Error = c.as_ref();
-            c
-        })
-    }
-}
+impl Error for CargoError {}
 
 impl fmt::Display for CargoError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -186,11 +179,7 @@ struct NotFoundError {
     path: path::PathBuf,
 }
 
-impl Error for NotFoundError {
-    fn cause(&self) -> Option<&dyn Error> {
-        None
-    }
-}
+impl Error for NotFoundError {}
 
 impl fmt::Display for NotFoundError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
