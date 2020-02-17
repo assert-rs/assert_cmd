@@ -2,3 +2,7 @@ pre-release-commit-message = "chore({{crate_name}}): Release {{version}}"
 no-dev-version = true
 tag-message = "{{tag_name}}"
 tag-name = "{{prefix}}v{{version}}"
+pre-release-replacements = [
+  {file="README.md", search="assert_cmd = .*", replace="assert_cmd = \"{{version}}\""},
+  {file="src/lib.rs", search="assert_cmd = .*", replace="assert_cmd = \"{{version}}\""},
+]
