@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! assert_cmd = "0.12"
+//! assert_cmd = "0.12.1"
 //! ```
 //!
 //! ## Overview
