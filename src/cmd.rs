@@ -4,7 +4,7 @@
 
 use std::ffi;
 use std::io;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path;
 use std::process;
 
@@ -416,7 +416,48 @@ impl Command {
     /// assert!(output.status.success());
     /// ```
     pub fn output(&mut self) -> io::Result<process::Output> {
-        self.spawn()?.wait_with_output()
+        let spawn = self.spawn()?;
+        Self::wait_with_input_output(spawn, self.stdin.clone())
+    }
+
+    /// If `input`, write it to `child`'s stdin while also reading `child`'s
+    /// stdout and stderr, then wait on `child` and return its status and output.
+    ///
+    /// This was lifted from `std::process::Child::wait_with_output` and modified
+    /// to also write to stdin.
+    fn wait_with_input_output(
+        mut child: process::Child,
+        input: Option<Vec<u8>>,
+    ) -> io::Result<process::Output> {
+        let stdin = input.and_then(|i| {
+            child
+                .stdin
+                .take()
+                .map(|mut stdin| std::thread::spawn(move || stdin.write_all(&i)))
+        });
+        fn read<R>(mut input: R) -> std::thread::JoinHandle<io::Result<Vec<u8>>>
+        where
+            R: Read + Send + 'static,
+        {
+            std::thread::spawn(move || {
+                let mut ret = Vec::new();
+                input.read_to_end(&mut ret).map(|_| ret)
+            })
+        }
+        let stdout = child.stdout.take().map(read);
+        let stderr = child.stderr.take().map(read);
+
+        // Finish writing stdin before waiting, because waiting drops stdin.
+        stdin.and_then(|t| t.join().unwrap().ok());
+        let status = child.wait()?;
+        let stdout = stdout.and_then(|t| t.join().unwrap().ok());
+        let stderr = stderr.and_then(|t| t.join().unwrap().ok());
+
+        Ok(process::Output {
+            status: status,
+            stdout: stdout.unwrap_or_default(),
+            stderr: stderr.unwrap_or_default(),
+        })
     }
 
     fn spawn(&mut self) -> io::Result<process::Child> {
@@ -425,16 +466,7 @@ impl Command {
         self.cmd.stdout(process::Stdio::piped());
         self.cmd.stderr(process::Stdio::piped());
 
-        let mut spawned = self.cmd.spawn()?;
-
-        if let Some(buffer) = self.stdin.as_ref() {
-            spawned
-                .stdin
-                .as_mut()
-                .expect("Couldn't get mut ref to command stdin")
-                .write_all(&buffer)?;
-        }
-        Ok(spawned)
+        self.cmd.spawn()
     }
 }
 
