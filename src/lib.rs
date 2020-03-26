@@ -1,8 +1,8 @@
 //! **Assert [`Command`]** - Easy command initialization and assertions.
 //!
-//! `assert_cmd` includes support for:
-//! - Setting up your program-under-test.
-//! - Verifying your program-under-test.
+//! `assert_cmd` aims to simplify the process for doing integration testing of CLIs, including:
+//! - Finding your crate's binary to test
+//! - Assert on the result of your program's run.
 //!
 //! ```toml
 //! [dependencies]
@@ -21,6 +21,7 @@
 //! - `current_dir`
 //! - `env` / `envs` / `env_remove` / `env_clear`
 //! - `write_stdin` / `pipe_stdin`
+//! - `timeout`
 //!
 //! Validate a [`Command`]:
 //! - `ok` / `unwrap` / `unwrap_err`

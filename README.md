@@ -7,6 +7,10 @@
 ![License](https://img.shields.io/crates/l/assert_cmd.svg)
 [![Crates Status](https://img.shields.io/crates/v/assert_cmd.svg)](https://crates.io/crates/assert_cmd)
 
+`assert_cmd` aims to simplify the process for doing integration testing of CLIs, including:
+- Finding your crate's binary to test
+- Assert on the result of your program's run.
+
 ## Install
 
 Add to your `Cargo.toml`:
@@ -26,6 +30,8 @@ use assert_cmd::Command;
 let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
 cmd.assert().success();
 ```
+
+See the [docs](http://docs.rs/assert_cmd) for more.
 
 ## Relevant crates
 
