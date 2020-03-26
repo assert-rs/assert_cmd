@@ -23,12 +23,17 @@ use crate::output::OutputResult;
 pub struct Command {
     cmd: process::Command,
     stdin: Option<Vec<u8>>,
+    timeout: Option<std::time::Duration>,
 }
 
 impl Command {
     /// Constructs a new `Command` from a `std` `Command`.
     pub fn from_std(cmd: process::Command) -> Self {
-        Self { cmd, stdin: None }
+        Self {
+            cmd,
+            stdin: None,
+            timeout: None,
+        }
     }
 
     /// Create a `Command` to run a specific binary of the current crate.
@@ -79,6 +84,23 @@ impl Command {
         S: Into<Vec<u8>>,
     {
         self.stdin = Some(buffer.into());
+        self
+    }
+
+    /// Error out if a timeout is reached
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let assert = Command::cargo_bin("bin_fixture")
+    ///     .unwrap()
+    ///     .timeout(std::time::Duration::from_secs(1))
+    ///     .env("sleep", "100")
+    ///     .assert();
+    /// assert.failure();
+    /// ```
+    pub fn timeout(&mut self, timeout: std::time::Duration) -> &mut Self {
+        self.timeout = Some(timeout);
         self
     }
 
@@ -417,7 +439,7 @@ impl Command {
     /// ```
     pub fn output(&mut self) -> io::Result<process::Output> {
         let spawn = self.spawn()?;
-        Self::wait_with_input_output(spawn, self.stdin.clone())
+        Self::wait_with_input_output(spawn, self.stdin.clone(), self.timeout)
     }
 
     /// If `input`, write it to `child`'s stdin while also reading `child`'s
@@ -428,6 +450,7 @@ impl Command {
     fn wait_with_input_output(
         mut child: process::Child,
         input: Option<Vec<u8>>,
+        timeout: Option<std::time::Duration>,
     ) -> io::Result<process::Output> {
         let stdin = input.and_then(|i| {
             child
@@ -449,14 +472,28 @@ impl Command {
 
         // Finish writing stdin before waiting, because waiting drops stdin.
         stdin.and_then(|t| t.join().unwrap().ok());
-        let status = child.wait()?;
-        let stdout = stdout.and_then(|t| t.join().unwrap().ok());
-        let stderr = stderr.and_then(|t| t.join().unwrap().ok());
+        let status = if let Some(timeout) = timeout {
+            wait_timeout::ChildExt::wait_timeout(&mut child, timeout)
+                .transpose()
+                .unwrap_or_else(|| {
+                    let _ = child.kill();
+                    child.wait()
+                })
+        } else {
+            child.wait()
+        }?;
+
+        let stdout = stdout
+            .and_then(|t| t.join().unwrap().ok())
+            .unwrap_or_default();
+        let stderr = stderr
+            .and_then(|t| t.join().unwrap().ok())
+            .unwrap_or_default();
 
         Ok(process::Output {
-            status: status,
-            stdout: stdout.unwrap_or_default(),
-            stderr: stderr.unwrap_or_default(),
+            status,
+            stdout,
+            stderr,
         })
     }
 
