@@ -31,6 +31,7 @@
 //!   - `code`, see [`Assert`]
 //!   - `stdout`, see [`Assert`]
 //!   - `stderr`, see [`Assert`]
+//!   - `get_output` for everything else, see [`Assert`]
 //!
 //! Note: [`Command`] is provided as a convenience. Extension traits for [`std::process::Command`]
 //! and `Output` are provided for interoperability:
