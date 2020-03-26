@@ -12,6 +12,10 @@ fn run() -> Result<(), Box<dyn Error>> {
         eprintln!("{}", text);
     }
 
+    if let Some(timeout) = env::var("sleep").ok().and_then(|s| s.parse().ok()) {
+        std::thread::sleep(std::time::Duration::from_secs(timeout));
+    }
+
     let code = env::var("exit")
         .ok()
         .map(|v| v.parse::<i32>())

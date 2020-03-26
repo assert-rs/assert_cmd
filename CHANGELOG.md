@@ -1,10 +1,17 @@
+<a name="0.12.2"></a>
+## 0.12.2 (2020-03-26)
+
+* **cmd**:
+  * Support timeouts (closes [#10](https://github.com/assert-rs/assert_cmd/issues/20)).
+
 <a name="0.12.1"></a>
 ## 0.12.1 (2020-03-25)
 
 
 #### Bug Fixes
 
-* **stdin**: Avoid stdin/stdout deadlocks by writing/reading in parallel (closes [#42](https://github.com/assert-rs/assert_cmd/issues/42)).
+* **cmd**:
+  * Avoid stdin/stdout deadlocks by writing/reading in parallel (closes [#42](https://github.com/assert-rs/assert_cmd/issues/42)).
 
 <a name="0.12.0"></a>
 ## 0.12.0 (2019-12-05)
