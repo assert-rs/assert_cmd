@@ -7,6 +7,10 @@
 ![License](https://img.shields.io/crates/l/assert_cmd.svg)
 [![Crates Status](https://img.shields.io/crates/v/assert_cmd.svg)](https://crates.io/crates/assert_cmd)
 
+`assert_cmd` aims to simplify the process for doing integration testing of CLIs, including:
+- Finding your crate's binary to test
+- Assert on the result of your program's run.
+
 ## Install
 
 Add to your `Cargo.toml`:
@@ -27,20 +31,26 @@ let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
 cmd.assert().success();
 ```
 
+See the [docs](http://docs.rs/assert_cmd) for more.
+
 ## Relevant crates
 
 Other crates that might be useful in testing command line programs.
+* [escargot][escargot] for more control over configurin the crate's binary.
 * [duct][duct] for orchestrating multiple processes.
+  * or [commandspec] for easier writing of commands
 * [rexpect][rexpect] for testing interactive programs.
 * [`assert_fs`][assert_fs] for filesystem fixtures and assertions.
+  * or [tempfile][tempfile] for scratchpad directories.
 * [dir-diff][dir-diff] for testing file side-effects.
-* [tempfile][tempfile] for scratchpad directories.
 
+[escargot]: http://docs.rs/escargot
 [rexpect]: https://crates.io/crates/rexpect
 [dir-diff]: https://crates.io/crates/dir-diff
 [tempfile]: https://crates.io/crates/tempfile
 [duct]: https://crates.io/crates/duct
 [assert_fs]: https://crates.io/crates/assert_fs
+[commandspec]: https://crates.io/crates/commandspec
 
 ## License
 

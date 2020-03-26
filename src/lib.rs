@@ -1,8 +1,8 @@
 //! **Assert [`Command`]** - Easy command initialization and assertions.
 //!
-//! `assert_cmd` includes support for:
-//! - Setting up your program-under-test.
-//! - Verifying your program-under-test.
+//! `assert_cmd` aims to simplify the process for doing integration testing of CLIs, including:
+//! - Finding your crate's binary to test
+//! - Assert on the result of your program's run.
 //!
 //! ```toml
 //! [dependencies]
@@ -21,6 +21,7 @@
 //! - `current_dir`
 //! - `env` / `envs` / `env_remove` / `env_clear`
 //! - `write_stdin` / `pipe_stdin`
+//! - `timeout`
 //!
 //! Validate a [`Command`]:
 //! - `ok` / `unwrap` / `unwrap_err`
@@ -31,6 +32,7 @@
 //!   - `code`, see [`Assert`]
 //!   - `stdout`, see [`Assert`]
 //!   - `stderr`, see [`Assert`]
+//!   - `get_output` for everything else, see [`Assert`]
 //!
 //! Note: [`Command`] is provided as a convenience. Extension traits for [`std::process::Command`]
 //! and `Output` are provided for interoperability:
@@ -72,11 +74,13 @@
 //! ## Relevant crates
 //!
 //! Other crates that might be useful in testing command line programs.
-//! - [duct] for orchestrating multiple processes.
-//! - [commandspec] for easier writing of commands
-//! - [assert_fs] for filesystem fixtures and assertions.
-//! - [dir-diff] for testing file side-effects.
-//! - [tempfile] for scratchpad directories.
+//! * [escargot][escargot] for more control over configurin the crate's binary.
+//! * [duct] for orchestrating multiple processes.
+//!   * or [commandspec] for easier writing of commands
+//! * [rexpect][rexpect] for testing interactive programs.
+//! * [assert_fs] for filesystem fixtures and assertions.
+//!   * or [tempfile] for scratchpad directories.
+//! * [dir-diff] for testing file side-effects.
 //!
 //! ## Migrating from `assert_cli` v0.6
 //!
@@ -96,6 +100,8 @@
 //! [tempfile]: https://crates.io/crates/tempfile
 //! [duct]: https://crates.io/crates/duct
 //! [assert_fs]: https://crates.io/crates/assert_fs
+//! [escargot]: http://docs.rs/escargot
+//! [rexpect]: https://crates.io/crates/rexpect
 //! [`Command`]: cmd/struct.Command.html
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 //! [`Assert`]: assert/struct.Assert.html
