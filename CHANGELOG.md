@@ -1,6 +1,8 @@
 <a name="0.12.2"></a>
 ## 0.12.2 (2020-03-26)
 
+#### Features
+
 * **cmd**:
   * Support timeouts (closes [#10](https://github.com/assert-rs/assert_cmd/issues/20)).
 
