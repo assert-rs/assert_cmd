@@ -17,7 +17,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-assert_cmd = "0.12.1"
+assert_cmd = "0.12.2"
 ```
 
 ## Example
