@@ -27,9 +27,6 @@
 //! If you run into these limitations, we recommend trying out [`escargot`]:
 //!
 //! ```rust,no_run
-//! extern crate assert_cmd;
-//! extern crate escargot;
-//!
 //! use assert_cmd::prelude::*;
 //! use escargot;
 //!

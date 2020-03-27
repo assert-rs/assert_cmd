@@ -201,9 +201,6 @@ impl Assert {
     ///
     /// Accepting a predicate:
     /// ```rust,no_run
-    /// extern crate assert_cmd;
-    /// extern crate predicates;
-    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -274,9 +271,6 @@ impl Assert {
     ///
     /// Accepting a bytes predicate:
     /// ```rust,no_run
-    /// extern crate assert_cmd;
-    /// extern crate predicates;
-    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -292,9 +286,6 @@ impl Assert {
     ///
     /// Accepting a `str` predicate:
     /// ```rust,no_run
-    /// extern crate assert_cmd;
-    /// extern crate predicates;
-    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -366,9 +357,6 @@ impl Assert {
     ///
     /// Accepting a bytes predicate:
     /// ```rust,no_run
-    /// extern crate assert_cmd;
-    /// extern crate predicates;
-    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -384,9 +372,6 @@ impl Assert {
     ///
     /// Accepting a `str` predicate:
     /// ```rust,no_run
-    /// extern crate assert_cmd;
-    /// extern crate predicates;
-    ///
     /// use assert_cmd::prelude::*;
     ///
     /// use std::process::Command;
@@ -472,9 +457,6 @@ impl fmt::Debug for Assert {
 /// # Examples
 ///
 /// ```rust,no_run
-/// extern crate assert_cmd;
-/// extern crate predicates;
-///
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
@@ -676,9 +658,6 @@ impl IntoCodePredicate<InCodePredicate> for &'static [i32] {
 /// # Examples
 ///
 /// ```rust,no_run
-/// extern crate assert_cmd;
-/// extern crate predicates;
-///
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
@@ -893,9 +872,6 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 /// # Example
 ///
 /// ```rust,no_run
-/// extern crate assert_cmd;
-/// extern crate predicates;
-///
 /// use assert_cmd::prelude::*;
 ///
 /// use std::process::Command;
