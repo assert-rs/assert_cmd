@@ -6,9 +6,7 @@ use std::fmt;
 use std::process;
 use std::str;
 
-use predicates;
 use predicates::str::PredicateStrExt;
-use predicates_core;
 use predicates_tree::CaseTreeExt;
 
 use crate::output::dump_buffer;
