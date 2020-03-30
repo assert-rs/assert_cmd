@@ -1,8 +1,6 @@
 use std::process;
 use std::process::Command;
 
-use escargot;
-
 use assert_cmd::prelude::*;
 
 #[test]

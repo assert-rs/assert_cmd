@@ -28,7 +28,6 @@
 //!
 //! ```rust,no_run
 //! use assert_cmd::prelude::*;
-//! use escargot;
 //!
 //! use std::process::Command;
 //!
