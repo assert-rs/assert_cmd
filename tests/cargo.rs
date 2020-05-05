@@ -52,3 +52,10 @@ fn cargo_bin_example_2() {
     let output = cmd.unwrap();
     println!("{:?}", output);
 }
+
+#[test]
+fn cargo_bin_exe() {
+    let cmd = Command::absolute_path(env!("CARGO_BIN_EXE_bin_fixture"));
+    let output = cmd.unwrap();
+    println!("{:?}", output);
+}

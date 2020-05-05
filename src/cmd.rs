@@ -66,6 +66,30 @@ impl Command {
         Ok(Self::from_std(cmd))
     }
 
+    /// Create a [`Command`] to run a specific binary of the current crate using absolute
+    /// path.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// let mut cmd = Command::absolute_path(env!("CARGO_BIN_EXE_bin_fixture"))
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
+    /// ```
+    ///
+    /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+    pub fn absolute_path<T: Into<path::PathBuf>>(
+        path: T,
+    ) -> Result<Self, crate::cargo::CargoError> {
+        let cmd = crate::cargo::from_path(path)?;
+        Ok(Self::from_std(cmd))
+    }
+
     /// Write `buffer` to `stdin` when the `Command` is run.
     ///
     /// # Examples

@@ -118,11 +118,34 @@ where
     /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
     /// [`cargo`]: index.html
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError>;
+
+    /// Create a [`Command`] to run a specific binary of the current crate using absolute
+    /// path.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    ///
+    /// let mut cmd = Command::absolute_path(env!("CARGO_BIN_EXE_bin_fixture"))
+    ///     .unwrap();
+    /// let output = cmd.unwrap();
+    /// println!("{:?}", output);
+    /// ```
+    ///
+    /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+    fn absolute_path<T: Into<path::PathBuf>>(path: T) -> Result<Self, CargoError>;
 }
 
 impl CommandCargoExt for crate::cmd::Command {
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
         crate::cmd::Command::cargo_bin(name)
+    }
+
+    fn absolute_path<T: Into<path::PathBuf>>(path: T) -> Result<Self, CargoError> {
+        crate::cmd::Command::absolute_path(path)
     }
 }
 
@@ -130,10 +153,19 @@ impl CommandCargoExt for process::Command {
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
         cargo_bin_cmd(name)
     }
+
+    fn absolute_path<T: Into<path::PathBuf>>(path: T) -> Result<Self, CargoError> {
+        from_path(path)
+    }
 }
 
 pub(crate) fn cargo_bin_cmd<S: AsRef<str>>(name: S) -> Result<process::Command, CargoError> {
     let path = cargo_bin(name);
+    from_path(path)
+}
+
+pub(crate) fn from_path<T: Into<path::PathBuf>>(path: T) -> Result<process::Command, CargoError> {
+    let path = path.into();
     if path.is_file() {
         Ok(process::Command::new(path))
     } else {
