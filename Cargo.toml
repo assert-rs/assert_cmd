@@ -21,6 +21,7 @@ predicates-core = "1.0"
 predicates-tree = "1.0"
 doc-comment = "0.3"
 wait-timeout = "0.2.0"
+bstr = "0.2.14"
 
 [dev-dependencies]
 escargot = "0.5"

@@ -5,6 +5,8 @@ use std::fmt;
 use std::process;
 use std::str;
 
+use bstr::ByteSlice;
+
 /// Converts a type to an [`OutputResult`].
 ///
 /// This is for example implemented on [`std::process::Output`].
@@ -316,7 +318,7 @@ pub(crate) fn write_buffer(buffer: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Re
     if let Ok(buffer) = str::from_utf8(buffer) {
         write!(f, "{}", buffer)
     } else {
-        write!(f, "{:?}", buffer)
+        write!(f, "{}", buffer.as_bstr())
     }
 }
 
@@ -333,6 +335,23 @@ impl DebugBuffer {
 
 impl fmt::Display for DebugBuffer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write_buffer(&self.buffer, f)
+        const MIN_OVERFLOW: usize = 8192;
+        const MAX_START: usize = 2048;
+        const MAX_END: usize = 2048;
+        const MAX_PRINTED: usize = MAX_START + MAX_END;
+        assert!(MAX_PRINTED < MIN_OVERFLOW);
+
+        if self.buffer.len() >= MIN_OVERFLOW {
+            write!(
+                f,
+                "<{} bytes total>{:?}...<{} bytes omitted>...{:?}",
+                self.buffer.len(),
+                self.buffer[..MAX_START].as_bstr(),
+                self.buffer.len() - MAX_PRINTED,
+                self.buffer[self.buffer.len() - MAX_END..].as_bstr(),
+            )
+        } else {
+            write!(f, "{:?}", self.buffer.as_bstr())
+        }
     }
 }
