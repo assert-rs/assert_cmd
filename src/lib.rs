@@ -74,7 +74,7 @@
 //! ## Relevant crates
 //!
 //! Other crates that might be useful in testing command line programs.
-//! * [escargot][escargot] for more control over configurin the crate's binary.
+//! * [escargot][escargot] for more control over configuring the crate's binary.
 //! * [duct] for orchestrating multiple processes.
 //!   * or [commandspec] for easier writing of commands
 //! * [rexpect][rexpect] for testing interactive programs.
