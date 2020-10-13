@@ -2,6 +2,7 @@
 //!
 //! [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
 
+use std::borrow::Cow;
 use std::fmt;
 use std::process;
 use std::str;
@@ -723,47 +724,50 @@ where
 /// [`IntoOutputPredicate`]: trait.IntoOutputPredicate.html
 /// [Predicate]: https://docs.rs/predicates-core/1.0.0/predicates_core/trait.Predicate.html
 #[derive(Debug)]
-pub struct BytesContentOutputPredicate(predicates::ord::EqPredicate<&'static [u8]>);
+pub struct BytesContentOutputPredicate(Cow<'static, [u8]>);
 
 impl BytesContentOutputPredicate {
     pub(crate) fn new(value: &'static [u8]) -> Self {
-        let pred = predicates::ord::eq(value);
-        BytesContentOutputPredicate(pred)
+        BytesContentOutputPredicate(Cow::from(value))
+    }
+
+    pub(crate) fn from_vec(value: Vec<u8>) -> Self {
+        BytesContentOutputPredicate(Cow::from(value))
     }
 }
 
-impl predicates_core::reflection::PredicateReflection for BytesContentOutputPredicate {
-    fn parameters<'a>(
-        &'a self,
-    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Parameter<'a>> + 'a> {
-        self.0.parameters()
-    }
-
-    /// Nested `Predicate`s of the current `Predicate`.
-    fn children<'a>(
-        &'a self,
-    ) -> Box<dyn Iterator<Item = predicates_core::reflection::Child<'a>> + 'a> {
-        self.0.children()
-    }
-}
+impl predicates_core::reflection::PredicateReflection for BytesContentOutputPredicate {}
 
 impl predicates_core::Predicate<[u8]> for BytesContentOutputPredicate {
     fn eval(&self, item: &[u8]) -> bool {
-        self.0.eval(item)
+        self.0.as_ref() == item
     }
 
-    fn find_case<'a>(
-        &'a self,
+    fn find_case(
+        &self,
         expected: bool,
         variable: &[u8],
-    ) -> Option<predicates_core::reflection::Case<'a>> {
-        self.0.find_case(expected, variable)
+    ) -> Option<predicates_core::reflection::Case> {
+        let actual = self.eval(variable);
+        if expected == actual {
+            Some(predicates_core::reflection::Case::new(Some(self), actual))
+        } else {
+            None
+        }
     }
 }
 
 impl fmt::Display for BytesContentOutputPredicate {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
+        predicates::ord::eq(self.0.as_ref()).fmt(f)
+    }
+}
+
+impl IntoOutputPredicate<BytesContentOutputPredicate> for Vec<u8> {
+    type Predicate = BytesContentOutputPredicate;
+
+    fn into_output(self) -> Self::Predicate {
+        Self::Predicate::from_vec(self)
     }
 }
 
@@ -1014,6 +1018,12 @@ mod test {
     #[test]
     fn into_output_from_bytes() {
         let pred = convert_output(b"Hello" as &[u8]);
+        assert!(pred.eval(b"Hello" as &[u8]));
+    }
+
+    #[test]
+    fn into_output_from_vec() {
+        let pred = convert_output(vec![b'H', b'e', b'l', b'l', b'o']);
         assert!(pred.eval(b"Hello" as &[u8]));
     }
 

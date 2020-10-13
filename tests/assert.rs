@@ -107,6 +107,13 @@ fn stdout_example() {
         .env("stdout", "hello")
         .env("stderr", "world")
         .assert()
+        .stdout(vec![b'h', b'e', b'l', b'l', b'o', b'\n']);
+
+    Command::cargo_bin("bin_fixture")
+        .unwrap()
+        .env("stdout", "hello")
+        .env("stderr", "world")
+        .assert()
         .stdout("hello\n");
 }
 
@@ -132,6 +139,13 @@ fn stderr_example() {
         .env("stderr", "world")
         .assert()
         .stderr(b"world\n" as &[u8]);
+
+    Command::cargo_bin("bin_fixture")
+        .unwrap()
+        .env("stdout", "hello")
+        .env("stderr", "world")
+        .assert()
+        .stderr(vec![b'w', b'o', b'r', b'l', b'd', b'\n']);
 
     Command::cargo_bin("bin_fixture")
         .unwrap()
