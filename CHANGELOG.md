@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+#### Fixes
+
+- Be explicit about spawn failure (closes [#109](https://github.com/assert-rs/assert_cmd/issues/109)).
+
 ## 1.0.1 (2020-03-30)
 
 #### Fixes
