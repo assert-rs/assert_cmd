@@ -1,16 +1,23 @@
-<a name="1.0.1"></a>
+# Change Log
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+<!-- next-header -->
+
+## [Unreleased] - ReleaseDate
+
 ## 1.0.1 (2020-03-30)
 
 #### Fixes
 
 - Reduce dependencies.
 
-<a name="1.0.0"></a>
 ## 1.0.0 (2020-03-26)
 
 Stable release!
 
-<a name="0.12.2"></a>
 ## 0.12.2 (2020-03-26)
 
 #### Features
@@ -18,7 +25,6 @@ Stable release!
 * **cmd**:
   * Support timeouts (closes [#10](https://github.com/assert-rs/assert_cmd/issues/20)).
 
-<a name="0.12.1"></a>
 ## 0.12.1 (2020-03-25)
 
 
@@ -27,7 +33,6 @@ Stable release!
 * **cmd**:
   * Avoid stdin/stdout deadlocks by writing/reading in parallel (closes [#42](https://github.com/assert-rs/assert_cmd/issues/42)).
 
-<a name="0.12.0"></a>
 ## 0.12.0 (2019-12-05)
 
 
@@ -43,7 +48,6 @@ Stable release!
 
 
 
-<a name="0.11.1"></a>
 ## 0.11.1 (2019-03-23)
 
 
@@ -53,7 +57,6 @@ Stable release!
 
 
 
-<a name="0.11.0"></a>
 ## 0.11.0 (2019-01-29)
 
 
@@ -68,7 +71,6 @@ Stable release!
   * See the [`assert_cmd::cargo` docs](https://docs.rs/assert_cmd/0.11.0/assert_cmd/cargo/index.html) for trade-offs with when to use `escargot` vs `assert_cmd`
 
 
-<a name="0.10.2"></a>
 ## 0.10.2 (2018-11-21)
 
 
@@ -81,7 +83,6 @@ Stable release!
 
 
 
-<a name="0.10.1"></a>
 ## 0.10.1 (2018-10-10)
 
 
@@ -90,7 +91,6 @@ Stable release!
 * Documentation fixes
 
 
-<a name="0.10.0"></a>
 ## 0.10.0 (2018-10-10)
 
 
@@ -107,7 +107,6 @@ Stable release!
 
 
 
-<a name="0.9.1"></a>
 ## 0.9.1 (2018-08-09)
 
 
@@ -117,7 +116,6 @@ Stable release!
 
 
 
-<a name="0.9.0"></a>
 ## 0.9.0 (2018-08-02)
 
 
@@ -140,7 +138,6 @@ Stable release!
 
 
 
-<a name="0.5.0"></a>
 ## 0.6.0 (2018-07-18)
 
 
@@ -154,7 +151,6 @@ Stable release!
 
 
 
-<a name="0.5.0"></a>
 ## 0.5.0 (2018-07-13)
 
 
@@ -168,7 +164,6 @@ Stable release!
 
 
 
-<a name="0.4.0"></a>
 ## 0.4.0 (2018-06-28)
 
 
@@ -188,7 +183,6 @@ Stable release!
 
 
 
-<a name="0.3.0"></a>
 ## 0.3.0 (2018-06-07)
 
 ### Features
@@ -200,7 +194,6 @@ Stable release!
 * Moved all cargo stuff under `cargo` module.
 
 
-<a name="0.2.0"></a>
 ## 0.2.0 (2018-06-06)
 
 
@@ -216,3 +209,7 @@ Stable release!
 
 *   Change to predicates v0.5.0 ([5fa02435](https://github.com/assert-rs/assert_cmd/commit/5fa02435ffee0a3fb5f94fa374437ae71201f7d7))
 *   Simplify stdout/stderr str predicates ([8cdfb91e](https://github.com/assert-rs/assert_cmd/commit/8cdfb91e0f7a535d3d2b9fbb21f0df5d236a0f0a), closes [#11](https://github.com/assert-rs/assert_cmd/issues/11))
+
+
+<!-- next-url -->
+[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v1.0.1...HEAD
