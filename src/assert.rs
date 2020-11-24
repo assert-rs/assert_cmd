@@ -57,7 +57,12 @@ impl OutputAssertExt for process::Output {
 
 impl<'c> OutputAssertExt for &'c mut process::Command {
     fn assert(self) -> Assert {
-        let output = self.output().unwrap();
+        let output = match self.output() {
+            Ok(output) => output,
+            Err(err) => {
+                panic!("Failed to spawn {:?}: {}", self, err);
+            }
+        };
         Assert::new(output).append_context("command", format!("{:?}", self))
     }
 }
