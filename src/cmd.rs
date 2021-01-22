@@ -10,8 +10,8 @@ use std::process;
 
 use crate::assert::Assert;
 use crate::assert::OutputAssertExt;
-use crate::output::dump_buffer;
 use crate::output::DebugBuffer;
+use crate::output::DebugBytes;
 use crate::output::OutputError;
 use crate::output::OutputOkExt;
 use crate::output::OutputResult;
@@ -536,14 +536,14 @@ impl<'c> OutputOkExt for &'c mut Command {
                     panic!(
                         "Completed successfully:\ncommand=`{:?}`\nstdin=```{}```\nstdout=```{}```",
                         self.cmd,
-                        dump_buffer(&stdin),
-                        dump_buffer(&output.stdout)
+                        DebugBytes::new(&stdin),
+                        DebugBytes::new(&output.stdout)
                     )
                 } else {
                     panic!(
                         "Completed successfully:\ncommand=`{:?}`\nstdout=```{}```",
                         self.cmd,
-                        dump_buffer(&output.stdout)
+                        DebugBytes::new(&output.stdout)
                     )
                 }
             }
