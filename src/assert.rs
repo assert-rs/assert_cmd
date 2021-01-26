@@ -10,8 +10,8 @@ use std::str;
 use predicates::str::PredicateStrExt;
 use predicates_tree::CaseTreeExt;
 
-use crate::output::dump_buffer;
 use crate::output::output_fmt;
+use crate::output::DebugBytes;
 
 /// Assert the state of an [`Output`].
 ///
@@ -151,14 +151,14 @@ impl Assert {
             let actual_code = self.output.status.code().unwrap_or_else(|| {
                 panic!(
                     "Unexpected failure.\ncode=<interrupted>\nstderr=```{}```\n{}",
-                    dump_buffer(&self.output.stderr),
+                    DebugBytes::new(&self.output.stderr),
                     self
                 )
             });
             panic!(
                 "Unexpected failure.\ncode-{}\nstderr=```{}```\n{}",
                 actual_code,
-                dump_buffer(&self.output.stderr),
+                DebugBytes::new(&self.output.stderr),
                 self
             );
         }

@@ -1,5 +1,6 @@
 //! Simplify one-off runs of programs.
 
+use bstr::ByteSlice;
 use std::error::Error;
 use std::fmt;
 use std::process;
@@ -88,7 +89,7 @@ where
         match self.ok() {
             Ok(output) => panic!(
                 "Command completed successfully\nstdout=```{}```",
-                dump_buffer(&output.stdout)
+                DebugBytes::new(&output.stdout)
             ),
             Err(err) => err,
         }
@@ -122,7 +123,7 @@ impl<'c> OutputOkExt for &'c mut process::Command {
             Ok(output) => panic!(
                 "Completed successfully:\ncommand=`{:?}`\nstdout=```{}```",
                 self,
-                dump_buffer(&output.stdout)
+                DebugBytes::new(&output.stdout)
             ),
             Err(err) => err,
         }
@@ -293,30 +294,29 @@ pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -
         writeln!(f, "code=<interrupted>")?;
     }
 
-    write!(f, "stdout=```")?;
-    write_buffer(&output.stdout, f)?;
-    writeln!(f, "```")?;
-
-    write!(f, "stderr=```")?;
-    write_buffer(&output.stderr, f)?;
-    writeln!(f, "```")?;
-
+    write!(
+        f,
+        "stdout=```{}```\nstderr=```{}```\n",
+        DebugBytes::new(&output.stdout),
+        DebugBytes::new(&output.stderr),
+    )?;
     Ok(())
 }
 
-pub(crate) fn dump_buffer(buffer: &[u8]) -> String {
-    if let Ok(buffer) = str::from_utf8(buffer) {
-        buffer.to_string()
-    } else {
-        format!("{:?}", buffer)
+#[derive(Debug)]
+pub(crate) struct DebugBytes<'a> {
+    bytes: &'a [u8],
+}
+
+impl<'a> DebugBytes<'a> {
+    pub(crate) fn new(bytes: &'a [u8]) -> Self {
+        DebugBytes { bytes }
     }
 }
 
-pub(crate) fn write_buffer(buffer: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    if let Ok(buffer) = str::from_utf8(buffer) {
-        write!(f, "{}", buffer)
-    } else {
-        write!(f, "{:?}", buffer)
+impl<'a> fmt::Display for DebugBytes<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        format_bytes(self.bytes, f)
     }
 }
 
@@ -333,6 +333,27 @@ impl DebugBuffer {
 
 impl fmt::Display for DebugBuffer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write_buffer(&self.buffer, f)
+        format_bytes(&self.buffer, f)
+    }
+}
+
+fn format_bytes(data: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    const MIN_OVERFLOW: usize = 8192;
+    const MAX_START: usize = 2048;
+    const MAX_END: usize = 2048;
+    const MAX_PRINTED: usize = MAX_START + MAX_END;
+    assert!(MAX_PRINTED < MIN_OVERFLOW);
+
+    if data.len() >= MIN_OVERFLOW {
+        write!(
+            f,
+            "<{} bytes total>{:?}...<{} bytes omitted>...{:?}",
+            data.len(),
+            data[..MAX_START].as_bstr(),
+            data.len() - MAX_PRINTED,
+            data[data.len() - MAX_END..].as_bstr(),
+        )
+    } else {
+        write!(f, "{:?}", data.as_bstr())
     }
 }
