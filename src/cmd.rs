@@ -1,6 +1,6 @@
 //! [`std::process::Command`][Command] customized for testing.
 //!
-//! [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+//! [Command]: std::process::Command
 
 use std::ffi;
 use std::io;
@@ -18,7 +18,7 @@ use crate::output::OutputResult;
 
 /// [`std::process::Command`][Command] customized for testing.
 ///
-/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+/// [Command]: std::process::Command
 #[derive(Debug)]
 pub struct Command {
     cmd: process::Command,
@@ -60,7 +60,6 @@ impl Command {
     /// println!("{:?}", output);
     /// ```
     ///
-    /// [`cargo`]: index.html
     pub fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, crate::cargo::CargoError> {
         let cmd = crate::cargo::cargo_bin_cmd(name)?;
         Ok(Self::from_std(cmd))
@@ -109,8 +108,8 @@ impl Command {
     /// Paths are relative to the [`env::current_dir`][env_current_dir] and not
     /// [`Command::current_dir`][Command_current_dir].
     ///
-    /// [env_current_dir]: https://doc.rust-lang.org/std/env/fn.current_dir.html
-    /// [Command_current_dir]: https://doc.rust-lang.org/std/process/struct.Command.html#method.current_dir
+    /// [env_current_dir]: std::env::current_dir()
+    /// [Command_current_dir]: std::process::Command::current_dir()
     pub fn pipe_stdin<P>(&mut self, file: P) -> io::Result<&mut Self>
     where
         P: AsRef<path::Path>,
@@ -132,7 +131,6 @@ impl Command {
     /// assert!(result.is_ok());
     /// ```
     ///
-    /// [OutputResult]: type.OutputResult.html
     pub fn ok(&mut self) -> OutputResult {
         OutputOkExt::ok(self)
     }
@@ -149,7 +147,6 @@ impl Command {
     ///     .unwrap();
     /// ```
     ///
-    /// [OutputResult]: type.OutputResult.html
     pub fn unwrap(&mut self) -> process::Output {
         OutputOkExt::unwrap(self)
     }
@@ -166,7 +163,7 @@ impl Command {
     ///     .unwrap_err();
     /// ```
     ///
-    /// [Output]: https://doc.rust-lang.org/std/process/struct.Output.html
+    /// [Output]: std::process::Output
     pub fn unwrap_err(&mut self) -> OutputError {
         OutputOkExt::unwrap_err(self)
     }
@@ -184,7 +181,7 @@ impl Command {
     ///     .success();
     /// ```
     ///
-    /// [`Output`]: https://doc.rust-lang.org/std/process/struct.Output.html
+    /// [`Output`]: std::process::Output
     pub fn assert(&mut self) -> Assert {
         OutputAssertExt::assert(self)
     }
@@ -192,7 +189,7 @@ impl Command {
 
 /// Mirror [`std::process::Command`][Command]'s API
 ///
-/// [Command]: https://doc.rust-lang.org/std/process/struct.Command.html
+/// [Command]: std::process::Command
 impl Command {
     /// Constructs a new `Command` for launching the program at
     /// path `program`, with the following default configuration:
@@ -248,7 +245,7 @@ impl Command {
     ///
     /// To pass multiple arguments see [`args`].
     ///
-    /// [`args`]: #method.args
+    /// [`args`]: Command::args()
     ///
     /// # Examples
     ///
@@ -271,7 +268,7 @@ impl Command {
     ///
     /// To pass a single argument see [`arg`].
     ///
-    /// [`arg`]: #method.arg
+    /// [`arg`]: Command::arg()
     ///
     /// # Examples
     ///
@@ -374,8 +371,8 @@ impl Command {
     ///
     /// Basic usage:
     ///
-    /// use std::process::Command;;
-
+    /// ```no_run
+    /// use assert_cmd::Command;
     ///
     /// Command::new("ls")
     ///         .env_clear()
@@ -408,7 +405,7 @@ impl Command {
     ///         .unwrap();
     /// ```
     ///
-    /// [`canonicalize`]: ../fs/fn.canonicalize.html
+    /// [`canonicalize`]: super::fs::canonicalize()
     pub fn current_dir<P: AsRef<path::Path>>(&mut self, dir: P) -> &mut Self {
         self.cmd.current_dir(dir);
         self

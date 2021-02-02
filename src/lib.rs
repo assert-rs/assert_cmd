@@ -95,15 +95,13 @@
 //! [tempfile]: https://crates.io/crates/tempfile
 //! [duct]: https://crates.io/crates/duct
 //! [assert_fs]: https://crates.io/crates/assert_fs
-//! [escargot]: http://docs.rs/escargot
 //! [rexpect]: https://crates.io/crates/rexpect
-//! [`Command`]: cmd/struct.Command.html
-//! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-//! [`Assert`]: assert/struct.Assert.html
-//! [`success()`]: assert/struct.Assert.html#method.success
-//! [`CommandCargoExt`]: cargo/trait.CommandCargoExt.html
-//! [`OutputOkExt`]: cmd/trait.OutputOkExt.html
-//! [`OutputAssertExt`]: assert/trait.OutputAssertExt.html
+//! [`Command`]: cmd::Command
+//! [`Assert`]: assert::Assert
+//! [`success()`]: assert::Assert::success()
+//! [`CommandCargoExt`]: cargo::CommandCargoExt
+//! [`OutputOkExt`]: cmd::OutputOkExt
+//! [`OutputAssertExt`]: assert::OutputAssertExt
 
 #![warn(missing_docs)]
 

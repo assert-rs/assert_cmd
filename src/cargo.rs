@@ -43,15 +43,13 @@
 //! ```
 //!
 //! Notes:
-//! - There is a [noticeable per-call overhead](cargo-overhead) for `CargoBuild`.  We recommend
+//! - There is a [noticeable per-call overhead][cargo-overhead] for `CargoBuild`.  We recommend
 //!   caching the binary location (`.path()` instead of `.command()`) with [`lazy_static`].
 //! - `.current_target()` improves platform coverage at the cost of [slower test runs if you don't
-//!   explicitly pass `--target <TRIPLET>` on the command line](first-call).
+//!   explicitly pass `--target <TRIPLET>` on the command line][first-call].
 //!
 //! [`lazy_static`]: https://crates.io/crates/lazy_static
-//! [`CommandCargoExt`]: trait.CommandCargoExt.html
-//! [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-//! [`escargot`]: https://docs.rs/escargot/
+//! [`Command`]: std::process::Command
 //! [cargo-overhead]: https://github.com/assert-rs/assert_cmd/issues/6
 //! [first-call]: https://github.com/assert-rs/assert_cmd/issues/57
 
@@ -81,8 +79,7 @@ use std::process;
 /// println!("{:?}", output);
 /// ```
 ///
-/// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-/// [`cargo`]: index.html
+/// [`Command`]: std::process::Command
 pub trait CommandCargoExt
 where
     Self: Sized,
@@ -115,8 +112,7 @@ where
     /// println!("{:?}", output);
     /// ```
     ///
-    /// [`Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-    /// [`cargo`]: index.html
+    /// [`Command`]: std::process::Command
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError>;
 }
 
