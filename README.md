@@ -11,15 +11,6 @@
 - Finding your crate's binary to test
 - Assert on the result of your program's run.
 
-## Install
-
-Add to your `Cargo.toml`:
-
-```toml
-[dependencies]
-assert_cmd = "1.0.2"
-```
-
 ## Example
 
 Here's a trivial example:
