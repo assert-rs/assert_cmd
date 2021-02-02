@@ -13,24 +13,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Be explicit about spawn failure (closes [#109](https://github.com/assert-rs/assert_cmd/issues/109)).
 
-## 1.0.1 (2020-03-30)
+## 1.0.1 - 2020-03-30
 
 #### Fixes
 
 - Reduce dependencies.
 
-## 1.0.0 (2020-03-26)
+## 1.0.0 - 2020-03-26
 
 Stable release!
 
-## 0.12.2 (2020-03-26)
+## 0.12.2 - 2020-03-26
 
 #### Features
 
 * **cmd**:
   * Support timeouts (closes [#10](https://github.com/assert-rs/assert_cmd/issues/20)).
 
-## 0.12.1 (2020-03-25)
+## 0.12.1 - 2020-03-25
 
 
 #### Bug Fixes
@@ -38,7 +38,7 @@ Stable release!
 * **cmd**:
   * Avoid stdin/stdout deadlocks by writing/reading in parallel (closes [#42](https://github.com/assert-rs/assert_cmd/issues/42)).
 
-## 0.12.0 (2019-12-05)
+## 0.12.0 - 2019-12-05
 
 
 #### Bug Fixes
@@ -53,7 +53,7 @@ Stable release!
 
 
 
-## 0.11.1 (2019-03-23)
+## 0.11.1 - 2019-03-23
 
 
 #### Bug Fixes
@@ -62,7 +62,7 @@ Stable release!
 
 
 
-## 0.11.0 (2019-01-29)
+## 0.11.0 - 2019-01-29
 
 
 #### Performance
@@ -76,7 +76,7 @@ Stable release!
   * See the [`assert_cmd::cargo` docs](https://docs.rs/assert_cmd/0.11.0/assert_cmd/cargo/index.html) for trade-offs with when to use `escargot` vs `assert_cmd`
 
 
-## 0.10.2 (2018-11-21)
+## 0.10.2 - 2018-11-21
 
 
 #### Bug Fixes
@@ -88,7 +88,7 @@ Stable release!
 
 
 
-## 0.10.1 (2018-10-10)
+## 0.10.1 - 2018-10-10
 
 
 #### Bug Fixes
@@ -96,7 +96,7 @@ Stable release!
 * Documentation fixes
 
 
-## 0.10.0 (2018-10-10)
+## 0.10.0 - 2018-10-10
 
 
 #### Breaking Changes
@@ -112,7 +112,7 @@ Stable release!
 
 
 
-## 0.9.1 (2018-08-09)
+## 0.9.1 - 2018-08-09
 
 
 #### Bug Fixes
@@ -121,7 +121,7 @@ Stable release!
 
 
 
-## 0.9.0 (2018-08-02)
+## 0.9.0 - 2018-08-02
 
 
 #### Breaking Changes
@@ -143,7 +143,7 @@ Stable release!
 
 
 
-## 0.6.0 (2018-07-18)
+## 0.6.0 - 2018-07-18
 
 
 #### Features
@@ -156,7 +156,7 @@ Stable release!
 
 
 
-## 0.5.0 (2018-07-13)
+## 0.5.0 - 2018-07-13
 
 
 #### Features
@@ -169,7 +169,7 @@ Stable release!
 
 
 
-## 0.4.0 (2018-06-28)
+## 0.4.0 - 2018-06-28
 
 
 #### Features
@@ -188,7 +188,7 @@ Stable release!
 
 
 
-## 0.3.0 (2018-06-07)
+## 0.3.0 - 2018-06-07
 
 ### Features
 
@@ -199,7 +199,7 @@ Stable release!
 * Moved all cargo stuff under `cargo` module.
 
 
-## 0.2.0 (2018-06-06)
+## 0.2.0 - 2018-06-06
 
 
 #### Features
