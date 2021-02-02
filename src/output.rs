@@ -333,6 +333,7 @@ impl fmt::Display for DebugBuffer {
 }
 
 fn format_bytes(data: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    #![allow(clippy::assertions_on_constants)]
     const MIN_OVERFLOW: usize = 8192;
     const MAX_START: usize = 2048;
     const MAX_END: usize = 2048;
