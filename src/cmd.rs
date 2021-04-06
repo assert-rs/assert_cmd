@@ -551,7 +551,12 @@ impl<'c> OutputOkExt for &'c mut Command {
 
 impl<'c> OutputAssertExt for &'c mut Command {
     fn assert(self) -> Assert {
-        let output = self.output().unwrap();
+        let output = match self.output() {
+            Ok(output) => output,
+            Err(err) => {
+                panic!("Failed to spawn {:?}: {}", self, err);
+            }
+        };
         let assert = Assert::new(output).append_context("command", format!("{:?}", self.cmd));
         if let Some(stdin) = self.stdin.as_ref() {
             assert.append_context("stdin", DebugBuffer::new(stdin.clone()))
