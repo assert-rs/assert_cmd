@@ -50,6 +50,7 @@
 //!
 //! [`lazy_static`]: https://crates.io/crates/lazy_static
 //! [`Command`]: std::process::Command
+//! [`escargot`]: https://crates.io/crates/escargot
 //! [cargo-overhead]: https://github.com/assert-rs/assert_cmd/issues/6
 //! [first-call]: https://github.com/assert-rs/assert_cmd/issues/57
 
