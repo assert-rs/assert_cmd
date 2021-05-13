@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [1.0.4] - 2021-05-12
+
 #### Features
 
 - Take advantage of `CARGO_BIN_EXE` for less brittleness
@@ -228,6 +230,7 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/predicates-rs/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/assert-rs/predicates-rs/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/assert-rs/predicates-rs/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/assert-rs/predicates-rs/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/assert-rs/assert_cmd/compare/v1.0.1...v1.0.2
