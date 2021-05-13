@@ -65,7 +65,7 @@
 //! ## Relevant crates
 //!
 //! Other crates that might be useful in testing command line programs.
-//! * [escargot][escargot] for more control over configuring the crate's binary.
+//! * [escargot] for more control over configuring the crate's binary.
 //! * [duct] for orchestrating multiple processes.
 //!   * or [commandspec] for easier writing of commands
 //! * [rexpect][rexpect] for testing interactive programs.
@@ -89,6 +89,7 @@
 //! [assert_cli]: https://crates.io/crates/assert_cli/0.6.3
 //! [dir-diff]: https://crates.io/crates/dir-diff
 //! [tempfile]: https://crates.io/crates/tempfile
+//! [escargot]: https://crates.io/crates/escargot
 //! [duct]: https://crates.io/crates/duct
 //! [assert_fs]: https://crates.io/crates/assert_fs
 //! [rexpect]: https://crates.io/crates/rexpect
