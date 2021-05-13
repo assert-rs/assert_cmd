@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+#### Features
+
+- Take advantage of `CARGO_BIN_EXE` for less brittleness
+
+#### Fixes
+
+- Fix broken links in documentation
+- Provide consistent spawn failure message
+
 ## [1.0.3] - 2021-02-01
 
 ## [1.0.2] - 2020-11-23
