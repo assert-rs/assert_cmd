@@ -21,9 +21,10 @@ maintenance = { status = "passively-maintained" }
 name = "bin_fixture"
 
 [dependencies]
-predicates = { version = "1.0", default-features = false, features = ["difference"] }
-predicates-core = "1.0"
-predicates-tree = "1.0"
+predicates = { version = "1.0", default-features = false, features = ["diff"], path="../predicates-rs" }
+predicates-core = {version="1.0", path="../predicates-rs/crates/core" }
+predicates-tree = {version="1.0", path="../predicates-rs/crates/tree" }
+
 doc-comment = "0.3"
 wait-timeout = "0.2.0"
 bstr = "0.2.14"

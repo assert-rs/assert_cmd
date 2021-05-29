@@ -295,7 +295,7 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stdout(predicate::str::similar("hello\n"));
+    ///     .stdout(predicate::str::diff("hello\n"));
     /// ```
     ///
     /// Accepting bytes:
@@ -379,7 +379,7 @@ impl Assert {
     ///     .env("stdout", "hello")
     ///     .env("stderr", "world")
     ///     .assert()
-    ///     .stderr(predicate::str::similar("world\n"));
+    ///     .stderr(predicate::str::diff("world\n"));
     /// ```
     ///
     /// Accepting bytes:
@@ -654,7 +654,7 @@ impl IntoCodePredicate<InCodePredicate> for &'static [i32] {
 ///     .env("stdout", "hello")
 ///     .env("stderr", "world")
 ///     .assert()
-///     .stdout(predicate::str::similar("hello\n").from_utf8());
+///     .stdout(predicate::str::diff("hello\n").from_utf8());
 ///
 /// // which can be shortened to:
 /// Command::cargo_bin("bin_fixture")
@@ -785,12 +785,12 @@ pub struct StrContentOutputPredicate(
 
 impl StrContentOutputPredicate {
     pub(crate) fn from_str(value: &'static str) -> Self {
-        let pred = predicates::str::similar(value).from_utf8();
+        let pred = predicates::str::diff(value).from_utf8();
         StrContentOutputPredicate(pred)
     }
 
     pub(crate) fn from_string(value: String) -> Self {
-        let pred = predicates::str::similar(value).from_utf8();
+        let pred = predicates::str::diff(value).from_utf8();
         StrContentOutputPredicate(pred)
     }
 }
@@ -862,7 +862,7 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 ///     .env("stdout", "hello")
 ///     .env("stderr", "world")
 ///     .assert()
-///     .stderr(predicate::str::similar("world\n"));
+///     .stderr(predicate::str::diff("world\n"));
 /// ```
 #[derive(Debug, Clone)]
 pub struct StrOutputPredicate<P: predicates_core::Predicate<str>>(

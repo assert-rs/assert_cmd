@@ -93,7 +93,7 @@ fn stdout_example() {
         .env("stdout", "hello")
         .env("stderr", "world")
         .assert()
-        .stdout(predicate::str::similar("hello\n"));
+        .stdout(predicate::str::diff("hello\n"));
 
     Command::cargo_bin("bin_fixture")
         .unwrap()
@@ -131,7 +131,7 @@ fn stderr_example() {
         .env("stdout", "hello")
         .env("stderr", "world")
         .assert()
-        .stderr(predicate::str::similar("world\n"));
+        .stderr(predicate::str::diff("world foo\n"));
 
     Command::cargo_bin("bin_fixture")
         .unwrap()

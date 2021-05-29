@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+#### Breaking Changes
+
+- `predicates::str::diff` was removed
+- `predicates::str::similar` was renamed to `diff`
+- The `difference` feature flag was renamed to `diff`
+- `diff().split` and `diff().distance` were removed
+
+#### Fixes
+
+- Shrink the output of Diffs because its redundant
+- Moved off of an unmaintained Diff library
+
 ## [1.0.4] - 2021-05-12
 
 #### Features
