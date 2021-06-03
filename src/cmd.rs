@@ -38,7 +38,7 @@ impl Command {
 
     /// Create a `Command` to run a specific binary of the current crate.
     ///
-    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+    /// See the [`cargo` module documentation][cargo] for caveats and workarounds.
     ///
     /// # Examples
     ///
