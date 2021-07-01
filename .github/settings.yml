@@ -15,7 +15,7 @@ repository:
   allow_rebase_merge: true
 
   # Manual: allow_auto_merge: true, see https://github.com/probot/settings/issues/402
-  # Manual: auto_delete_branch: true, see https://github.com/probot/settings/issues/466
+  delete_branch_on_merge: true
 
 labels:
   # Type
