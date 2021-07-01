@@ -38,7 +38,7 @@ impl Command {
 
     /// Create a `Command` to run a specific binary of the current crate.
     ///
-    /// See the [`cargo` module documentation][cargo] for caveats and workarounds.
+    /// See the [`cargo` module documentation][crate::cargo] for caveats and workarounds.
     ///
     /// # Examples
     ///
@@ -405,7 +405,7 @@ impl Command {
     ///         .unwrap();
     /// ```
     ///
-    /// [`canonicalize`]: super::fs::canonicalize()
+    /// [`canonicalize`]: std::fs::canonicalize()
     pub fn current_dir<P: AsRef<path::Path>>(&mut self, dir: P) -> &mut Self {
         self.cmd.current_dir(dir);
         self

@@ -97,7 +97,7 @@
 //! [`Assert`]: assert::Assert
 //! [`success()`]: assert::Assert::success()
 //! [`CommandCargoExt`]: cargo::CommandCargoExt
-//! [`OutputOkExt`]: cmd::OutputOkExt
+//! [`OutputOkExt`]: output::OutputOkExt
 //! [`OutputAssertExt`]: assert::OutputAssertExt
 
 #![warn(missing_docs)]

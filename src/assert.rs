@@ -847,7 +847,8 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 }
 
 // Keep `predicates` concrete Predicates out of our public API.
-/// [predicates_core::Predicate] used by [`IntoOutputPredicate`] for [`Predicate<str>`].
+/// [predicates_core::Predicate] used by [`IntoOutputPredicate`] for
+/// [`Predicate<str>`][predicates_core::Predicate].
 ///
 /// # Example
 ///

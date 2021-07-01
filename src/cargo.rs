@@ -62,10 +62,10 @@ use std::process;
 
 /// Create a [`Command`] for a `bin` in the Cargo project.
 ///
-/// `CommandCargoExt` is an extension trait for [`Command`][Command] to easily launch a crate's
+/// `CommandCargoExt` is an extension trait for [`Command`][std::process::Command] to easily launch a crate's
 /// binaries.
 ///
-/// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+/// See the [`cargo` module documentation][super::cargo] for caveats and workarounds.
 ///
 /// # Examples
 ///
@@ -87,7 +87,7 @@ where
 {
     /// Create a [`Command`] to run a specific binary of the current crate.
     ///
-    /// See the [`cargo` module documentation][`cargo`] for caveats and workarounds.
+    /// See the [`cargo` module documentation][crate::cargo] for caveats and workarounds.
     ///
     /// # Examples
     ///
