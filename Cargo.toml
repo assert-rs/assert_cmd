@@ -21,7 +21,7 @@ maintenance = { status = "passively-maintained" }
 name = "bin_fixture"
 
 [dependencies]
-predicates = { version = "1.0", default-features = false, features = ["difference"] }
+predicates = { version = "2.0", default-features = false, features = ["diff"] }
 predicates-core = "1.0"
 predicates-tree = "1.0"
 doc-comment = "0.3"
