@@ -1,6 +1,7 @@
 //! [`std::process::Output`] assertions.
 
 use std::borrow::Cow;
+use std::error::Error;
 use std::fmt;
 use std::process;
 use std::str;
@@ -65,6 +66,100 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
     }
 }
 
+/// [`Assert`] represented as a [`Result`].
+///
+/// Produced by the `try_` variants the [`Assert`] methods.
+///
+/// # Example
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// let result = Command::new("echo")
+///     .assert()
+///     .try_success();
+/// assert!(result.is_ok());
+/// ```
+///
+/// [`Result`]: std::result::Result
+pub type AssertResult = Result<Assert, AssertError>;
+
+/// [`Assert`] error (see [`AssertResult`]).
+#[derive(Debug)]
+pub struct AssertError {
+    assert: Assert,
+    reason: AssertReason,
+}
+
+#[derive(Debug)]
+enum AssertReason {
+    UnexpectedFailure { actual_code: Option<i32> },
+    UnexpectedSuccess,
+    UnexpectedCompletion,
+    CommandInterrupted,
+    UnexpectedReturnCode { case_tree: CaseTree },
+    UnexpectedStdout { case_tree: CaseTree },
+    UnexpectedStderr { case_tree: CaseTree },
+}
+
+struct CaseTree(predicates_tree::CaseTree);
+
+impl fmt::Display for CaseTree {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        <predicates_tree::CaseTree as fmt::Display>::fmt(&self.0, f)
+    }
+}
+
+// Work around `Debug` not being implemented for `predicates_tree::CaseTree`.
+impl fmt::Debug for CaseTree {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        <predicates_tree::CaseTree as fmt::Display>::fmt(&self.0, f)
+    }
+}
+
+impl AssertError {
+    fn panic<T>(self) -> T {
+        panic!("{}", self.to_string())
+    }
+}
+
+impl Error for AssertError {}
+
+impl fmt::Display for AssertError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.reason {
+            AssertReason::UnexpectedFailure { actual_code } => writeln!(
+                f,
+                "Unexpected failure.\ncode-{}\nstderr=```{}```",
+                actual_code.map_or("<interrupted>".to_owned(), |actual_code| actual_code
+                    .to_string()),
+                DebugBytes::new(&self.assert.output.stderr),
+            ),
+            AssertReason::UnexpectedSuccess => {
+                writeln!(f, "Unexpected success")
+            }
+            AssertReason::UnexpectedCompletion => {
+                writeln!(f, "Unexpected completion")
+            }
+            AssertReason::CommandInterrupted => {
+                writeln!(f, "Command interrupted")
+            }
+            AssertReason::UnexpectedReturnCode { case_tree } => {
+                writeln!(f, "Unexpected return code, failed {}", case_tree)
+            }
+            AssertReason::UnexpectedStdout { case_tree } => {
+                writeln!(f, "Unexpected stdout, failed {}", case_tree)
+            }
+            AssertReason::UnexpectedStderr { case_tree } => {
+                writeln!(f, "Unexpected stderr, failed {}", case_tree)
+            }
+        }?;
+        write!(f, "{}", self.assert)
+    }
+}
+
 /// Assert the state of an [`Output`].
 ///
 /// Create an `Assert` through the [`OutputAssertExt`] trait.
@@ -96,6 +191,13 @@ impl Assert {
         Self {
             output,
             context: vec![],
+        }
+    }
+
+    fn into_error(self, reason: AssertReason) -> AssertError {
+        AssertError {
+            assert: self,
+            reason,
         }
     }
 
@@ -144,22 +246,16 @@ impl Assert {
     ///     .success();
     /// ```
     pub fn success(self) -> Self {
+        self.try_success().unwrap_or_else(AssertError::panic)
+    }
+
+    /// `try_` variant of [`Assert::success`].
+    pub fn try_success(self) -> AssertResult {
         if !self.output.status.success() {
-            let actual_code = self.output.status.code().unwrap_or_else(|| {
-                panic!(
-                    "Unexpected failure.\ncode=<interrupted>\nstderr=```{}```\n{}",
-                    DebugBytes::new(&self.output.stderr),
-                    self
-                )
-            });
-            panic!(
-                "Unexpected failure.\ncode-{}\nstderr=```{}```\n{}",
-                actual_code,
-                DebugBytes::new(&self.output.stderr),
-                self
-            );
+            let actual_code = self.output.status.code();
+            return Err(self.into_error(AssertReason::UnexpectedFailure { actual_code }));
         }
-        self
+        Ok(self)
     }
 
     /// Ensure the command failed.
@@ -178,18 +274,28 @@ impl Assert {
     ///     .failure();
     /// ```
     pub fn failure(self) -> Self {
+        self.try_failure().unwrap_or_else(AssertError::panic)
+    }
+
+    /// Variant of [`Assert::failure`] that returns an [`AssertResult`].
+    pub fn try_failure(self) -> AssertResult {
         if self.output.status.success() {
-            panic!("Unexpected success\n{}", self);
+            return Err(self.into_error(AssertReason::UnexpectedSuccess));
         }
-        self
+        Ok(self)
     }
 
     /// Ensure the command aborted before returning a code.
     pub fn interrupted(self) -> Self {
+        self.try_interrupted().unwrap_or_else(AssertError::panic)
+    }
+
+    /// Variant of [`Assert::interrupted`] that returns an [`AssertResult`].
+    pub fn try_interrupted(self) -> AssertResult {
         if self.output.status.code().is_some() {
-            panic!("Unexpected completion\n{}", self);
+            return Err(self.into_error(AssertReason::UnexpectedCompletion));
         }
-        self
+        Ok(self)
     }
 
     /// Ensure the command returned the expected code.
@@ -245,19 +351,30 @@ impl Assert {
         I: IntoCodePredicate<P>,
         P: predicates_core::Predicate<i32>,
     {
+        self.try_code(pred).unwrap_or_else(AssertError::panic)
+    }
+
+    /// Variant of [`Assert::code`] that returns an [`AssertResult`].
+    pub fn try_code<I, P>(self, pred: I) -> AssertResult
+    where
+        I: IntoCodePredicate<P>,
+        P: predicates_core::Predicate<i32>,
+    {
         self.code_impl(&pred.into_code())
     }
 
-    fn code_impl(self, pred: &dyn predicates_core::Predicate<i32>) -> Self {
-        let actual_code = self
-            .output
-            .status
-            .code()
-            .unwrap_or_else(|| panic!("Command interrupted\n{}", self));
+    fn code_impl(self, pred: &dyn predicates_core::Predicate<i32>) -> AssertResult {
+        let actual_code = if let Some(actual_code) = self.output.status.code() {
+            actual_code
+        } else {
+            return Err(self.into_error(AssertReason::CommandInterrupted));
+        };
         if let Some(case) = pred.find_case(false, &actual_code) {
-            panic!("Unexpected return code, failed {}\n{}", case.tree(), self);
+            return Err(self.into_error(AssertReason::UnexpectedReturnCode {
+                case_tree: CaseTree(case.tree()),
+            }));
         }
-        self
+        Ok(self)
     }
 
     /// Ensure the command wrote the expected data to `stdout`.
@@ -331,17 +448,28 @@ impl Assert {
         I: IntoOutputPredicate<P>,
         P: predicates_core::Predicate<[u8]>,
     {
+        self.try_stdout(pred).unwrap_or_else(AssertError::panic)
+    }
+
+    /// Variant of [`Assert::stdout`] that returns an [`AssertResult`].
+    pub fn try_stdout<I, P>(self, pred: I) -> AssertResult
+    where
+        I: IntoOutputPredicate<P>,
+        P: predicates_core::Predicate<[u8]>,
+    {
         self.stdout_impl(&pred.into_output())
     }
 
-    fn stdout_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> Self {
+    fn stdout_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> AssertResult {
         {
             let actual = &self.output.stdout;
             if let Some(case) = pred.find_case(false, &actual) {
-                panic!("Unexpected stdout, failed {}\n{}", case.tree(), self);
+                return Err(self.into_error(AssertReason::UnexpectedStdout {
+                    case_tree: CaseTree(case.tree()),
+                }));
             }
         }
-        self
+        Ok(self)
     }
 
     /// Ensure the command wrote the expected data to `stderr`.
@@ -415,17 +543,28 @@ impl Assert {
         I: IntoOutputPredicate<P>,
         P: predicates_core::Predicate<[u8]>,
     {
+        self.try_stderr(pred).unwrap_or_else(AssertError::panic)
+    }
+
+    /// Variant of [`Assert::stderr`] that returns an [`AssertResult`].
+    pub fn try_stderr<I, P>(self, pred: I) -> AssertResult
+    where
+        I: IntoOutputPredicate<P>,
+        P: predicates_core::Predicate<[u8]>,
+    {
         self.stderr_impl(&pred.into_output())
     }
 
-    fn stderr_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> Self {
+    fn stderr_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> AssertResult {
         {
             let actual = &self.output.stderr;
             if let Some(case) = pred.find_case(false, &actual) {
-                panic!("Unexpected stderr, failed {}\n\n{}", case.tree(), self);
+                return Err(self.into_error(AssertReason::UnexpectedStderr {
+                    case_tree: CaseTree(case.tree()),
+                }));
             }
         }
-        self
+        Ok(self)
     }
 }
 
