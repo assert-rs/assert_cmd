@@ -533,7 +533,7 @@ impl<'c> OutputOkExt for &'c mut Command {
                     panic!(
                         "Completed successfully:\ncommand=`{:?}`\nstdin=```{}```\nstdout=```{}```",
                         self.cmd,
-                        DebugBytes::new(&stdin),
+                        DebugBytes::new(stdin),
                         DebugBytes::new(&output.stdout)
                     )
                 } else {

@@ -463,7 +463,7 @@ impl Assert {
     fn stdout_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> AssertResult {
         {
             let actual = &self.output.stdout;
-            if let Some(case) = pred.find_case(false, &actual) {
+            if let Some(case) = pred.find_case(false, actual) {
                 return Err(self.into_error(AssertReason::UnexpectedStdout {
                     case_tree: CaseTree(case.tree()),
                 }));
@@ -558,7 +558,7 @@ impl Assert {
     fn stderr_impl(self, pred: &dyn predicates_core::Predicate<[u8]>) -> AssertResult {
         {
             let actual = &self.output.stderr;
-            if let Some(case) = pred.find_case(false, &actual) {
+            if let Some(case) = pred.find_case(false, actual) {
                 return Err(self.into_error(AssertReason::UnexpectedStderr {
                     case_tree: CaseTree(case.tree()),
                 }));
