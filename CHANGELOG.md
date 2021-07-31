@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+#### Features
+
+- `try` variants of asserts to get an error instead
+
 ## [1.0.7] - 2021-07-03
 
 ## [1.0.6] - 2021-07-01
