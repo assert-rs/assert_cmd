@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Breaking Changes
+
+- `Assert::append_context` now requires a `Send+Sync` context, to be compatible with being put in error types
+
 ## [1.0.8] - 2021-07-31
 
 #### Features
