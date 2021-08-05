@@ -180,7 +180,7 @@ impl fmt::Display for AssertError {
 /// [`Output`]: std::process::Output
 pub struct Assert {
     output: process::Output,
-    context: Vec<(&'static str, Box<dyn fmt::Display>)>,
+    context: Vec<(&'static str, Box<dyn fmt::Display + Send + Sync>)>,
 }
 
 impl Assert {
@@ -218,7 +218,7 @@ impl Assert {
     /// ```
     pub fn append_context<D>(mut self, name: &'static str, context: D) -> Self
     where
-        D: fmt::Display + 'static,
+        D: fmt::Display + Send + Sync + 'static,
     {
         self.context.push((name, Box::new(context)));
         self
