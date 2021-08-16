@@ -42,4 +42,4 @@ branches:
       required_status_checks:
         # Required. Require branches to be up to date before merging.
         strict: false
-        contexts: ["ci", "committed", "spelling"]
+        contexts: ["ci"]
