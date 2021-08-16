@@ -13,7 +13,6 @@ keywords = ["cli", "test", "assert", "command", "duct"]
 edition = "2018"
 
 [badges]
-azure-devops = { project = "assert-rs", pipeline = "assert_cmd" }
 codecov = { repository = "assert-rs/assert_cmd" }
 maintenance = { status = "passively-maintained" }
 

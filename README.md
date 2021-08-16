@@ -2,7 +2,6 @@
 
 > **Assert `process::Command`** - Easy command initialization and assertions.
 
-[![Build Status](https://dev.azure.com/assert-rs/assert-rs/_apis/build/status/assert_cmd?branchName=master)](https://dev.azure.com/assert-rs/assert-rs/_build/latest?definitionId=3&branchName=master)
 [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
 ![License](https://img.shields.io/crates/l/assert_cmd.svg)
 [![Crates Status](https://img.shields.io/crates/v/assert_cmd.svg)](https://crates.io/crates/assert_cmd)
