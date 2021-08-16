@@ -17,6 +17,13 @@ on:
   schedule:
   - cron: '13 13 */2 * *'
 jobs:
+  ci:
+    name: CI
+    needs: [smoke, test, msrv, docs, rustfmt, clippy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Done
+        run: exit 0
   smoke:
     name: Quick Check
     runs-on: ubuntu-latest
