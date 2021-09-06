@@ -1020,7 +1020,7 @@ enum AssertReason {
 
 impl AssertError {
     fn panic<T>(self) -> T {
-        panic!("{}", self.to_string())
+        panic!("{}", self)
     }
 }
 
