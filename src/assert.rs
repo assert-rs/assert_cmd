@@ -66,100 +66,6 @@ impl<'c> OutputAssertExt for &'c mut process::Command {
     }
 }
 
-/// [`Assert`] represented as a [`Result`].
-///
-/// Produced by the `try_` variants the [`Assert`] methods.
-///
-/// # Example
-///
-/// ```rust
-/// use assert_cmd::prelude::*;
-///
-/// use std::process::Command;
-///
-/// let result = Command::new("echo")
-///     .assert()
-///     .try_success();
-/// assert!(result.is_ok());
-/// ```
-///
-/// [`Result`]: std::result::Result
-pub type AssertResult = Result<Assert, AssertError>;
-
-/// [`Assert`] error (see [`AssertResult`]).
-#[derive(Debug)]
-pub struct AssertError {
-    assert: Assert,
-    reason: AssertReason,
-}
-
-#[derive(Debug)]
-enum AssertReason {
-    UnexpectedFailure { actual_code: Option<i32> },
-    UnexpectedSuccess,
-    UnexpectedCompletion,
-    CommandInterrupted,
-    UnexpectedReturnCode { case_tree: CaseTree },
-    UnexpectedStdout { case_tree: CaseTree },
-    UnexpectedStderr { case_tree: CaseTree },
-}
-
-struct CaseTree(predicates_tree::CaseTree);
-
-impl fmt::Display for CaseTree {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        <predicates_tree::CaseTree as fmt::Display>::fmt(&self.0, f)
-    }
-}
-
-// Work around `Debug` not being implemented for `predicates_tree::CaseTree`.
-impl fmt::Debug for CaseTree {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        <predicates_tree::CaseTree as fmt::Display>::fmt(&self.0, f)
-    }
-}
-
-impl AssertError {
-    fn panic<T>(self) -> T {
-        panic!("{}", self.to_string())
-    }
-}
-
-impl Error for AssertError {}
-
-impl fmt::Display for AssertError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self.reason {
-            AssertReason::UnexpectedFailure { actual_code } => writeln!(
-                f,
-                "Unexpected failure.\ncode-{}\nstderr=```{}```",
-                actual_code.map_or("<interrupted>".to_owned(), |actual_code| actual_code
-                    .to_string()),
-                DebugBytes::new(&self.assert.output.stderr),
-            ),
-            AssertReason::UnexpectedSuccess => {
-                writeln!(f, "Unexpected success")
-            }
-            AssertReason::UnexpectedCompletion => {
-                writeln!(f, "Unexpected completion")
-            }
-            AssertReason::CommandInterrupted => {
-                writeln!(f, "Command interrupted")
-            }
-            AssertReason::UnexpectedReturnCode { case_tree } => {
-                writeln!(f, "Unexpected return code, failed {}", case_tree)
-            }
-            AssertReason::UnexpectedStdout { case_tree } => {
-                writeln!(f, "Unexpected stdout, failed {}", case_tree)
-            }
-            AssertReason::UnexpectedStderr { case_tree } => {
-                writeln!(f, "Unexpected stderr, failed {}", case_tree)
-            }
-        }?;
-        write!(f, "{}", self.assert)
-    }
-}
-
 /// Assert the state of an [`Output`].
 ///
 /// Create an `Assert` through the [`OutputAssertExt`] trait.
@@ -1071,6 +977,100 @@ where
 
     fn into_output(self) -> Self::Predicate {
         Self::Predicate::new(self)
+    }
+}
+
+/// [`Assert`] represented as a [`Result`].
+///
+/// Produced by the `try_` variants the [`Assert`] methods.
+///
+/// # Example
+///
+/// ```rust
+/// use assert_cmd::prelude::*;
+///
+/// use std::process::Command;
+///
+/// let result = Command::new("echo")
+///     .assert()
+///     .try_success();
+/// assert!(result.is_ok());
+/// ```
+///
+/// [`Result`]: std::result::Result
+pub type AssertResult = Result<Assert, AssertError>;
+
+/// [`Assert`] error (see [`AssertResult`]).
+#[derive(Debug)]
+pub struct AssertError {
+    assert: Assert,
+    reason: AssertReason,
+}
+
+#[derive(Debug)]
+enum AssertReason {
+    UnexpectedFailure { actual_code: Option<i32> },
+    UnexpectedSuccess,
+    UnexpectedCompletion,
+    CommandInterrupted,
+    UnexpectedReturnCode { case_tree: CaseTree },
+    UnexpectedStdout { case_tree: CaseTree },
+    UnexpectedStderr { case_tree: CaseTree },
+}
+
+impl AssertError {
+    fn panic<T>(self) -> T {
+        panic!("{}", self.to_string())
+    }
+}
+
+impl Error for AssertError {}
+
+impl fmt::Display for AssertError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.reason {
+            AssertReason::UnexpectedFailure { actual_code } => writeln!(
+                f,
+                "Unexpected failure.\ncode-{}\nstderr=```{}```",
+                actual_code.map_or("<interrupted>".to_owned(), |actual_code| actual_code
+                    .to_string()),
+                DebugBytes::new(&self.assert.output.stderr),
+            ),
+            AssertReason::UnexpectedSuccess => {
+                writeln!(f, "Unexpected success")
+            }
+            AssertReason::UnexpectedCompletion => {
+                writeln!(f, "Unexpected completion")
+            }
+            AssertReason::CommandInterrupted => {
+                writeln!(f, "Command interrupted")
+            }
+            AssertReason::UnexpectedReturnCode { case_tree } => {
+                writeln!(f, "Unexpected return code, failed {}", case_tree)
+            }
+            AssertReason::UnexpectedStdout { case_tree } => {
+                writeln!(f, "Unexpected stdout, failed {}", case_tree)
+            }
+            AssertReason::UnexpectedStderr { case_tree } => {
+                writeln!(f, "Unexpected stderr, failed {}", case_tree)
+            }
+        }?;
+        write!(f, "{}", self.assert)
+    }
+}
+
+struct CaseTree(predicates_tree::CaseTree);
+
+impl fmt::Display for CaseTree {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        <predicates_tree::CaseTree as fmt::Display>::fmt(&self.0, f)
+    }
+}
+
+// Work around `Debug` not being implemented for `predicates_tree::CaseTree`.
+impl fmt::Debug for CaseTree {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        <predicates_tree::CaseTree as fmt::Display>::fmt(&self.0, f)
     }
 }
 
