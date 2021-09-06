@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+#### Fixes
+
+- Show caller for panic, rather than `assert_cmd`
+
 ## [2.0.0] - 2021-08-05
 
 ### Breaking Changes
