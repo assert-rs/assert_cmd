@@ -151,6 +151,7 @@ impl Assert {
     ///     .assert()
     ///     .success();
     /// ```
+    #[track_caller]
     pub fn success(self) -> Self {
         self.try_success().unwrap_or_else(AssertError::panic)
     }
@@ -179,6 +180,7 @@ impl Assert {
     ///     .assert()
     ///     .failure();
     /// ```
+    #[track_caller]
     pub fn failure(self) -> Self {
         self.try_failure().unwrap_or_else(AssertError::panic)
     }
@@ -192,6 +194,7 @@ impl Assert {
     }
 
     /// Ensure the command aborted before returning a code.
+    #[track_caller]
     pub fn interrupted(self) -> Self {
         self.try_interrupted().unwrap_or_else(AssertError::panic)
     }
@@ -252,6 +255,7 @@ impl Assert {
     ///     .code(&[2, 42] as &[i32]);
     /// ```
     ///
+    #[track_caller]
     pub fn code<I, P>(self, pred: I) -> Self
     where
         I: IntoCodePredicate<P>,
@@ -349,6 +353,7 @@ impl Assert {
     ///     .stdout("hello\n");
     /// ```
     ///
+    #[track_caller]
     pub fn stdout<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -444,6 +449,7 @@ impl Assert {
     ///     .stderr("world\n");
     /// ```
     ///
+    #[track_caller]
     pub fn stderr<I, P>(self, pred: I) -> Self
     where
         I: IntoOutputPredicate<P>,
@@ -1019,6 +1025,7 @@ enum AssertReason {
 }
 
 impl AssertError {
+    #[track_caller]
     fn panic<T>(self) -> T {
         panic!("{}", self)
     }
