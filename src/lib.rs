@@ -144,4 +144,7 @@ pub mod prelude {
 
 pub use crate::cmd::Command;
 
+mod color;
+use color::Palette;
+
 doc_comment::doctest!("../README.md");

@@ -482,8 +482,14 @@ impl Assert {
 
 impl fmt::Display for Assert {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let palette = crate::Palette::current();
         for &(ref name, ref context) in &self.context {
-            writeln!(f, "{}=`{}`", name, context)?;
+            writeln!(
+                f,
+                "{}=`{}`",
+                palette.key.paint(name),
+                palette.value.paint(context)
+            )?;
         }
         output_fmt(&self.output, f)
     }
