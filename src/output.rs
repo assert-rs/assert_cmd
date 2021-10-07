@@ -4,7 +4,6 @@ use bstr::ByteSlice;
 use std::error::Error;
 use std::fmt;
 use std::process;
-use std::str;
 
 /// Converts a type to an [`OutputResult`].
 ///
@@ -242,15 +241,22 @@ impl Error for OutputError {}
 
 impl fmt::Display for OutputError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let palette = crate::Palette::current();
         if let Some(ref cmd) = self.cmd {
-            writeln!(f, "command=`{}`", cmd)?;
+            writeln!(
+                f,
+                "{}={}",
+                palette.key.paint("command"),
+                palette.value.paint(cmd)
+            )?;
         }
         if let Some(ref stdin) = self.stdin {
-            if let Ok(stdin) = str::from_utf8(stdin) {
-                writeln!(f, "stdin=```{}```", stdin)?;
-            } else {
-                writeln!(f, "stdin=```{:?}```", stdin)?;
-            }
+            writeln!(
+                f,
+                "{}={}",
+                palette.key.paint("stdin"),
+                palette.value.paint(DebugBytes::new(stdin))
+            )?;
         }
         write!(f, "{}", self.cause)
     }
@@ -283,17 +289,30 @@ impl fmt::Display for Output {
 }
 
 pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let palette = crate::Palette::current();
     if let Some(code) = output.status.code() {
-        writeln!(f, "code={}", code)?;
+        writeln!(
+            f,
+            "{}={}",
+            palette.key.paint("code"),
+            palette.value.paint(code)
+        )?;
     } else {
-        writeln!(f, "code=<interrupted>")?;
+        writeln!(
+            f,
+            "{}={}",
+            palette.key.paint("code"),
+            palette.value.paint("<interrupted>")
+        )?;
     }
 
     write!(
         f,
-        "stdout=```{}```\nstderr=```{}```\n",
-        DebugBytes::new(&output.stdout),
-        DebugBytes::new(&output.stderr),
+        "{}={}\n{}={}\n",
+        palette.key.paint("stdout"),
+        palette.value.paint(DebugBytes::new(&output.stdout)),
+        palette.key.paint("stderr"),
+        palette.value.paint(DebugBytes::new(&output.stderr)),
     )?;
     Ok(())
 }
