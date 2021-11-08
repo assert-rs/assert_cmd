@@ -15,7 +15,7 @@ on:
     - '!/docs/**'
     - "!/LICENSE-*"
   schedule:
-  - cron: '13 13 */2 * *'
+  - cron: '13 13 13 * *'
 jobs:
   ci:
     name: CI

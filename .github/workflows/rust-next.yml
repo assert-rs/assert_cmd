@@ -10,7 +10,6 @@ on:
     - "!/LICENSE-*"
   schedule:
   - cron: '13 13 13 * *'
-  - cron: '13 13 28 * *'
 jobs:
   test:
     name: Test
