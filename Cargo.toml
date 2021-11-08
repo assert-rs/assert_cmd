@@ -12,6 +12,7 @@ categories = ["development-tools::testing"]
 keywords = ["cli", "test", "assert", "command", "duct"]
 edition = "2018"
 include = [
+  "build.rs",
   "src/**/*",
   "Cargo.toml",
   "LICENSE*",
