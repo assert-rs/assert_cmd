@@ -9,7 +9,7 @@ on:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
   schedule:
-  - cron: '13 13 13 * *'
+  - cron: '3 3 3 * *'
 jobs:
   security_audit:
     runs-on: ubuntu-latest
