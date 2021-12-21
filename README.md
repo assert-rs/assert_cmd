@@ -51,7 +51,7 @@ Licensed under either of
 
 at your option.
 
-### Testimonials
+## Testimonials
 
 fitzgen
 > assert_cmd is just such a pleasure to use every single time, I fall in love all over again
@@ -69,7 +69,7 @@ coreyja
 >
 > This library has made it really easy to add some test coverage to my project, even when I am just learning how to write Rust!
 
-### Contribution
+## Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally
 submitted for inclusion in the work by you, as defined in the Apache-2.0
