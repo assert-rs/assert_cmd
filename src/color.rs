@@ -7,7 +7,7 @@ pub(crate) struct Palette {
 impl Palette {
     #[cfg(feature = "color")]
     pub(crate) fn current() -> Self {
-        if concolor_control::get(concolor_control::Stream::Either).ansi_color() {
+        if concolor::get(concolor::Stream::Either).ansi_color() {
             Self {
                 key: styled::Style(yansi::Style::new(yansi::Color::Blue).bold()),
                 value: styled::Style(yansi::Style::new(yansi::Color::Yellow).bold()),
