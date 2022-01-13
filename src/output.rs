@@ -167,7 +167,7 @@ pub type OutputResult = Result<process::Output, OutputError>;
 #[derive(Debug)]
 pub struct OutputError {
     cmd: Option<String>,
-    stdin: Option<Vec<u8>>,
+    stdin: Option<bstr::BString>,
     cause: OutputCause,
 }
 
@@ -206,7 +206,7 @@ impl OutputError {
 
     /// Add the `stdin` for additional context.
     pub fn set_stdin(mut self, stdin: Vec<u8>) -> Self {
-        self.stdin = Some(stdin);
+        self.stdin = Some(bstr::BString::from(stdin));
         self
     }
 
@@ -336,12 +336,14 @@ impl<'a> fmt::Display for DebugBytes<'a> {
 
 #[derive(Debug)]
 pub(crate) struct DebugBuffer {
-    buffer: Vec<u8>,
+    buffer: bstr::BString,
 }
 
 impl DebugBuffer {
     pub(crate) fn new(buffer: Vec<u8>) -> Self {
-        DebugBuffer { buffer }
+        DebugBuffer {
+            buffer: buffer.into(),
+        }
     }
 }
 
