@@ -5,6 +5,7 @@
 use std::ffi;
 use std::io;
 use std::io::{Read, Write};
+use std::ops::Deref;
 use std::path;
 use std::process;
 
@@ -22,7 +23,7 @@ use crate::output::OutputResult;
 #[derive(Debug)]
 pub struct Command {
     cmd: process::Command,
-    stdin: Option<Vec<u8>>,
+    stdin: Option<bstr::BString>,
     timeout: Option<std::time::Duration>,
 }
 
@@ -82,7 +83,7 @@ impl Command {
     where
         S: Into<Vec<u8>>,
     {
-        self.stdin = Some(buffer.into());
+        self.stdin = Some(bstr::BString::from(buffer.into()));
         self
     }
 
@@ -436,7 +437,7 @@ impl Command {
     /// ```
     pub fn output(&mut self) -> io::Result<process::Output> {
         let spawn = self.spawn()?;
-        Self::wait_with_input_output(spawn, self.stdin.clone(), self.timeout)
+        Self::wait_with_input_output(spawn, self.stdin.as_deref().cloned(), self.timeout)
     }
 
     /// If `input`, write it to `child`'s stdin while also reading `child`'s
@@ -518,7 +519,7 @@ impl<'c> OutputOkExt for &'c mut Command {
         } else {
             let error = OutputError::new(output).set_cmd(format!("{:?}", self.cmd));
             let error = if let Some(stdin) = self.stdin.as_ref() {
-                error.set_stdin(stdin.clone())
+                error.set_stdin(stdin.deref().clone())
             } else {
                 error
             };
@@ -559,7 +560,7 @@ impl<'c> OutputAssertExt for &'c mut Command {
         };
         let assert = Assert::new(output).append_context("command", format!("{:?}", self.cmd));
         if let Some(stdin) = self.stdin.as_ref() {
-            assert.append_context("stdin", DebugBuffer::new(stdin.clone()))
+            assert.append_context("stdin", DebugBuffer::new(stdin.deref().clone()))
         } else {
             assert
         }
