@@ -2,7 +2,7 @@
 
 repository:
   description: Assert process::Command - Easy command initialization and assertions
-  homepage: docs.rs/assert_cmd
+  homepage: https://docs.rs/assert_cmd
   topics: rust cli test
   has_issues: true
   has_projects: false
