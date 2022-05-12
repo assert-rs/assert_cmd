@@ -1035,6 +1035,33 @@ impl AssertError {
     fn panic<T>(self) -> T {
         panic!("{}", self)
     }
+
+    /// Returns the [`Assert`] wrapped into the [`Result`] produced by
+    /// the `try_` variants of the [`Assert`] methods.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::prelude::*;
+    ///
+    /// use std::process::Command;
+    /// use predicates::prelude::*;
+    ///
+    /// let result = Command::new("echo")
+    ///     .assert();
+    ///
+    /// match result.try_success() {
+    ///         Ok(assert) => {
+    ///             assert.stdout(predicate::eq(b"Success\n" as &[u8]));
+    ///         }
+    ///         Err(err) => {
+    ///            err.assert().stdout(predicate::eq(b"Err but some specific output you might want to check\n" as &[u8]));
+    ///         }
+    ///     }
+    /// ```
+    pub fn assert(self) -> Assert {
+        self.assert
+    }
 }
 
 impl Error for AssertError {}
