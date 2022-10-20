@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Added `AssertError::assert`
+
 ## [2.0.4] - 2022-01-13
 
 ### Fixes
