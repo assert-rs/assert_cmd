@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.0.5] - 2022-10-20
+
 ### Features
 
 - Added `AssertError::assert`
@@ -272,7 +274,8 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.4...HEAD
+[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.5...HEAD
+[2.0.5]: https://github.com/assert-rs/assert_cmd/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/assert-rs/assert_cmd/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/assert-rs/assert_cmd/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/assert-rs/assert_cmd/compare/v2.0.1...v2.0.2
