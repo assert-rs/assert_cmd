@@ -32,8 +32,8 @@ pre-release-replacements = [
 ]
 
 [features]
-color = ["yansi", "concolor/std", "predicates/color"]
-color-auto = ["color", "concolor/auto"]
+color = ["dep:yansi", "dep:concolor", "concolor?/std", "predicates/color"]
+color-auto = ["color", "concolor?/auto"]
 
 [[bin]]
 name = "bin_fixture"
