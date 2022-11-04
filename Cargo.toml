@@ -10,7 +10,8 @@ documentation = "http://docs.rs/assert_cmd/"
 readme = "README.md"
 categories = ["development-tools::testing"]
 keywords = ["cli", "test", "assert", "command", "duct"]
-edition = "2018"
+edition = "2021"
+rust-version = "1.60.0"  # MSRV
 include = [
   "build.rs",
   "src/**/*",
@@ -31,21 +32,21 @@ pre-release-replacements = [
 ]
 
 [features]
-color = ["yansi", "concolor/std", "predicates/color"]
-color-auto = ["color", "concolor/auto"]
+color = ["dep:yansi", "dep:concolor", "concolor?/std", "predicates/color"]
+color-auto = ["color", "concolor?/auto"]
 
 [[bin]]
 name = "bin_fixture"
 
 [dependencies]
-predicates = { version = "2.0", default-features = false, features = ["diff"] }
+predicates = { version = "2.1", default-features = false, features = ["diff"] }
 predicates-core = "1.0"
 predicates-tree = "1.0"
 doc-comment = "0.3"
 wait-timeout = "0.2.0"
-bstr = "0.2.14"
-yansi = { version = "0.5.0", optional = true }
-concolor = { version = "0.0.8", optional = true }
+bstr = "1.0.1"
+yansi = { version = "0.5.1", optional = true }
+concolor = { version = "0.0.9", optional = true }
 
 [dev-dependencies]
 escargot = "0.5"
