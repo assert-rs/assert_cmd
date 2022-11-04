@@ -39,14 +39,14 @@ color-auto = ["color", "concolor?/auto"]
 name = "bin_fixture"
 
 [dependencies]
-predicates = { version = "2.0", default-features = false, features = ["diff"] }
+predicates = { version = "2.1", default-features = false, features = ["diff"] }
 predicates-core = "1.0"
 predicates-tree = "1.0"
 doc-comment = "0.3"
 wait-timeout = "0.2.0"
-bstr = "0.2.14"
-yansi = { version = "0.5.0", optional = true }
-concolor = { version = "0.0.8", optional = true }
+bstr = "1.0.1"
+yansi = { version = "0.5.1", optional = true }
+concolor = { version = "0.0.9", optional = true }
 
 [dev-dependencies]
 escargot = "0.5"
