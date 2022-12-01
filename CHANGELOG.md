@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixes
 
-- Hide internal-only optional dependenices
+- Hide internal-only optional dependencies
 
 ## [2.0.5] - 2022-10-20
 
