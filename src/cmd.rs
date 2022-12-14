@@ -497,7 +497,9 @@ impl Command {
 
     fn spawn(&mut self) -> io::Result<process::Child> {
         // stdout/stderr should only be piped for `output` according to `process::Command::new`.
-        self.cmd.stdin(process::Stdio::piped());
+        if self.stdin.is_some() {
+            self.cmd.stdin(process::Stdio::piped());
+        }
         self.cmd.stdout(process::Stdio::piped());
         self.cmd.stderr(process::Stdio::piped());
 

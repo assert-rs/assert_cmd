@@ -10,6 +10,7 @@ dependencies = [
  "concolor 0.0.11",
  "doc-comment",
  "escargot",
+ "libc",
  "predicates",
  "predicates-core",
  "predicates-tree",

@@ -154,3 +154,23 @@ fn stderr_example() {
         .assert()
         .stderr("world\n");
 }
+
+#[test]
+fn pipe_example() {
+    assert_cmd::Command::cargo_bin("examples/example_tty")
+        .unwrap()
+        .write_stdin("stdin")
+        .assert()
+        .success()
+        .stdout("stdin\n");
+}
+
+#[test]
+fn tty_example() {
+    assert_cmd::Command::cargo_bin("examples/example_tty")
+        .unwrap()
+        .arg("arg")
+        .assert()
+        .success()
+        .stdout("arg\n");
+}
