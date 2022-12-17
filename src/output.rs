@@ -2,7 +2,7 @@
 
 use bstr::ByteSlice;
 use std::error::Error;
-use std::fmt;
+use std::fmt::{self, Write};
 use std::process;
 
 /// Converts a type to an [`OutputResult`].
@@ -353,24 +353,168 @@ impl fmt::Display for DebugBuffer {
     }
 }
 
-fn format_bytes(data: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Result {
+fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
     #![allow(clippy::assertions_on_constants)]
-    const MIN_OVERFLOW: usize = 8192;
-    const MAX_START: usize = 2048;
-    const MAX_END: usize = 2048;
-    const MAX_PRINTED: usize = MAX_START + MAX_END;
-    assert!(MAX_PRINTED < MIN_OVERFLOW);
 
-    if data.len() >= MIN_OVERFLOW {
+    const LINES_MIN_OVERFLOW: usize = 40;
+    const LINES_MAX_START: usize = 10;
+    const LINES_MAX_END: usize = 10;
+    const LINES_MAX_PRINTED: usize = LINES_MAX_START + LINES_MAX_END;
+    assert!(LINES_MAX_PRINTED < LINES_MIN_OVERFLOW);
+
+    const BYTES_MIN_OVERFLOW: usize = 8192;
+    const BYTES_MAX_START: usize = 2048;
+    const BYTES_MAX_END: usize = 2048;
+    const BYTES_MAX_PRINTED: usize = BYTES_MAX_START + BYTES_MAX_END;
+    assert!(BYTES_MAX_PRINTED < BYTES_MIN_OVERFLOW);
+
+    let data_as_bstr = restore_newlines(&format!("{:?}", data.as_bstr()))?;
+
+    // Strip quotes at beginning and end.
+    let lines = data_as_bstr[1..data_as_bstr.len() - 1]
+        .lines()
+        .collect::<Vec<_>>();
+
+    if lines.len() >= LINES_MIN_OVERFLOW {
         write!(
             f,
+            "<{} lines total>\"{}\"\n<{} lines omitted>\n\"{}\"",
+            lines.len(),
+            lines[..LINES_MAX_START].join("\n"),
+            lines.len() - LINES_MAX_PRINTED,
+            lines[lines.len() - LINES_MAX_END..].join("\n"),
+        )
+    } else if data.len() >= BYTES_MIN_OVERFLOW {
+        write!(
+            &mut NewlineRestorer::new(f),
             "<{} bytes total>{:?}...<{} bytes omitted>...{:?}",
             data.len(),
-            data[..MAX_START].as_bstr(),
-            data.len() - MAX_PRINTED,
-            data[data.len() - MAX_END..].as_bstr(),
+            data[..BYTES_MAX_START].as_bstr(),
+            data.len() - BYTES_MAX_PRINTED,
+            data[data.len() - BYTES_MAX_END..].as_bstr(),
         )
     } else {
-        write!(f, "{:?}", data.as_bstr())
+        f.write_str(&data_as_bstr)
+    }
+}
+
+fn restore_newlines(s: &str) -> Result<String, fmt::Error> {
+    let mut buf = String::new();
+    NewlineRestorer::new(&mut buf).write_str(s)?;
+    Ok(buf)
+}
+
+struct NewlineRestorer<'a, T>
+where
+    T: fmt::Write,
+{
+    inner: &'a mut T,
+    trailing_backslash: bool,
+}
+
+impl<'a, T> NewlineRestorer<'a, T>
+where
+    T: fmt::Write,
+{
+    fn new(inner: &'a mut T) -> Self {
+        Self {
+            inner,
+            trailing_backslash: false,
+        }
+    }
+}
+
+impl<'a, T> fmt::Write for NewlineRestorer<'a, T>
+where
+    T: fmt::Write,
+{
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        let mut buf = if self.trailing_backslash {
+            String::from("\\")
+        } else {
+            String::new()
+        };
+
+        buf += s;
+
+        let trailing_backslashes = buf.chars().rev().take_while(|&c| c == '\\').count();
+
+        self.trailing_backslash = if trailing_backslashes % 2 != 0 {
+            buf.pop();
+            true
+        } else {
+            false
+        };
+
+        self.inner.write_str(&buf.replace("\\n", "\n"))
+    }
+}
+
+impl<'a, T> Drop for NewlineRestorer<'a, T>
+where
+    T: fmt::Write,
+{
+    fn drop(&mut self) {
+        if self.trailing_backslash {
+            self.inner.write_char('\\').unwrap_or_default();
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn format_bytes() {
+        let mut s = String::new();
+        for i in 0..40 {
+            s.push_str(&format!("{}\n", i));
+        }
+        let mut buf = String::new();
+        super::format_bytes(s.as_bytes(), &mut buf).unwrap();
+        assert_eq!(
+            r#"<40 lines total>"0
+1
+2
+3
+4
+5
+6
+7
+8
+9"
+<20 lines omitted>
+"30
+31
+32
+33
+34
+35
+36
+37
+38
+39""#,
+            buf
+        );
+    }
+
+    #[test]
+    fn restore_newlines() {
+        let s = r#"escaped nul\0unescaped newline
+escaped newline\n<end>"#;
+        assert_eq!(
+            r#"escaped nul\0unescaped newline
+escaped newline
+<end>"#,
+            super::restore_newlines(s).unwrap()
+        );
+    }
+
+    #[test]
+    fn restore_newlines_trailing_backslashes() {
+        let mut s = String::from("trailing backslashes");
+        for _ in 0..4 {
+            s.push('\\');
+            assert_eq!(s, super::restore_newlines(&s).unwrap());
+        }
     }
 }
