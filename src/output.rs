@@ -368,22 +368,16 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
     const BYTES_MAX_PRINTED: usize = BYTES_MAX_START + BYTES_MAX_END;
     assert!(BYTES_MAX_PRINTED < BYTES_MIN_OVERFLOW);
 
-    let data_as_bstr = restore_newlines(&format!("{:?}", data.as_bstr()))?;
+    let lines_total = data.as_bstr().lines().count();
 
-    // Strip quotes at beginning and end.
-    let lines = data_as_bstr[1..data_as_bstr.len() - 1]
-        .lines()
-        .collect::<Vec<_>>();
-
-    if lines.len() >= LINES_MIN_OVERFLOW {
-        write!(
-            f,
-            "<{} lines total>\"{}\"\n<{} lines omitted>\n\"{}\"",
-            lines.len(),
-            lines[..LINES_MAX_START].join("\n"),
-            lines.len() - LINES_MAX_PRINTED,
-            lines[lines.len() - LINES_MAX_END..].join("\n"),
-        )
+    if lines_total >= LINES_MIN_OVERFLOW {
+        let lines_omitted = lines_total - LINES_MAX_PRINTED;
+        let start_lines = data.as_bstr().lines().take(LINES_MAX_START);
+        let end_lines = data.as_bstr().lines().skip(LINES_MAX_START + lines_omitted);
+        write!(f, "<{} lines total>", lines_total)?;
+        write_debug_bstrs(f, start_lines)?;
+        write!(f, "\n<{} lines omitted>\n", lines_omitted)?;
+        write_debug_bstrs(f, end_lines)
     } else if data.len() >= BYTES_MIN_OVERFLOW {
         write!(
             &mut NewlineRestorer::new(f),
@@ -394,14 +388,25 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
             data[data.len() - BYTES_MAX_END..].as_bstr(),
         )
     } else {
-        f.write_str(&data_as_bstr)
+        write!(&mut NewlineRestorer::new(f), "{:?}", data.as_bstr())
     }
 }
 
-fn restore_newlines(s: &str) -> Result<String, fmt::Error> {
-    let mut buf = String::new();
-    NewlineRestorer::new(&mut buf).write_str(s)?;
-    Ok(buf)
+fn write_debug_bstrs<'a>(
+    f: &mut impl std::fmt::Write,
+    lines: impl Iterator<Item = &'a [u8]>,
+) -> std::fmt::Result {
+    let mut newline_needed = false;
+    write!(f, "\"")?;
+    for line in lines {
+        if newline_needed {
+            writeln!(f)?;
+        }
+        let s = format!("{:?}", line.as_bstr());
+        write!(f, "{}", &s[1..s.len() - 1])?;
+        newline_needed = true;
+    }
+    write!(f, "\"")
 }
 
 struct NewlineRestorer<'a, T>
@@ -463,6 +468,8 @@ where
 
 #[cfg(test)]
 mod test {
+    use super::*;
+
     #[test]
     fn format_bytes() {
         let mut s = String::new();
@@ -498,23 +505,29 @@ mod test {
     }
 
     #[test]
-    fn restore_newlines() {
+    fn restore_newlines_generally() {
         let s = r#"escaped nul\0unescaped newline
 escaped newline\n<end>"#;
         assert_eq!(
             r#"escaped nul\0unescaped newline
 escaped newline
 <end>"#,
-            super::restore_newlines(s).unwrap()
+            restore_newlines(s).unwrap()
         );
     }
 
     #[test]
-    fn restore_newlines_trailing_backslashes() {
+    fn restore_newlines_with_trailing_backslashes() {
         let mut s = String::from("trailing backslashes");
         for _ in 0..4 {
             s.push('\\');
-            assert_eq!(s, super::restore_newlines(&s).unwrap());
+            assert_eq!(s, restore_newlines(&s).unwrap());
         }
+    }
+
+    fn restore_newlines(s: &str) -> Result<String, fmt::Error> {
+        let mut buf = String::new();
+        super::NewlineRestorer::new(&mut buf).write_str(s)?;
+        Ok(buf)
     }
 }
