@@ -2,7 +2,7 @@
 
 use bstr::ByteSlice;
 use std::error::Error;
-use std::fmt::{self, Write};
+use std::fmt;
 use std::process;
 
 /// Converts a type to an [`OutputResult`].
@@ -379,16 +379,12 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
         write!(f, "\n<{} lines omitted>\n", lines_omitted)?;
         write_debug_bstrs(f, end_lines)
     } else if data.len() >= BYTES_MIN_OVERFLOW {
-        write!(
-            &mut NewlineRestorer::new(f),
-            "<{} bytes total>{:?}...<{} bytes omitted>...{:?}",
-            data.len(),
-            data[..BYTES_MAX_START].as_bstr(),
-            data.len() - BYTES_MAX_PRINTED,
-            data[data.len() - BYTES_MAX_END..].as_bstr(),
-        )
+        write!(f, "<{} bytes total>", data.len())?;
+        write_debug_bstrs(f, data[..BYTES_MAX_START].lines())?;
+        write!(f, "<{} bytes omitted>", data.len() - BYTES_MAX_PRINTED)?;
+        write_debug_bstrs(f, data[data.len() - BYTES_MAX_END..].lines())
     } else {
-        write!(&mut NewlineRestorer::new(f), "{:?}", data.as_bstr())
+        write_debug_bstrs(f, data.lines())
     }
 }
 
@@ -409,67 +405,8 @@ fn write_debug_bstrs<'a>(
     write!(f, "\"")
 }
 
-struct NewlineRestorer<'a, T>
-where
-    T: fmt::Write,
-{
-    inner: &'a mut T,
-    trailing_backslash: bool,
-}
-
-impl<'a, T> NewlineRestorer<'a, T>
-where
-    T: fmt::Write,
-{
-    fn new(inner: &'a mut T) -> Self {
-        Self {
-            inner,
-            trailing_backslash: false,
-        }
-    }
-}
-
-impl<'a, T> fmt::Write for NewlineRestorer<'a, T>
-where
-    T: fmt::Write,
-{
-    fn write_str(&mut self, s: &str) -> fmt::Result {
-        let mut buf = if self.trailing_backslash {
-            String::from("\\")
-        } else {
-            String::new()
-        };
-
-        buf += s;
-
-        let trailing_backslashes = buf.chars().rev().take_while(|&c| c == '\\').count();
-
-        self.trailing_backslash = if trailing_backslashes % 2 != 0 {
-            buf.pop();
-            true
-        } else {
-            false
-        };
-
-        self.inner.write_str(&buf.replace("\\n", "\n"))
-    }
-}
-
-impl<'a, T> Drop for NewlineRestorer<'a, T>
-where
-    T: fmt::Write,
-{
-    fn drop(&mut self) {
-        if self.trailing_backslash {
-            self.inner.write_char('\\').unwrap_or_default();
-        }
-    }
-}
-
 #[cfg(test)]
 mod test {
-    use super::*;
-
     #[test]
     fn format_bytes() {
         let mut s = String::new();
@@ -502,32 +439,5 @@ mod test {
 39""#,
             buf
         );
-    }
-
-    #[test]
-    fn restore_newlines_generally() {
-        let s = r#"escaped nul\0unescaped newline
-escaped newline\n<end>"#;
-        assert_eq!(
-            r#"escaped nul\0unescaped newline
-escaped newline
-<end>"#,
-            restore_newlines(s).unwrap()
-        );
-    }
-
-    #[test]
-    fn restore_newlines_with_trailing_backslashes() {
-        let mut s = String::from("trailing backslashes");
-        for _ in 0..4 {
-            s.push('\\');
-            assert_eq!(s, restore_newlines(&s).unwrap());
-        }
-    }
-
-    fn restore_newlines(s: &str) -> Result<String, fmt::Error> {
-        let mut buf = String::new();
-        super::NewlineRestorer::new(&mut buf).write_str(s)?;
-        Ok(buf)
     }
 }
