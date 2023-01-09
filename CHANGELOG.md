@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Make binary data easier to read by resolving newlines
+
 ## [2.0.7] - 2022-12-02
 
 ## [2.0.6] - 2022-11-04
