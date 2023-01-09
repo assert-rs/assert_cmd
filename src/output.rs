@@ -353,24 +353,188 @@ impl fmt::Display for DebugBuffer {
     }
 }
 
-fn format_bytes(data: &[u8], f: &mut fmt::Formatter<'_>) -> fmt::Result {
+fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
     #![allow(clippy::assertions_on_constants)]
-    const MIN_OVERFLOW: usize = 8192;
-    const MAX_START: usize = 2048;
-    const MAX_END: usize = 2048;
-    const MAX_PRINTED: usize = MAX_START + MAX_END;
-    assert!(MAX_PRINTED < MIN_OVERFLOW);
 
-    if data.len() >= MIN_OVERFLOW {
+    const LINES_MIN_OVERFLOW: usize = 80;
+    const LINES_MAX_START: usize = 20;
+    const LINES_MAX_END: usize = 40;
+    const LINES_MAX_PRINTED: usize = LINES_MAX_START + LINES_MAX_END;
+    assert!(LINES_MAX_PRINTED < LINES_MIN_OVERFLOW);
+
+    const BYTES_MIN_OVERFLOW: usize = 8192;
+    const BYTES_MAX_START: usize = 2048;
+    const BYTES_MAX_END: usize = 2048;
+    const BYTES_MAX_PRINTED: usize = BYTES_MAX_START + BYTES_MAX_END;
+    assert!(BYTES_MAX_PRINTED < BYTES_MIN_OVERFLOW);
+
+    let lines_total = data.as_bstr().lines_with_terminator().count();
+    let multiline = 1 < lines_total;
+
+    if LINES_MIN_OVERFLOW <= lines_total {
+        let lines_omitted = lines_total - LINES_MAX_PRINTED;
+        let start_lines = data.as_bstr().lines_with_terminator().take(LINES_MAX_START);
+        let end_lines = data
+            .as_bstr()
+            .lines_with_terminator()
+            .skip(LINES_MAX_START + lines_omitted);
+        writeln!(f, "<{} lines total>", lines_total)?;
+        write_debug_bstrs(f, true, start_lines)?;
+        writeln!(f, "<{} lines omitted>", lines_omitted)?;
+        write_debug_bstrs(f, true, end_lines)
+    } else if BYTES_MIN_OVERFLOW <= data.len() {
         write!(
             f,
-            "<{} bytes total>{:?}...<{} bytes omitted>...{:?}",
+            "<{} bytes total>{}",
             data.len(),
-            data[..MAX_START].as_bstr(),
-            data.len() - MAX_PRINTED,
-            data[data.len() - MAX_END..].as_bstr(),
+            if multiline { "\n" } else { "" }
+        )?;
+        write_debug_bstrs(
+            f,
+            multiline,
+            data[..BYTES_MAX_START].lines_with_terminator(),
+        )?;
+        write!(
+            f,
+            "<{} bytes omitted>{}",
+            data.len() - BYTES_MAX_PRINTED,
+            if multiline { "\n" } else { "" }
+        )?;
+        write_debug_bstrs(
+            f,
+            multiline,
+            data[data.len() - BYTES_MAX_END..].lines_with_terminator(),
         )
     } else {
-        write!(f, "{:?}", data.as_bstr())
+        write_debug_bstrs(f, multiline, data.lines_with_terminator())
+    }
+}
+
+fn write_debug_bstrs<'a>(
+    f: &mut impl std::fmt::Write,
+    multiline: bool,
+    mut lines: impl Iterator<Item = &'a [u8]>,
+) -> std::fmt::Result {
+    if multiline {
+        writeln!(f, "```")?;
+        for mut line in lines {
+            let mut newline = false;
+            if line.last() == Some(&b'\n') {
+                line = &line[..line.len() - 1];
+                newline = true;
+            }
+            let s = format!("{:?}", line.as_bstr());
+            write!(
+                f,
+                "{}{}",
+                &s[1..s.len() - 1],
+                if newline { "\n" } else { "" }
+            )?;
+        }
+        writeln!(f, "```")
+    } else {
+        write!(f, "{:?}", lines.next().unwrap_or(&[]).as_bstr())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn format_bytes() {
+        let mut s = String::new();
+        for i in 0..80 {
+            s.push_str(&format!("{}\n", i));
+        }
+
+        let mut buf = String::new();
+        super::format_bytes(s.as_bytes(), &mut buf).unwrap();
+
+        assert_eq!(
+            "<80 lines total>
+```
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+```
+<20 lines omitted>
+```
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+```
+",
+            buf
+        );
+    }
+
+    #[test]
+    fn no_trailing_newline() {
+        let s = "no\ntrailing\nnewline";
+
+        let mut buf = String::new();
+        super::format_bytes(s.as_bytes(), &mut buf).unwrap();
+
+        assert_eq!(
+            "```
+no
+trailing
+newline```
+",
+            buf
+        );
     }
 }
