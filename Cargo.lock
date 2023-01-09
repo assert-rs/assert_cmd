@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "assert_cmd"
-version = "2.0.7"
+version = "2.0.8"
 dependencies = [
  "bstr",
  "concolor 0.0.11",
