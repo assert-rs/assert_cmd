@@ -353,14 +353,13 @@ impl fmt::Display for DebugBuffer {
     }
 }
 
-const LINES_MIN_OVERFLOW: usize = 80;
-const LINES_MAX_START: usize = 20;
-const LINES_MAX_END: usize = 40;
-const LINES_MAX_PRINTED: usize = LINES_MAX_START + LINES_MAX_END;
-
 fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
     #![allow(clippy::assertions_on_constants)]
 
+    const LINES_MIN_OVERFLOW: usize = 80;
+    const LINES_MAX_START: usize = 20;
+    const LINES_MAX_END: usize = 40;
+    const LINES_MAX_PRINTED: usize = LINES_MAX_START + LINES_MAX_END;
     assert!(LINES_MAX_PRINTED < LINES_MIN_OVERFLOW);
 
     const BYTES_MIN_OVERFLOW: usize = 8192;
@@ -369,13 +368,16 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
     const BYTES_MAX_PRINTED: usize = BYTES_MAX_START + BYTES_MAX_END;
     assert!(BYTES_MAX_PRINTED < BYTES_MIN_OVERFLOW);
 
-    let lines_total = data.as_bstr().lines().count();
+    let lines_total = data.as_bstr().lines_with_terminator().count();
     let multiline = 1 < lines_total;
 
     if LINES_MIN_OVERFLOW <= lines_total {
         let lines_omitted = lines_total - LINES_MAX_PRINTED;
-        let start_lines = data.as_bstr().lines().take(LINES_MAX_START);
-        let end_lines = data.as_bstr().lines().skip(LINES_MAX_START + lines_omitted);
+        let start_lines = data.as_bstr().lines_with_terminator().take(LINES_MAX_START);
+        let end_lines = data
+            .as_bstr()
+            .lines_with_terminator()
+            .skip(LINES_MAX_START + lines_omitted);
         writeln!(f, "<{} lines total>", lines_total)?;
         write_debug_bstrs(f, true, start_lines)?;
         writeln!(f, "<{} lines omitted>", lines_omitted)?;
@@ -387,16 +389,24 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
             data.len(),
             if multiline { "\n" } else { "" }
         )?;
-        write_debug_bstrs(f, multiline, data[..BYTES_MAX_START].lines())?;
+        write_debug_bstrs(
+            f,
+            multiline,
+            data[..BYTES_MAX_START].lines_with_terminator(),
+        )?;
         write!(
             f,
             "<{} bytes omitted>{}",
             data.len() - BYTES_MAX_PRINTED,
             if multiline { "\n" } else { "" }
         )?;
-        write_debug_bstrs(f, multiline, data[data.len() - BYTES_MAX_END..].lines())
+        write_debug_bstrs(
+            f,
+            multiline,
+            data[data.len() - BYTES_MAX_END..].lines_with_terminator(),
+        )
     } else {
-        write_debug_bstrs(f, multiline, data.lines())
+        write_debug_bstrs(f, multiline, data.lines_with_terminator())
     }
 }
 
@@ -407,12 +417,19 @@ fn write_debug_bstrs<'a>(
 ) -> std::fmt::Result {
     if multiline {
         writeln!(f, "```")?;
-        for line in lines {
-            let s = format!("{:?}", line.as_bstr());
-            write!(f, "{}", &s[1..s.len() - 1])?;
-            if multiline {
-                writeln!(f)?;
+        for mut line in lines {
+            let mut newline = false;
+            if line.last() == Some(&b'\n') {
+                line = &line[..line.len() - 1];
+                newline = true;
             }
+            let s = format!("{:?}", line.as_bstr());
+            write!(
+                f,
+                "{}{}",
+                &s[1..s.len() - 1],
+                if newline { "\n" } else { "" }
+            )?;
         }
         writeln!(f, "```")
     } else {
@@ -422,42 +439,102 @@ fn write_debug_bstrs<'a>(
 
 #[cfg(test)]
 mod test {
-    use super::{LINES_MAX_END, LINES_MAX_PRINTED, LINES_MAX_START, LINES_MIN_OVERFLOW};
-
     #[test]
     fn format_bytes() {
         let mut s = String::new();
-        for i in 0..LINES_MIN_OVERFLOW {
+        for i in 0..80 {
             s.push_str(&format!("{}\n", i));
         }
 
         let mut buf = String::new();
         super::format_bytes(s.as_bytes(), &mut buf).unwrap();
 
-        let lines_omitted = LINES_MIN_OVERFLOW - LINES_MAX_PRINTED;
+        assert_eq!(
+            "<80 lines total>
+```
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+```
+<20 lines omitted>
+```
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+```
+",
+            buf
+        );
+    }
 
-        let mut lines = buf.lines();
+    #[test]
+    fn no_trailing_newline() {
+        let s = "no\ntrailing\nnewline";
+
+        let mut buf = String::new();
+        super::format_bytes(s.as_bytes(), &mut buf).unwrap();
+
         assert_eq!(
-            format!("<{} lines total>", LINES_MIN_OVERFLOW),
-            lines.next().unwrap()
+            "```
+no
+trailing
+newline```
+",
+            buf
         );
-        assert_eq!(format!("```"), lines.next().unwrap());
-        for i in 0..LINES_MAX_START {
-            assert_eq!(format!("{}", i), lines.next().unwrap());
-        }
-        assert_eq!(format!("```"), lines.next().unwrap());
-        assert_eq!(
-            format!("<{} lines omitted>", lines_omitted),
-            lines.next().unwrap()
-        );
-        assert_eq!(format!("```"), lines.next().unwrap());
-        for i in 0..LINES_MAX_END {
-            assert_eq!(
-                format!("{}", LINES_MAX_START + lines_omitted + i),
-                lines.next().unwrap()
-            );
-        }
-        assert_eq!(format!("```"), lines.next().unwrap());
-        assert_eq!(None, lines.next());
     }
 }
