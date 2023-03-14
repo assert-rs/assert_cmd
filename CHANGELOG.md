@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.0.9] - 2023-03-14
+
 ### Compatibility
 
 - Update MSRV to 1.64.0
@@ -298,7 +300,8 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.8...HEAD
+[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.9...HEAD
+[2.0.9]: https://github.com/assert-rs/assert_cmd/compare/v2.0.8...v2.0.9
 [2.0.8]: https://github.com/assert-rs/assert_cmd/compare/v2.0.7...v2.0.8
 [2.0.7]: https://github.com/assert-rs/assert_cmd/compare/v2.0.6...v2.0.7
 [2.0.6]: https://github.com/assert-rs/assert_cmd/compare/v2.0.5...v2.0.6
