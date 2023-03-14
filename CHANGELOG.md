@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Compatibility
+
+- Update MSRV to 1.64.0
+
+### Fixes
+
+- Correctly handle `CLICOLOR=1`
+- Correctly handle `NO_COLOR=`
+- Auto-enable color on CI
+
 ## [2.0.8] - 2023-01-09
 
 ### Features
