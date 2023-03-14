@@ -1,48 +1,59 @@
 #[derive(Copy, Clone, Debug, Default)]
 pub(crate) struct Palette {
-    pub(crate) key: styled::Style,
-    pub(crate) value: styled::Style,
+    key: anstyle::Style,
+    value: anstyle::Style,
 }
 
 impl Palette {
-    #[cfg(feature = "color")]
-    pub(crate) fn current() -> Self {
-        if concolor::get(concolor::Stream::Either).ansi_color() {
+    pub(crate) fn color() -> Self {
+        if cfg!(feature = "color") {
             Self {
-                key: styled::Style(yansi::Style::new(yansi::Color::Blue).bold()),
-                value: styled::Style(yansi::Style::new(yansi::Color::Yellow).bold()),
+                key: anstyle::AnsiColor::Blue | anstyle::Effects::BOLD,
+                value: anstyle::AnsiColor::Yellow | anstyle::Effects::BOLD,
             }
         } else {
-            Self::default()
+            Self::plain()
         }
     }
 
-    #[cfg(not(feature = "color"))]
-    pub(crate) fn current() -> Self {
+    pub(crate) fn plain() -> Self {
         Self::default()
     }
-}
 
-#[cfg(feature = "color")]
-mod styled {
-    #[derive(Copy, Clone, Debug, Default)]
-    pub(crate) struct Style(pub(crate) yansi::Style);
+    pub(crate) fn key<D: std::fmt::Display>(self, display: D) -> Styled<D> {
+        Styled::new(display, self.key)
+    }
 
-    impl Style {
-        pub(crate) fn paint<T: std::fmt::Display>(self, item: T) -> impl std::fmt::Display {
-            self.0.paint(item)
-        }
+    pub(crate) fn value<D: std::fmt::Display>(self, display: D) -> Styled<D> {
+        Styled::new(display, self.value)
     }
 }
 
-#[cfg(not(feature = "color"))]
-mod styled {
-    #[derive(Copy, Clone, Debug, Default)]
-    pub(crate) struct Style;
+#[derive(Debug)]
+pub(crate) struct Styled<D> {
+    display: D,
+    style: anstyle::Style,
+}
 
-    impl Style {
-        pub(crate) fn paint<T: std::fmt::Display>(self, item: T) -> impl std::fmt::Display {
-            item
+impl<D: std::fmt::Display> Styled<D> {
+    pub(crate) fn new(display: D, style: anstyle::Style) -> Self {
+        Self { display, style }
+    }
+}
+
+impl<D: std::fmt::Display> std::fmt::Display for Styled<D> {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if f.alternate() {
+            write!(
+                f,
+                "{}{}{}",
+                self.style.render(),
+                self.display,
+                self.style.render_reset()
+            )
+        } else {
+            self.display.fmt(f)
         }
     }
 }
