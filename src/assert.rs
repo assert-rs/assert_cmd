@@ -6,6 +6,8 @@ use std::fmt;
 use std::process;
 use std::str;
 
+#[cfg(feature = "color")]
+use anstyle_stream::panic;
 use predicates::str::PredicateStrExt;
 use predicates_tree::CaseTreeExt;
 
@@ -482,14 +484,9 @@ impl Assert {
 
 impl fmt::Display for Assert {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let palette = crate::Palette::current();
+        let palette = crate::Palette::color();
         for &(ref name, ref context) in &self.context {
-            writeln!(
-                f,
-                "{}=`{}`",
-                palette.key.paint(name),
-                palette.value.paint(context)
-            )?;
+            writeln!(f, "{:#}=`{:#}`", palette.key(name), palette.value(context))?;
         }
         output_fmt(&self.output, f)
     }

@@ -11,7 +11,7 @@ readme = "README.md"
 categories = ["development-tools::testing"]
 keywords = ["cli", "test", "assert", "command", "duct"]
 edition = "2021"
-rust-version = "1.60.0"  # MSRV
+rust-version = "1.64.0"  # MSRV
 include = [
   "build.rs",
   "src/**/*",
@@ -32,21 +32,21 @@ pre-release-replacements = [
 ]
 
 [features]
-color = ["dep:yansi", "dep:concolor", "concolor?/std", "predicates/color"]
-color-auto = ["color", "concolor?/auto"]
+color = ["dep:anstyle-stream", "predicates/color"]
+color-auto = ["color"]
 
 [[bin]]
 name = "bin_fixture"
 
 [dependencies]
-predicates = { version = "2.1", default-features = false, features = ["diff"] }
-predicates-core = "1.0"
-predicates-tree = "1.0"
+predicates = { version = "3.0.1", default-features = false, features = ["diff"] }
+predicates-core = "1.0.6"
+predicates-tree = "1.0.1"
 doc-comment = "0.3"
 wait-timeout = "0.2.0"
 bstr = "1.0.1"
-yansi = { version = "0.5.1", optional = true }
-concolor = { version = "0.0.12", optional = true }
+anstyle-stream = { version = "0.2.1", optional = true }
+anstyle = "0.3.1"
 
 [dev-dependencies]
 escargot = "0.5"

@@ -241,24 +241,19 @@ impl Error for OutputError {}
 
 impl fmt::Display for OutputError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let palette = crate::Palette::current();
+        let palette = crate::Palette::color();
         if let Some(ref cmd) = self.cmd {
-            writeln!(
-                f,
-                "{}={}",
-                palette.key.paint("command"),
-                palette.value.paint(cmd)
-            )?;
+            writeln!(f, "{:#}={:#}", palette.key("command"), palette.value(cmd))?;
         }
         if let Some(ref stdin) = self.stdin {
             writeln!(
                 f,
-                "{}={}",
-                palette.key.paint("stdin"),
-                palette.value.paint(DebugBytes::new(stdin))
+                "{:#}={:#}",
+                palette.key("stdin"),
+                palette.value(DebugBytes::new(stdin))
             )?;
         }
-        write!(f, "{}", self.cause)
+        write!(f, "{:#}", self.cause)
     }
 }
 
@@ -271,8 +266,8 @@ enum OutputCause {
 impl fmt::Display for OutputCause {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            OutputCause::Expected(ref e) => write!(f, "{}", e),
-            OutputCause::Unexpected(ref e) => write!(f, "{}", e),
+            OutputCause::Expected(ref e) => write!(f, "{:#}", e),
+            OutputCause::Unexpected(ref e) => write!(f, "{:#}", e),
         }
     }
 }
@@ -289,30 +284,25 @@ impl fmt::Display for Output {
 }
 
 pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let palette = crate::Palette::current();
+    let palette = crate::Palette::color();
     if let Some(code) = output.status.code() {
-        writeln!(
-            f,
-            "{}={}",
-            palette.key.paint("code"),
-            palette.value.paint(code)
-        )?;
+        writeln!(f, "{:#}={:#}", palette.key("code"), palette.value(code))?;
     } else {
         writeln!(
             f,
-            "{}={}",
-            palette.key.paint("code"),
-            palette.value.paint("<interrupted>")
+            "{:#}={:#}",
+            palette.key("code"),
+            palette.value("<interrupted>")
         )?;
     }
 
     write!(
         f,
-        "{}={}\n{}={}\n",
-        palette.key.paint("stdout"),
-        palette.value.paint(DebugBytes::new(&output.stdout)),
-        palette.key.paint("stderr"),
-        palette.value.paint(DebugBytes::new(&output.stderr)),
+        "{:#}={:#}\n{:#}={:#}\n",
+        palette.key("stdout"),
+        palette.value(DebugBytes::new(&output.stdout)),
+        palette.key("stderr"),
+        palette.value(DebugBytes::new(&output.stderr)),
     )?;
     Ok(())
 }
