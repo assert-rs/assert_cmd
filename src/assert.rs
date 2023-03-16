@@ -7,7 +7,7 @@ use std::process;
 use std::str;
 
 #[cfg(feature = "color")]
-use anstyle_stream::panic;
+use anstream::panic;
 use predicates::str::PredicateStrExt;
 use predicates_tree::CaseTreeExt;
 
