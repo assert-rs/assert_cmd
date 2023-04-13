@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.0.11] - 2023-04-13
+
 ### Internal
 
 - Dependency update
@@ -310,7 +312,8 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.10...HEAD
+[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.11...HEAD
+[2.0.11]: https://github.com/assert-rs/assert_cmd/compare/v2.0.10...v2.0.11
 [2.0.10]: https://github.com/assert-rs/assert_cmd/compare/v2.0.9...v2.0.10
 [2.0.9]: https://github.com/assert-rs/assert_cmd/compare/v2.0.8...v2.0.9
 [2.0.8]: https://github.com/assert-rs/assert_cmd/compare/v2.0.7...v2.0.8
