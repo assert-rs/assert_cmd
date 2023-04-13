@@ -8,8 +8,8 @@ impl Palette {
     pub(crate) fn color() -> Self {
         if cfg!(feature = "color") {
             Self {
-                key: anstyle::AnsiColor::Blue | anstyle::Effects::BOLD,
-                value: anstyle::AnsiColor::Yellow | anstyle::Effects::BOLD,
+                key: anstyle::AnsiColor::Blue.on_default() | anstyle::Effects::BOLD,
+                value: anstyle::AnsiColor::Yellow.on_default() | anstyle::Effects::BOLD,
             }
         } else {
             Self::plain()
