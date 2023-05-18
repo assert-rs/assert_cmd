@@ -202,7 +202,7 @@ pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
 
 fn cargo_bin_str(name: &str) -> path::PathBuf {
     let env_var = format!("CARGO_BIN_EXE_{}", name);
-    std::env::var_os(&env_var)
+    std::env::var_os(env_var)
         .map(|p| p.into())
         .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))
 }

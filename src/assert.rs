@@ -485,7 +485,7 @@ impl Assert {
 impl fmt::Display for Assert {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let palette = crate::Palette::color();
-        for &(ref name, ref context) in &self.context {
+        for (name, context) in &self.context {
             writeln!(f, "{:#}=`{:#}`", palette.key(name), palette.value(context))?;
         }
         output_fmt(&self.output, f)
@@ -1069,8 +1069,9 @@ impl fmt::Display for AssertError {
             AssertReason::UnexpectedFailure { actual_code } => writeln!(
                 f,
                 "Unexpected failure.\ncode-{}\nstderr=```{}```",
-                actual_code.map_or("<interrupted>".to_owned(), |actual_code| actual_code
-                    .to_string()),
+                actual_code
+                    .map(|actual_code| actual_code.to_string())
+                    .unwrap_or_else(|| "<interrupted>".to_owned()),
                 DebugBytes::new(&self.assert.output.stderr),
             ),
             AssertReason::UnexpectedSuccess => {
