@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Compatibility
+
+- MSRV is now 1.66.0
+
+### Fixes
+
+- Fix typo in failure output
+
 ## [2.0.11] - 2023-04-13
 
 ### Internal
