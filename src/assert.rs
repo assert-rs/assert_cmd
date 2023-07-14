@@ -1068,7 +1068,7 @@ impl fmt::Display for AssertError {
         match &self.reason {
             AssertReason::UnexpectedFailure { actual_code } => writeln!(
                 f,
-                "Unexpected failure.\ncode-{}\nstderr=```{}```",
+                "Unexpected failure.\ncode={}\nstderr=```{}```",
                 actual_code
                     .map(|actual_code| actual_code.to_string())
                     .unwrap_or_else(|| "<interrupted>".to_owned()),
