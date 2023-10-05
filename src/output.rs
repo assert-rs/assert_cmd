@@ -26,7 +26,7 @@ pub trait OutputOkExt
 where
     Self: ::std::marker::Sized,
 {
-    /// Convert an [`Output`][Output] to an [`OutputResult`][OutputResult].
+    /// Convert an [`Output`] to an [`OutputResult`].
     ///
     /// # Examples
     ///
@@ -41,10 +41,10 @@ where
     /// assert!(result.is_ok());
     /// ```
     ///
-    /// [Output]: std::process::Output
+    /// [`Output`]: std::process::Output
     fn ok(self) -> OutputResult;
 
-    /// Unwrap a [`Output`][Output] but with a prettier message than `.ok().unwrap()`.
+    /// Unwrap a [`Output`] but with a prettier message than `.ok().unwrap()`.
     ///
     /// # Examples
     ///
@@ -58,7 +58,7 @@ where
     ///     .unwrap();
     /// ```
     ///
-    /// [Output]: std::process::Output
+    /// [`Output`]: std::process::Output
     fn unwrap(self) -> process::Output {
         match self.ok() {
             Ok(output) => output,
@@ -66,7 +66,7 @@ where
         }
     }
 
-    /// Unwrap a [`Output`][Output] but with a prettier message than `ok().err().unwrap()`.
+    /// Unwrap a [`Output`] but with a prettier message than `ok().err().unwrap()`.
     ///
     /// # Examples
     ///
@@ -80,7 +80,7 @@ where
     ///     .unwrap_err();
     /// ```
     ///
-    /// [Output]: std::process::Output
+    /// [`Output`]: std::process::Output
     fn unwrap_err(self) -> OutputError {
         match self.ok() {
             Ok(output) => panic!(

@@ -1,6 +1,4 @@
-//! [`std::process::Command`][Command] customized for testing.
-//!
-//! [Command]: std::process::Command
+//! [`std::process::Command`] customized for testing.
 
 use std::ffi;
 use std::io;
@@ -17,9 +15,7 @@ use crate::output::OutputError;
 use crate::output::OutputOkExt;
 use crate::output::OutputResult;
 
-/// [`std::process::Command`][Command] customized for testing.
-///
-/// [Command]: std::process::Command
+/// [`std::process::Command`] customized for testing.
 #[derive(Debug)]
 pub struct Command {
     cmd: process::Command,
@@ -119,7 +115,7 @@ impl Command {
         Ok(self.write_stdin(buffer))
     }
 
-    /// Run a `Command`, returning an [`OutputResult`][OutputResult].
+    /// Run a `Command`, returning an [`OutputResult`].
     ///
     /// # Examples
     ///
@@ -136,7 +132,7 @@ impl Command {
         OutputOkExt::ok(self)
     }
 
-    /// Run a `Command`, unwrapping the [`OutputResult`][OutputResult].
+    /// Run a `Command`, unwrapping the [`OutputResult`].
     ///
     /// # Examples
     ///
@@ -152,7 +148,7 @@ impl Command {
         OutputOkExt::unwrap(self)
     }
 
-    /// Run a `Command`, unwrapping the error in the [`OutputResult`][OutputResult].
+    /// Run a `Command`, unwrapping the error in the [`OutputResult`].
     ///
     /// # Examples
     ///
@@ -188,9 +184,7 @@ impl Command {
     }
 }
 
-/// Mirror [`std::process::Command`][Command]'s API
-///
-/// [Command]: std::process::Command
+/// Mirror [`std::process::Command`]'s API
 impl Command {
     /// Constructs a new `Command` for launching the program at
     /// path `program`, with the following default configuration:
