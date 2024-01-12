@@ -59,7 +59,7 @@ predicates-tree = "1.0.1"
 doc-comment = "0.3"
 wait-timeout = "0.2.0"
 bstr = "1.0.1"
-anstream = { version = "0.6.4", optional = true }
+anstream = { version = "0.6.7", optional = true }
 anstyle = "1.0.0"
 
 [dev-dependencies]
