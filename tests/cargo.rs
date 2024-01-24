@@ -2,6 +2,7 @@ use std::process;
 use std::process::Command;
 
 use assert_cmd::prelude::*;
+use escargot::CURRENT_TARGET;
 
 #[test]
 fn cargo_binary() {
@@ -19,15 +20,23 @@ fn cargo_binary_with_empty_env() {
 
 #[test]
 fn mod_example() {
-    let bin_under_test = escargot::CargoBuild::new()
-        .bin("bin_fixture")
-        .current_release()
-        .current_target()
-        .run()
-        .unwrap();
-    let mut cmd = bin_under_test.command();
-    let output = cmd.unwrap();
-    println!("{:?}", output);
+    let runner_env = format!(
+        "CARGO_TARGET_{}_RUNNER",
+        CURRENT_TARGET.replace('-', "_").to_uppercase()
+    );
+    if std::env::var(runner_env).is_ok() {
+        // not running this test on cross because escargot doesn't support the cargo target runner yet
+    } else {
+        let bin_under_test = escargot::CargoBuild::new()
+            .bin("bin_fixture")
+            .current_release()
+            .current_target()
+            .run()
+            .unwrap();
+        let mut cmd = bin_under_test.command();
+        let output = cmd.unwrap();
+        println!("{:?}", output);
+    }
 }
 
 #[test]
