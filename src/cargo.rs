@@ -89,6 +89,12 @@ where
     ///
     /// See the [`cargo` module documentation][crate::cargo] for caveats and workarounds.
     ///
+    /// The [`Command`] created with this method may run the binary through a runner, as configured
+    /// in the `CARGO_TARGET_<TRIPLET>_RUNNER` environment variable.  This is useful for running
+    /// binaries that can't be launched directly, such as cross-compiled binaries. When using
+    /// this method with [cross](https://github.com/cross-rs/cross), no extra configuration is
+    /// needed.
+    ///
     /// # Examples
     ///
     /// ```rust,no_run
@@ -132,10 +138,25 @@ impl CommandCargoExt for process::Command {
 pub(crate) fn cargo_bin_cmd<S: AsRef<str>>(name: S) -> Result<process::Command, CargoError> {
     let path = cargo_bin(name);
     if path.is_file() {
-        Ok(process::Command::new(path))
+        if let Some(runner) = cargo_runner() {
+            let mut cmd = process::Command::new(&runner[0]);
+            cmd.args(&runner[1..]).arg(path);
+            Ok(cmd)
+        } else {
+            Ok(process::Command::new(path))
+        }
     } else {
         Err(CargoError::with_cause(NotFoundError { path }))
     }
+}
+
+pub(crate) fn cargo_runner() -> Option<Vec<String>> {
+    let runner_env = format!(
+        "CARGO_TARGET_{}_RUNNER",
+        CURRENT_TARGET.replace('-', "_").to_uppercase()
+    );
+    let runner = std::env::var(runner_env).ok()?;
+    Some(runner.split(' ').map(str::to_string).collect())
 }
 
 /// Error when finding crate binary.
@@ -206,3 +227,6 @@ fn cargo_bin_str(name: &str) -> path::PathBuf {
         .map(|p| p.into())
         .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))
 }
+
+/// The current process' target triplet.
+const CURRENT_TARGET: &str = include_str!(concat!(env!("OUT_DIR"), "/current_target.txt"));

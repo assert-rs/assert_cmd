@@ -33,6 +33,7 @@ Other crates that might be useful in testing command line programs.
 * [`assert_fs`][assert_fs] for filesystem fixtures and assertions.
   * or [tempfile][tempfile] for scratchpad directories.
 * [dir-diff][dir-diff] for testing file side-effects.
+* [cross][cross] for cross-platform testing.
 
 [escargot]: http://docs.rs/escargot
 [rexpect]: https://crates.io/crates/rexpect
@@ -41,6 +42,7 @@ Other crates that might be useful in testing command line programs.
 [duct]: https://crates.io/crates/duct
 [assert_fs]: https://crates.io/crates/assert_fs
 [commandspec]: https://crates.io/crates/commandspec
+[cross]: https://github.com/cross-rs/cross
 
 ## License
 
@@ -58,13 +60,13 @@ fitzgen
 >
 > bravo bravo WG-cli
 
-passcod 
+passcod
 > Running commands and dealing with output can be complex in many many ways, so assert_cmd smoothing that is excellent, very much welcome, and improves ergonomics significantly.
 
-volks73 
+volks73
 >  I have used [assert_cmd] in other projects and I am extremely pleased with it
 
-coreyja 
+coreyja
 > [assert_cmd] pretty much IS my testing strategy so far, though my app under test is pretty small.
 >
 > This library has made it really easy to add some test coverage to my project, even when I am just learning how to write Rust!
