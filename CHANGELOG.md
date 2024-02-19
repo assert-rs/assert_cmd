@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Compatibility
+
+- MSRV is now 1.73.0
+
+### Features
+
+- Run using the cargo target runner
+
 ## [2.0.13] - 2024-01-12
 
 ### Internal
