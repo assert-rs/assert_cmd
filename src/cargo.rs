@@ -213,7 +213,7 @@ fn target_dir() -> path::PathBuf {
             }
             path
         })
-        .unwrap()
+        .expect("this should only be used where a `current_exe` can be set")
 }
 
 /// Look up the path to a cargo-built binary within an integration test.

@@ -444,12 +444,8 @@ impl Command {
         input: Option<Vec<u8>>,
         timeout: Option<std::time::Duration>,
     ) -> io::Result<process::Output> {
-        let stdin = input.and_then(|i| {
-            child
-                .stdin
-                .take()
-                .map(|mut stdin| std::thread::spawn(move || stdin.write_all(&i)))
-        });
+        #![allow(clippy::unwrap_used)] // changes behavior in some tests
+
         fn read<R>(mut input: R) -> std::thread::JoinHandle<io::Result<Vec<u8>>>
         where
             R: Read + Send + 'static,
@@ -459,6 +455,13 @@ impl Command {
                 input.read_to_end(&mut ret).map(|_| ret)
             })
         }
+
+        let stdin = input.and_then(|i| {
+            child
+                .stdin
+                .take()
+                .map(|mut stdin| std::thread::spawn(move || stdin.write_all(&i)))
+        });
         let stdout = child.stdout.take().map(read);
         let stderr = child.stderr.take().map(read);
 

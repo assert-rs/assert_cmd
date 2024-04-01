@@ -11,6 +11,7 @@ fn main() {
     let out = path::PathBuf::from(env::var_os("OUT_DIR").expect("run within cargo"))
         .join("current_target.txt");
     let default_target = env::var("TARGET").expect("run as cargo build script");
-    let mut file = fs::File::create(out).unwrap();
-    file.write_all(default_target.as_bytes()).unwrap();
+    let mut file = fs::File::create(out).expect("can write to OUT_DIR");
+    file.write_all(default_target.as_bytes())
+        .expect("can write to OUT_DIR");
 }

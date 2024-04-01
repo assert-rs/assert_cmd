@@ -547,7 +547,7 @@ where
 }
 
 /// Keep `predicates` concrete Predicates out of our public API.
-/// [predicates_core::Predicate] used by [`IntoCodePredicate`] for code.
+/// [`predicates_core::Predicate`] used by [`IntoCodePredicate`] for code.
 ///
 /// # Example
 ///
@@ -616,7 +616,7 @@ impl IntoCodePredicate<EqCodePredicate> for i32 {
 }
 
 /// Keep `predicates` concrete Predicates out of our public API.
-/// [predicates_core::Predicate] used by [`IntoCodePredicate`] for iterables of codes.
+/// [`predicates_core::Predicate`] used by [`IntoCodePredicate`] for iterables of codes.
 ///
 /// # Example
 ///
@@ -741,7 +741,7 @@ where
 }
 
 /// Keep `predicates` concrete Predicates out of our public API.
-/// [predicates_core::Predicate] used by [`IntoOutputPredicate`] for bytes.
+/// [`predicates_core::Predicate`] used by [`IntoOutputPredicate`] for bytes.
 ///
 /// # Example
 ///
@@ -781,7 +781,7 @@ impl predicates_core::Predicate<[u8]> for BytesContentOutputPredicate {
         &self,
         expected: bool,
         variable: &[u8],
-    ) -> Option<predicates_core::reflection::Case> {
+    ) -> Option<predicates_core::reflection::Case<'_>> {
         let actual = self.eval(variable);
         if expected == actual {
             Some(predicates_core::reflection::Case::new(Some(self), actual))
@@ -814,7 +814,7 @@ impl IntoOutputPredicate<BytesContentOutputPredicate> for &'static [u8] {
 }
 
 /// Keep `predicates` concrete Predicates out of our public API.
-/// [predicates_core::Predicate] used by [`IntoOutputPredicate`] for [`str`].
+/// [`predicates_core::Predicate`] used by [`IntoOutputPredicate`] for [`str`].
 ///
 /// # Example
 ///
@@ -901,7 +901,7 @@ impl IntoOutputPredicate<StrContentOutputPredicate> for &'static str {
 }
 
 // Keep `predicates` concrete Predicates out of our public API.
-/// [predicates_core::Predicate] used by [`IntoOutputPredicate`] for
+/// [`predicates_core::Predicate`] used by [`IntoOutputPredicate`] for
 /// [`Predicate<str>`][predicates_core::Predicate].
 ///
 /// # Example
@@ -1123,7 +1123,7 @@ mod test {
     fn convert_code<I, P>(pred: I) -> P
     where
         I: IntoCodePredicate<P>,
-        P: predicates_core::Predicate<i32>,
+        P: Predicate<i32>,
     {
         pred.into_code()
     }
@@ -1157,7 +1157,7 @@ mod test {
     fn convert_output<I, P>(pred: I) -> P
     where
         I: IntoOutputPredicate<P>,
-        P: predicates_core::Predicate<[u8]>,
+        P: Predicate<[u8]>,
     {
         pred.into_output()
     }
