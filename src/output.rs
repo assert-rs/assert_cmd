@@ -350,12 +350,13 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
     const LINES_MAX_START: usize = 20;
     const LINES_MAX_END: usize = 40;
     const LINES_MAX_PRINTED: usize = LINES_MAX_START + LINES_MAX_END;
-    assert!(LINES_MAX_PRINTED < LINES_MIN_OVERFLOW);
 
     const BYTES_MIN_OVERFLOW: usize = 8192;
     const BYTES_MAX_START: usize = 2048;
     const BYTES_MAX_END: usize = 2048;
     const BYTES_MAX_PRINTED: usize = BYTES_MAX_START + BYTES_MAX_END;
+
+    assert!(LINES_MAX_PRINTED < LINES_MIN_OVERFLOW);
     assert!(BYTES_MAX_PRINTED < BYTES_MIN_OVERFLOW);
 
     let lines_total = data.as_bstr().lines_with_terminator().count();
