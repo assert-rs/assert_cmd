@@ -402,10 +402,10 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
 }
 
 fn write_debug_bstrs<'a>(
-    f: &mut impl std::fmt::Write,
+    f: &mut impl fmt::Write,
     multiline: bool,
     mut lines: impl Iterator<Item = &'a [u8]>,
-) -> std::fmt::Result {
+) -> fmt::Result {
     if multiline {
         writeln!(f, "```")?;
         for mut line in lines {

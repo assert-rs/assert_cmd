@@ -155,7 +155,7 @@ pub(crate) fn cargo_runner() -> Option<Vec<String>> {
         "CARGO_TARGET_{}_RUNNER",
         CURRENT_TARGET.replace('-', "_").to_uppercase()
     );
-    let runner = std::env::var(runner_env).ok()?;
+    let runner = env::var(runner_env).ok()?;
     Some(runner.split(' ').map(str::to_string).collect())
 }
 
@@ -223,7 +223,7 @@ pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
 
 fn cargo_bin_str(name: &str) -> path::PathBuf {
     let env_var = format!("CARGO_BIN_EXE_{}", name);
-    std::env::var_os(env_var)
+    env::var_os(env_var)
         .map(|p| p.into())
         .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))
 }

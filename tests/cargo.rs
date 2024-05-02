@@ -1,4 +1,3 @@
-use std::process;
 use std::process::Command;
 
 use assert_cmd::prelude::*;
@@ -6,14 +5,14 @@ use escargot::CURRENT_TARGET;
 
 #[test]
 fn cargo_binary() {
-    let mut cmd = process::Command::cargo_bin("bin_fixture").unwrap();
+    let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
     cmd.env("stdout", "42");
     cmd.assert().success().stdout("42\n");
 }
 
 #[test]
 fn cargo_binary_with_empty_env() {
-    let mut cmd = process::Command::cargo_bin("bin_fixture").unwrap();
+    let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
     cmd.env_clear().env("stdout", "42");
     cmd.assert().success().stdout("42\n");
 }
