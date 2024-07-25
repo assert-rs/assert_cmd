@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.0.15] - 2024-07-25
+
 ### Compatibility
 
 - MSRV is now 1.74.0
@@ -342,7 +344,8 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.14...HEAD
+[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.15...HEAD
+[2.0.15]: https://github.com/assert-rs/assert_cmd/compare/v2.0.14...v2.0.15
 [2.0.14]: https://github.com/assert-rs/assert_cmd/compare/v2.0.13...v2.0.14
 [2.0.13]: https://github.com/assert-rs/assert_cmd/compare/v2.0.12...v2.0.13
 [2.0.12]: https://github.com/assert-rs/assert_cmd/compare/v2.0.11...v2.0.12
