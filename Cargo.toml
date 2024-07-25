@@ -130,6 +130,9 @@ bstr = "1.0.1"
 anstream = { version = "0.6.7", optional = true }
 anstyle = "1.0.0"
 
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.137"  # hack around a bad minimal version
+
 [dev-dependencies]
 escargot = "0.5"
 automod = "1.0.14"
