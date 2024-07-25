@@ -2,6 +2,7 @@
 resolver = "2"
 
 [workspace.package]
+repository = "https://github.com/assert-rs/assert_cmd.git"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 rust-version = "1.74"  # MSRV
@@ -17,7 +18,7 @@ include = [
 ]
 
 [workspace.lints.rust]
-rust_2018_idioms = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
 unreachable_pub = "warn"
 unsafe_op_in_unsafe_fn = "warn"
 unused_lifetimes = "warn"
@@ -58,7 +59,6 @@ let_and_return = "allow"  # sometimes good to name what you are returning
 linkedlist = "warn"
 lossy_float_literal = "warn"
 macro_use_imports = "warn"
-match_wildcard_for_single_variants = "warn"
 mem_forget = "warn"
 mutex_integer = "warn"
 needless_continue = "warn"
@@ -73,7 +73,6 @@ rest_pat_in_fully_bound_structs = "warn"
 same_functions_in_if_condition = "warn"
 self_named_module_files = "warn"
 semicolon_if_nothing_returned = "warn"
-single_match_else = "warn"
 str_to_string = "warn"
 string_add = "warn"
 string_add_assign = "warn"
@@ -90,12 +89,12 @@ name = "assert_cmd"
 version = "2.0.15"
 description = "Test CLI Applications."
 authors = ["Pascal Hertleif <killercup@gmail.com>", "Ed Page <eopage@gmail.com>"]
-repository = "https://github.com/assert-rs/assert_cmd.git"
 homepage = "https://github.com/assert-rs/assert_cmd"
 documentation = "http://docs.rs/assert_cmd/"
 readme = "README.md"
 categories = ["development-tools::testing"]
 keywords = ["cli", "test", "assert", "command", "duct"]
+repository.workspace = true
 license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
