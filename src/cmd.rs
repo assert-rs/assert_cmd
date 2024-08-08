@@ -500,6 +500,102 @@ impl Command {
 
         self.cmd.spawn()
     }
+
+    /// Returns the path to the program that was given to [`Command::new`].
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust
+    /// use assert_cmd::Command;
+    ///
+    /// let cmd = Command::new("echo");
+    /// assert_eq!(cmd.get_program(), "echo");
+    /// ```
+    pub fn get_program(&self) -> &ffi::OsStr {
+        self.cmd.get_program()
+    }
+
+    /// Returns an iterator of the arguments that will be passed to the program.
+    ///
+    /// This does not include the path to the program as the first argument;
+    /// it only includes the arguments specified with [`Command::arg`] and
+    /// [`Command::args`].
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust
+    /// use std::ffi::OsStr;
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::new("echo");
+    /// cmd.arg("first").arg("second");
+    /// let args: Vec<&OsStr> = cmd.get_args().collect();
+    /// assert_eq!(args, &["first", "second"]);
+    /// ```
+    pub fn get_args(&self) -> process::CommandArgs<'_> {
+        self.cmd.get_args()
+    }
+
+    /// Returns an iterator of the environment variables explicitly set for the child process.
+    ///
+    /// Environment variables explicitly set using [`Command::env`], [`Command::envs`], and
+    /// [`Command::env_remove`] can be retrieved with this method.
+    ///
+    /// Note that this output does not include environment variables inherited from the parent
+    /// process.
+    ///
+    /// Each element is a tuple key/value pair `(&OsStr, Option<&OsStr>)`. A [`None`] value
+    /// indicates its key was explicitly removed via [`Command::env_remove`]. The associated key for
+    /// the [`None`] value will no longer inherit from its parent process.
+    ///
+    /// An empty iterator can indicate that no explicit mappings were added or that
+    /// [`Command::env_clear`] was called. After calling [`Command::env_clear`], the child process
+    /// will not inherit any environment variables from its parent process.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust
+    /// use std::ffi::OsStr;
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::new("ls");
+    /// cmd.env("TERM", "dumb").env_remove("TZ");
+    /// let envs: Vec<(&OsStr, Option<&OsStr>)> = cmd.get_envs().collect();
+    /// assert_eq!(envs, &[
+    ///     (OsStr::new("TERM"), Some(OsStr::new("dumb"))),
+    ///     (OsStr::new("TZ"), None)
+    /// ]);
+    /// ```
+    pub fn get_envs(&self) -> process::CommandEnvs<'_> {
+        self.cmd.get_envs()
+    }
+
+    /// Returns the working directory for the child process.
+    ///
+    /// This returns [`None`] if the working directory will not be changed.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust
+    /// use std::path::Path;
+    /// use assert_cmd::Command;
+    ///
+    /// let mut cmd = Command::new("ls");
+    /// assert_eq!(cmd.get_current_dir(), None);
+    /// cmd.current_dir("/bin");
+    /// assert_eq!(cmd.get_current_dir(), Some(Path::new("/bin")));
+    /// ```
+    pub fn get_current_dir(&self) -> Option<&path::Path> {
+        self.cmd.get_current_dir()
+    }
 }
 
 impl From<process::Command> for Command {
