@@ -508,6 +508,12 @@ impl From<process::Command> for Command {
     }
 }
 
+impl From<Command> for process::Command {
+    fn from(cmd: Command) -> process::Command {
+        cmd.cmd
+    }
+}
+
 impl<'c> OutputOkExt for &'c mut Command {
     fn ok(self) -> OutputResult {
         let output = self.output().map_err(OutputError::with_cause)?;
