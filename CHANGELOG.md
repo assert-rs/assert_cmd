@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Features
+
+- Add getters to `Command` to mirror those added to the standard library
+
 ## [2.0.15] - 2024-07-25
 
 ### Compatibility
