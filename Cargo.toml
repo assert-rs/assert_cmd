@@ -86,7 +86,7 @@ zero_sized_map_values = "warn"
 
 [package]
 name = "assert_cmd"
-version = "2.0.15"
+version = "2.0.16"
 description = "Test CLI Applications."
 authors = ["Pascal Hertleif <killercup@gmail.com>", "Ed Page <eopage@gmail.com>"]
 homepage = "https://github.com/assert-rs/assert_cmd"
