@@ -181,7 +181,7 @@ impl Error for CargoError {}
 impl fmt::Display for CargoError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref cause) = self.cause {
-            writeln!(f, "Cause: {}", cause)?;
+            writeln!(f, "Cause: {cause}")?;
         }
         Ok(())
     }
@@ -222,7 +222,7 @@ pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
 }
 
 fn cargo_bin_str(name: &str) -> path::PathBuf {
-    let env_var = format!("CARGO_BIN_EXE_{}", name);
+    let env_var = format!("CARGO_BIN_EXE_{name}");
     env::var_os(env_var)
         .map(|p| p.into())
         .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))

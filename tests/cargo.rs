@@ -34,7 +34,7 @@ fn mod_example() {
             .unwrap();
         let mut cmd = bin_under_test.command();
         let output = cmd.unwrap();
-        println!("{:?}", output);
+        println!("{output:?}");
     }
 }
 
@@ -43,7 +43,7 @@ fn mod_example() {
 fn trait_example() {
     let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     let output = cmd.unwrap();
-    println!("{:?}", output);
+    println!("{output:?}");
 }
 
 #[test]
@@ -51,12 +51,12 @@ fn trait_example() {
 fn cargo_bin_example_1() {
     let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     let output = cmd.unwrap();
-    println!("{:?}", output);
+    println!("{output:?}");
 }
 
 #[test]
 fn cargo_bin_example_2() {
     let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
     let output = cmd.unwrap();
-    println!("{:?}", output);
+    println!("{output:?}");
 }
