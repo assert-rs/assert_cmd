@@ -109,7 +109,7 @@ impl<'c> OutputOkExt for &'c mut process::Command {
         if output.status.success() {
             Ok(output)
         } else {
-            let error = OutputError::new(output).set_cmd(format!("{:?}", self));
+            let error = OutputError::new(output).set_cmd(format!("{self:?}"));
             Err(error)
         }
     }
@@ -266,8 +266,8 @@ enum OutputCause {
 impl fmt::Display for OutputCause {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            OutputCause::Expected(ref e) => write!(f, "{:#}", e),
-            OutputCause::Unexpected(ref e) => write!(f, "{:#}", e),
+            OutputCause::Expected(ref e) => write!(f, "{e:#}"),
+            OutputCause::Unexpected(ref e) => write!(f, "{e:#}"),
         }
     }
 }
@@ -369,9 +369,9 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
             .as_bstr()
             .lines_with_terminator()
             .skip(LINES_MAX_START + lines_omitted);
-        writeln!(f, "<{} lines total>", lines_total)?;
+        writeln!(f, "<{lines_total} lines total>")?;
         write_debug_bstrs(f, true, start_lines)?;
-        writeln!(f, "<{} lines omitted>", lines_omitted)?;
+        writeln!(f, "<{lines_omitted} lines omitted>")?;
         write_debug_bstrs(f, true, end_lines)
     } else if BYTES_MIN_OVERFLOW <= data.len() {
         write!(
@@ -434,7 +434,7 @@ mod test {
     fn format_bytes() {
         let mut s = String::new();
         for i in 0..80 {
-            s.push_str(&format!("{}\n", i));
+            s.push_str(&format!("{i}\n"));
         }
 
         let mut buf = String::new();

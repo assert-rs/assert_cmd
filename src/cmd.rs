@@ -648,7 +648,7 @@ impl<'c> OutputAssertExt for &'c mut Command {
         let output = match self.output() {
             Ok(output) => output,
             Err(err) => {
-                panic!("Failed to spawn {:?}: {}", self, err);
+                panic!("Failed to spawn {self:?}: {err}");
             }
         };
         let assert = Assert::new(output).append_context("command", format!("{:?}", self.cmd));
