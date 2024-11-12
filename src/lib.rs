@@ -138,6 +138,8 @@ pub mod output;
 /// Extension traits that are useful to have available.
 pub mod prelude {
     pub use crate::assert::OutputAssertExt;
+    #[cfg(feature = "tokio-command")]
+    pub use crate::assert::AsyncOutputAssertExt;
     pub use crate::cargo::CommandCargoExt;
     pub use crate::output::OutputOkExt;
 }
