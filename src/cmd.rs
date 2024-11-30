@@ -604,7 +604,7 @@ impl From<process::Command> for Command {
     }
 }
 
-impl<'c> OutputOkExt for &'c mut Command {
+impl OutputOkExt for &mut Command {
     fn ok(self) -> OutputResult {
         let output = self.output().map_err(OutputError::with_cause)?;
         if output.status.success() {
@@ -643,7 +643,7 @@ impl<'c> OutputOkExt for &'c mut Command {
     }
 }
 
-impl<'c> OutputAssertExt for &'c mut Command {
+impl OutputAssertExt for &mut Command {
     fn assert(self) -> Assert {
         let output = match self.output() {
             Ok(output) => output,

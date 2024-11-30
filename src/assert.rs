@@ -56,7 +56,7 @@ impl OutputAssertExt for process::Output {
     }
 }
 
-impl<'c> OutputAssertExt for &'c mut process::Command {
+impl OutputAssertExt for &mut process::Command {
     fn assert(self) -> Assert {
         let output = match self.output() {
             Ok(output) => output,

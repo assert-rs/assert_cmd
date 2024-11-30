@@ -103,7 +103,7 @@ impl OutputOkExt for process::Output {
     }
 }
 
-impl<'c> OutputOkExt for &'c mut process::Command {
+impl OutputOkExt for &mut process::Command {
     fn ok(self) -> OutputResult {
         let output = self.output().map_err(OutputError::with_cause)?;
         if output.status.success() {
@@ -318,7 +318,7 @@ impl<'a> DebugBytes<'a> {
     }
 }
 
-impl<'a> fmt::Display for DebugBytes<'a> {
+impl fmt::Display for DebugBytes<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         format_bytes(self.bytes, f)
     }
