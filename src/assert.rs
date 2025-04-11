@@ -61,7 +61,7 @@ impl OutputAssertExt for &mut process::Command {
         let output = match self.output() {
             Ok(output) => output,
             Err(err) => {
-                panic!("Failed to spawn {:?}: {}", self, err);
+                panic!("Failed to spawn {self:?}: {err}");
             }
         };
         Assert::new(output).append_context("command", format!("{self:?}"))
