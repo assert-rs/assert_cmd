@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.0.17] - 2025-04-16
+
 ### Features
 
 - Add `cargo::cargo_bin!` which will work with Cargo's `build-dir`
@@ -354,7 +356,8 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.16...HEAD
+[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.0.17...HEAD
+[2.0.17]: https://github.com/assert-rs/assert_cmd/compare/v2.0.16...v2.0.17
 [2.0.16]: https://github.com/assert-rs/assert_cmd/compare/v2.0.15...v2.0.16
 [2.0.15]: https://github.com/assert-rs/assert_cmd/compare/v2.0.14...v2.0.15
 [2.0.14]: https://github.com/assert-rs/assert_cmd/compare/v2.0.13...v2.0.14
