@@ -37,6 +37,8 @@ impl Command {
     ///
     /// See the [`cargo` module documentation][crate::cargo] for caveats and workarounds.
     ///
+    /// **NOTE:** Prefer [`cargo_bin!`][crate::cargo::cargo_bin!] as this makes assumptions about cargo
+    ///
     /// # Examples
     ///
     /// ```rust,no_run
