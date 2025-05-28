@@ -50,6 +50,10 @@ pub trait OutputAssertExt {
     fn assert(self) -> Assert;
 }
 
+pub trait AsyncOutputAssertExt {
+    fn assert(self) -> impl std::future::Future<Output = Assert> + Send;
+}
+
 impl OutputAssertExt for process::Output {
     fn assert(self) -> Assert {
         Assert::new(self)
@@ -62,6 +66,19 @@ impl OutputAssertExt for &mut process::Command {
             Ok(output) => output,
             Err(err) => {
                 panic!("Failed to spawn {self:?}: {err}");
+            }
+        };
+        Assert::new(output).append_context("command", format!("{self:?}"))
+    }
+}
+
+#[cfg(feature = "tokio-command")]
+impl<'c> AsyncOutputAssertExt for &'c mut tokio::process::Command {
+    async fn assert(self) -> Assert {
+        let output = match self.output().await {
+            Ok(output) => output,
+            Err(err) => {
+                panic!("Failed to spawn {:?}: {}", self, err);
             }
         };
         Assert::new(output).append_context("command", format!("{self:?}"))
