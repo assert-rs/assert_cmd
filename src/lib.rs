@@ -123,4 +123,6 @@ pub use crate::cmd::Command;
 mod color;
 use color::Palette;
 
-doc_comment::doctest!("../README.md");
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;
