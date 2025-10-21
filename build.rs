@@ -6,8 +6,8 @@ use std::path;
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
 
-    // env::ARCH doesn't include full triplet, and AFAIK there isn't a nicer way of getting the full triplet
-    // (see lib.rs for the rest of this hack)
+    // env::ARCH doesn't include the full triplet, and as far as I know there isn't a cleaner way of getting the full triplet
+    // (see cargo.rs for the rest of this implementation)
     let out = path::PathBuf::from(env::var_os("OUT_DIR").expect("run within cargo"))
         .join("current_target.txt");
     let default_target = env::var("TARGET").expect("run as cargo build script");
