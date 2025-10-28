@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Compatibility
+
+- Deprecated `crate_name!()` in favor of `pkg_name!()`
+- Deprecated `Command::cargo_bin`, `CommandCargoExt::cargo_bin`, `cargo_bin` in favor of `cargo_bin!`, `cargo_bin_cmd!`
+
+### Features
+
+- Provide `cargo_bin_cmd!()`
+- Use `pkg_name!()` as a default parameter to `cargo_bin!()`
+
 ## [2.0.17] - 2025-04-16
 
 ### Features
