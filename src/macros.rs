@@ -37,13 +37,16 @@ macro_rules! crate_name {
 /// #[test]
 /// fn cli_tests() {
 ///     trycmd::TestCases::new()
-///         .default_bin_path(trycmd::cargo_bin!("bin-fixture"))
+///         .default_bin_path(trycmd::cargo_bin!())
 ///         .case("tests/cmd/*.trycmd");
 /// }
 /// ```
 #[macro_export]
 #[doc(hidden)]
 macro_rules! cargo_bin {
+    () => {
+        $crate::cargo::cargo_bin!($crate::crate_name!())
+    };
     ($bin_target_name:expr) => {
         ::std::path::Path::new(env!(concat!("CARGO_BIN_EXE_", $bin_target_name)))
     };
