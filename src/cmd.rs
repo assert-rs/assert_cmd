@@ -43,8 +43,9 @@ impl Command {
     ///
     /// ```rust,no_run
     /// use assert_cmd::Command;
+    /// use assert_cmd::pkg_name;
     ///
-    /// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+    /// let mut cmd = Command::cargo_bin(pkg_name!())
     ///     .unwrap();
     /// let output = cmd.unwrap();
     /// println!("{:?}", output);
@@ -59,6 +60,10 @@ impl Command {
     /// println!("{:?}", output);
     /// ```
     ///
+    #[deprecated(
+        since = "2.1.0",
+        note = "incompatible with a custom cargo build-dir, see instead `cargo::cargo_bin_cmd!`"
+    )]
     pub fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, crate::cargo::CargoError> {
         let cmd = crate::cargo::cargo_bin_cmd(name)?;
         Ok(Self::from_std(cmd))

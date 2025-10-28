@@ -5,7 +5,7 @@
 /// ```should_panic
 /// use assert_cmd::Command;
 ///
-/// let mut cmd = Command::cargo_bin(assert_cmd::crate_name!()).unwrap();
+/// let mut cmd = Command::cargo_bin(assert_cmd::pkg_name!()).unwrap();
 /// let assert = cmd
 ///     .arg("-A")
 ///     .env("stdout", "hello")
@@ -17,6 +17,15 @@
 ///     .code(42)
 ///     .stdout("hello\n");
 /// ```
+#[macro_export]
+macro_rules! pkg_name {
+    () => {
+        env!("CARGO_PKG_NAME")
+    };
+}
+
+/// Deprecated, replaced with [`pkg_name`]
+#[deprecated(since = "2.1.0", note = "replaced with `pkg_name!`")]
 #[macro_export]
 macro_rules! crate_name {
     () => {
@@ -33,18 +42,53 @@ macro_rules! crate_name {
 ///
 /// ## Example
 ///
-/// ```rust,no_run
-/// #[test]
-/// fn cli_tests() {
-///     trycmd::TestCases::new()
-///         .default_bin_path(trycmd::cargo_bin!("bin-fixture"))
-///         .case("tests/cmd/*.trycmd");
-/// }
+/// ```rust,ignore
+/// use assert_cmd::prelude::*;
+/// use assert_cmd::cargo::cargo_bin;
+///
+/// use std::process::Command;
+///
+/// let mut cmd = Command::new(cargo_bin!())
+///     .unwrap();
+/// let output = cmd.unwrap();
 /// ```
 #[macro_export]
 #[doc(hidden)]
 macro_rules! cargo_bin {
+    () => {
+        $crate::cargo::cargo_bin!($crate::pkg_name!())
+    };
     ($bin_target_name:expr) => {
         ::std::path::Path::new(env!(concat!("CARGO_BIN_EXE_", $bin_target_name)))
+    };
+}
+
+/// The absolute path to a binary target's executable.
+///
+/// The `bin_target_name` is the name of the binary
+/// target, exactly as-is.
+///
+/// **NOTE:** This is only set when building an integration test or benchmark.
+///
+/// ## Example
+///
+/// ```rust,ignore
+/// use assert_cmd::prelude::*;
+/// use assert_cmd::cargo::cargo_bin_cmd;
+///
+/// use std::process::Command;
+///
+/// let mut cmd = cargo_bin_cmd!()
+///     .unwrap();
+/// let output = cmd.unwrap();
+/// ```
+#[macro_export]
+#[doc(hidden)]
+macro_rules! cargo_bin_cmd {
+    () => {
+        $crate::cargo::cargo_bin_cmd!($crate::pkg_name!())
+    };
+    ($bin_target_name:expr) => {
+        $crate::Command::new($crate::cargo::cargo_bin!($bin_target_name))
     };
 }
