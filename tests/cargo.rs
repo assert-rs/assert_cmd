@@ -1,5 +1,6 @@
 use std::process::Command;
 
+use assert_cmd::pkg_name;
 use assert_cmd::prelude::*;
 use escargot::CURRENT_TARGET;
 
@@ -41,7 +42,7 @@ fn mod_example() {
 #[test]
 #[should_panic] // No bin named `assert_cmd
 fn trait_example() {
-    let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
+    let mut cmd = Command::cargo_bin(pkg_name!()).unwrap();
     let output = cmd.unwrap();
     println!("{output:?}");
 }
@@ -49,7 +50,7 @@ fn trait_example() {
 #[test]
 #[should_panic] // No bin named `assert_cmd
 fn cargo_bin_example_1() {
-    let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
+    let mut cmd = Command::cargo_bin(pkg_name!()).unwrap();
     let output = cmd.unwrap();
     println!("{output:?}");
 }

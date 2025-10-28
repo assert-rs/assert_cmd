@@ -43,8 +43,9 @@ impl Command {
     ///
     /// ```rust,no_run
     /// use assert_cmd::Command;
+    /// use assert_cmd::pkg_name;
     ///
-    /// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+    /// let mut cmd = Command::cargo_bin(pkg_name!())
     ///     .unwrap();
     /// let output = cmd.unwrap();
     /// println!("{:?}", output);

@@ -9,10 +9,11 @@
 //!
 //! ```rust,no_run
 //! use assert_cmd::prelude::*;
+//! use assert_cmd::pkg_name;
 //!
 //! use std::process::Command;
 //!
-//! let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+//! let mut cmd = Command::cargo_bin(pkg_name!())
 //!     .unwrap();
 //! let output = cmd.unwrap();
 //! ```
@@ -74,10 +75,11 @@ pub use crate::cargo_bin;
 ///
 /// ```rust,no_run
 /// use assert_cmd::prelude::*;
+/// use assert_cmd::pkg_name;
 ///
 /// use std::process::Command;
 ///
-/// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+/// let mut cmd = Command::cargo_bin(pkg_name!())
 ///     .unwrap();
 /// let output = cmd.unwrap();
 /// println!("{:?}", output);
@@ -104,10 +106,11 @@ where
     ///
     /// ```rust,no_run
     /// use assert_cmd::prelude::*;
+    /// use assert_cmd::pkg_name;
     ///
     /// use std::process::Command;
     ///
-    /// let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+    /// let mut cmd = Command::cargo_bin(pkg_name!())
     ///     .unwrap();
     /// let output = cmd.unwrap();
     /// println!("{:?}", output);
