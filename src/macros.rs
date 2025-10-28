@@ -42,13 +42,15 @@ macro_rules! crate_name {
 ///
 /// ## Example
 ///
-/// ```rust,no_run
-/// #[test]
-/// fn cli_tests() {
-///     trycmd::TestCases::new()
-///         .default_bin_path(trycmd::cargo_bin!())
-///         .case("tests/cmd/*.trycmd");
-/// }
+/// ```rust,ignore
+/// use assert_cmd::prelude::*;
+/// use assert_cmd::cargo::cargo_bin;
+///
+/// use std::process::Command;
+///
+/// let mut cmd = Command::new(cargo_bin!())
+///     .unwrap();
+/// let output = cmd.unwrap();
 /// ```
 #[macro_export]
 #[doc(hidden)]
