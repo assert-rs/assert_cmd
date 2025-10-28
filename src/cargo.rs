@@ -130,11 +130,16 @@ where
     /// ```
     ///
     /// [`Command`]: std::process::Command
+    #[deprecated(
+        since = "2.1.0",
+        note = "incompatible with a custom cargo build-dir, see instead `cargo::cargo_bin!`"
+    )]
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError>;
 }
 
 impl CommandCargoExt for crate::cmd::Command {
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
+        #[allow(deprecated)]
         crate::cmd::Command::cargo_bin(name)
     }
 }
@@ -146,6 +151,7 @@ impl CommandCargoExt for process::Command {
 }
 
 pub(crate) fn cargo_bin_cmd<S: AsRef<str>>(name: S) -> Result<process::Command, CargoError> {
+    #[allow(deprecated)]
     let path = cargo_bin(name);
     if path.is_file() {
         if let Some(runner) = cargo_runner() {
@@ -229,6 +235,10 @@ fn target_dir() -> path::PathBuf {
 /// Look up the path to a cargo-built binary within an integration test.
 ///
 /// **NOTE:** Prefer [`cargo_bin!`] as this makes assumptions about cargo
+#[deprecated(
+    since = "2.1.0",
+    note = "incompatible with a custom cargo build-dir, see instead `cargo::cargo_bin!`"
+)]
 pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
     cargo_bin_str(name.as_ref())
 }
