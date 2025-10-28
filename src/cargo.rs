@@ -63,6 +63,8 @@ use std::process;
 
 #[doc(inline)]
 pub use crate::cargo_bin;
+#[doc(inline)]
+pub use crate::cargo_bin_cmd;
 
 /// Create a [`Command`] for a `bin` in the Cargo project.
 ///

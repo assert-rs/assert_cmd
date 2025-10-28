@@ -62,3 +62,33 @@ macro_rules! cargo_bin {
         ::std::path::Path::new(env!(concat!("CARGO_BIN_EXE_", $bin_target_name)))
     };
 }
+
+/// The absolute path to a binary target's executable.
+///
+/// The `bin_target_name` is the name of the binary
+/// target, exactly as-is.
+///
+/// **NOTE:** This is only set when building an integration test or benchmark.
+///
+/// ## Example
+///
+/// ```rust,ignore
+/// use assert_cmd::prelude::*;
+/// use assert_cmd::cargo::cargo_bin_cmd;
+///
+/// use std::process::Command;
+///
+/// let mut cmd = cargo_bin_cmd!()
+///     .unwrap();
+/// let output = cmd.unwrap();
+/// ```
+#[macro_export]
+#[doc(hidden)]
+macro_rules! cargo_bin_cmd {
+    () => {
+        $crate::cargo::cargo_bin_cmd!($crate::pkg_name!())
+    };
+    ($bin_target_name:expr) => {
+        $crate::Command::new($crate::cargo::cargo_bin!($bin_target_name))
+    };
+}
