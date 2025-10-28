@@ -5,7 +5,7 @@
 /// ```should_panic
 /// use assert_cmd::Command;
 ///
-/// let mut cmd = Command::cargo_bin(assert_cmd::crate_name!()).unwrap();
+/// let mut cmd = Command::cargo_bin(assert_cmd::pkg_name!()).unwrap();
 /// let assert = cmd
 ///     .arg("-A")
 ///     .env("stdout", "hello")
@@ -17,6 +17,15 @@
 ///     .code(42)
 ///     .stdout("hello\n");
 /// ```
+#[macro_export]
+macro_rules! pkg_name {
+    () => {
+        env!("CARGO_PKG_NAME")
+    };
+}
+
+/// Deprecated, replaced with [`pkg_name`]
+#[deprecated(since = "2.1.0", note = "replaced with `pkg_name!`")]
 #[macro_export]
 macro_rules! crate_name {
     () => {
@@ -45,7 +54,7 @@ macro_rules! crate_name {
 #[doc(hidden)]
 macro_rules! cargo_bin {
     () => {
-        $crate::cargo::cargo_bin!($crate::crate_name!())
+        $crate::cargo::cargo_bin!($crate::pkg_name!())
     };
     ($bin_target_name:expr) => {
         ::std::path::Path::new(env!(concat!("CARGO_BIN_EXE_", $bin_target_name)))
