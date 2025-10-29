@@ -49,7 +49,6 @@ macro_rules! crate_name {
 /// use std::process::Command;
 ///
 /// let mut cmd = Command::new(cargo_bin!())
-///     .unwrap();
 /// let output = cmd.unwrap();
 /// ```
 #[macro_export]
@@ -79,7 +78,6 @@ macro_rules! cargo_bin {
 /// use std::process::Command;
 ///
 /// let mut cmd = cargo_bin_cmd!()
-///     .unwrap();
 /// let output = cmd.unwrap();
 /// ```
 #[macro_export]
