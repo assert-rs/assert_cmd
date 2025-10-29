@@ -97,7 +97,7 @@ lto = true
 
 [package]
 name = "assert_cmd"
-version = "2.1.0"
+version = "2.1.1"
 description = "Test CLI Applications."
 authors = ["Pascal Hertleif <killercup@gmail.com>", "Ed Page <eopage@gmail.com>"]
 homepage = "https://github.com/assert-rs/assert_cmd"
