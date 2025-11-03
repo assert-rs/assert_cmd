@@ -62,7 +62,7 @@ macro_rules! cargo_bin {
     };
 }
 
-/// The absolute path to a binary target's executable.
+/// A [`Command`][crate::Command] for the binary target's executable.
 ///
 /// The `bin_target_name` is the name of the binary
 /// target, exactly as-is.
