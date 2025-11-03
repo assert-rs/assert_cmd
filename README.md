@@ -15,9 +15,9 @@
 Here's a trivial example:
 
 ```rust,no_run
-use assert_cmd::Command;
+use assert_cmd::cargo::cargo_bin_cmd;
 
-let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
+let mut cmd = cargo_bin_cmd!("bin_fixture").unwrap();
 cmd.assert().success();
 ```
 
