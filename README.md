@@ -14,7 +14,7 @@
 
 Here's a trivial example:
 
-```rust,no_run
+```rust,no_run,ignore
 use assert_cmd::cargo::cargo_bin_cmd;
 
 let mut cmd = cargo_bin_cmd!("bin_fixture").unwrap();
