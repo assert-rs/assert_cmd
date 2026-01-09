@@ -186,6 +186,7 @@ impl Command {
     /// ```
     ///
     /// [`Output`]: std::process::Output
+    #[must_use]
     pub fn assert(&mut self) -> Assert {
         OutputAssertExt::assert(self)
     }
