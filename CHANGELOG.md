@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Add `#[must_use]` to help catch missing assertions
+
 ## [2.1.1] - 2025-10-29
 
 ## [2.1.0] - 2025-10-28
