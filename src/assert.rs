@@ -47,6 +47,7 @@ pub trait OutputAssertExt {
     /// ```
     ///
     /// [`Output`]: std::process::Output
+    #[must_use]
     fn assert(self) -> Assert;
 }
 
@@ -95,6 +96,7 @@ impl Assert {
     /// Create an `Assert` for a given [`Output`].
     ///
     /// [`Output`]: std::process::Output
+    #[must_use]
     pub fn new(output: process::Output) -> Self {
         Self {
             output,
@@ -124,6 +126,7 @@ impl Assert {
     ///     .append_context("main", "no args")
     ///     .success();
     /// ```
+    #[must_use]
     pub fn append_context<D>(mut self, name: &'static str, context: D) -> Self
     where
         D: fmt::Display + Send + Sync + 'static,
