@@ -90,7 +90,7 @@ impl Command {
         self
     }
 
-    /// Error out if a timeout is reached
+    /// Error out if a timeout is reached.
     ///
     /// ```rust,no_run
     /// use assert_cmd::Command;
@@ -99,9 +99,13 @@ impl Command {
     ///     .unwrap()
     ///     .timeout(std::time::Duration::from_secs(1))
     ///     .env("sleep", "100")
-    ///     .assert();
-    /// assert.failure();
+    ///     .assert()
+    ///     .interrupted() // Child was interrupted.
+    ///     .failure(); // More generally a timeout is a type of failure.
     /// ```
+    ///
+    /// If the process does not complete before the timeout then it will be terminated
+    /// using [std::process::Child::kill], which on Unix sends a `SIGKILL`.
     pub fn timeout(&mut self, timeout: std::time::Duration) -> &mut Self {
         self.timeout = Some(timeout);
         self
