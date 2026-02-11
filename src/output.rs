@@ -85,7 +85,7 @@ where
         match self.ok() {
             Ok(output) => panic!(
                 "Command completed successfully\nstdout=```{}```",
-                DebugBytes::new(&output.stdout)
+                DebugBytes::new(&output.stdout, true)
             ),
             Err(err) => err,
         }
@@ -119,7 +119,7 @@ impl OutputOkExt for &mut process::Command {
             Ok(output) => panic!(
                 "Completed successfully:\ncommand=`{:?}`\nstdout=```{}```",
                 self,
-                DebugBytes::new(&output.stdout)
+                DebugBytes::new(&output.stdout, true)
             ),
             Err(err) => err,
         }
@@ -169,6 +169,7 @@ pub struct OutputError {
     cmd: Option<String>,
     stdin: Option<bstr::BString>,
     cause: OutputCause,
+    truncate_output: bool,
 }
 
 impl OutputError {
@@ -180,7 +181,11 @@ impl OutputError {
         Self {
             cmd: None,
             stdin: None,
-            cause: OutputCause::Expected(Output { output }),
+            cause: OutputCause::Expected(Output {
+                output,
+                truncate_output: true,
+            }),
+            truncate_output: true,
         }
     }
 
@@ -195,6 +200,7 @@ impl OutputError {
             cmd: None,
             stdin: None,
             cause: OutputCause::Unexpected(Box::new(cause)),
+            truncate_output: true,
         }
     }
 
@@ -207,6 +213,16 @@ impl OutputError {
     /// Add the `stdin` for additional context.
     pub fn set_stdin(mut self, stdin: Vec<u8>) -> Self {
         self.stdin = Some(bstr::BString::from(stdin));
+        self
+    }
+
+    /// Control whether error output gets truncated with `<n lines omitted>`. Enabled by default.
+    pub fn set_truncate(mut self, truncate: bool) -> Self {
+        self.truncate_output = truncate;
+        match &mut self.cause {
+            OutputCause::Expected(output) => output.truncate_output = truncate,
+            OutputCause::Unexpected(_e) => (),
+        }
         self
     }
 
@@ -250,7 +266,7 @@ impl fmt::Display for OutputError {
                 f,
                 "{:#}={:#}",
                 palette.key("stdin"),
-                palette.value(DebugBytes::new(stdin))
+                palette.value(DebugBytes::new(stdin, self.truncate_output))
             )?;
         }
         write!(f, "{:#}", self.cause)
@@ -275,15 +291,20 @@ impl fmt::Display for OutputCause {
 #[derive(Debug)]
 struct Output {
     output: process::Output,
+    truncate_output: bool,
 }
 
 impl fmt::Display for Output {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        output_fmt(&self.output, f)
+        output_fmt(&self.output, f, self.truncate_output)
     }
 }
 
-pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+pub(crate) fn output_fmt(
+    output: &process::Output,
+    f: &mut fmt::Formatter<'_>,
+    truncate: bool,
+) -> fmt::Result {
     let palette = crate::Palette::color();
     if let Some(code) = output.status.code() {
         writeln!(f, "{:#}={:#}", palette.key("code"), palette.value(code))?;
@@ -300,9 +321,9 @@ pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -
         f,
         "{:#}={:#}\n{:#}={:#}\n",
         palette.key("stdout"),
-        palette.value(DebugBytes::new(&output.stdout)),
+        palette.value(DebugBytes::new(&output.stdout, truncate)),
         palette.key("stderr"),
-        palette.value(DebugBytes::new(&output.stderr)),
+        palette.value(DebugBytes::new(&output.stderr, truncate)),
     )?;
     Ok(())
 }
@@ -310,40 +331,43 @@ pub(crate) fn output_fmt(output: &process::Output, f: &mut fmt::Formatter<'_>) -
 #[derive(Debug)]
 pub(crate) struct DebugBytes<'a> {
     bytes: &'a [u8],
+    truncate: bool,
 }
 
 impl<'a> DebugBytes<'a> {
-    pub(crate) fn new(bytes: &'a [u8]) -> Self {
-        DebugBytes { bytes }
+    pub(crate) fn new(bytes: &'a [u8], truncate: bool) -> Self {
+        DebugBytes { bytes, truncate }
     }
 }
 
 impl fmt::Display for DebugBytes<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        format_bytes(self.bytes, f)
+        format_bytes(self.bytes, f, self.truncate)
     }
 }
 
 #[derive(Debug)]
 pub(crate) struct DebugBuffer {
     buffer: bstr::BString,
+    truncate: bool,
 }
 
 impl DebugBuffer {
-    pub(crate) fn new(buffer: Vec<u8>) -> Self {
+    pub(crate) fn new(buffer: Vec<u8>, truncate: bool) -> Self {
         DebugBuffer {
             buffer: buffer.into(),
+            truncate,
         }
     }
 }
 
 impl fmt::Display for DebugBuffer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        format_bytes(&self.buffer, f)
+        format_bytes(&self.buffer, f, self.truncate)
     }
 }
 
-fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
+fn format_bytes(data: &[u8], f: &mut impl fmt::Write, truncate: bool) -> fmt::Result {
     #![allow(clippy::assertions_on_constants)]
 
     const LINES_MIN_OVERFLOW: usize = 80;
@@ -362,7 +386,7 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
     let lines_total = data.as_bstr().lines_with_terminator().count();
     let multiline = 1 < lines_total;
 
-    if LINES_MIN_OVERFLOW <= lines_total {
+    if truncate && LINES_MIN_OVERFLOW <= lines_total {
         let lines_omitted = lines_total - LINES_MAX_PRINTED;
         let start_lines = data.as_bstr().lines_with_terminator().take(LINES_MAX_START);
         let end_lines = data
@@ -373,7 +397,7 @@ fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
         write_debug_bstrs(f, true, start_lines)?;
         writeln!(f, "<{lines_omitted} lines omitted>")?;
         write_debug_bstrs(f, true, end_lines)
-    } else if BYTES_MIN_OVERFLOW <= data.len() {
+    } else if truncate && BYTES_MIN_OVERFLOW <= data.len() {
         write!(
             f,
             "<{} bytes total>{}",
@@ -438,7 +462,7 @@ mod test {
         }
 
         let mut buf = String::new();
-        super::format_bytes(s.as_bytes(), &mut buf).unwrap();
+        super::format_bytes(s.as_bytes(), &mut buf, true).unwrap();
 
         assert_eq!(
             "<80 lines total>
@@ -513,11 +537,37 @@ mod test {
     }
 
     #[test]
+    fn format_bytes_no_truncate() {
+        let mut s = String::new();
+        for i in 0..80 {
+            s.push_str(&format!("{i}\n"));
+        }
+
+        let mut buf = String::new();
+        super::format_bytes(s.as_bytes(), &mut buf, false).unwrap();
+
+        assert_eq!(
+            "```\n\
+            0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n\
+            11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n\
+            21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n\
+            31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n\
+            41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n\
+            51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n\
+            61\n62\n63\n64\n65\n66\n67\n68\n69\n70\n\
+            71\n72\n73\n74\n75\n76\n77\n78\n79\n\
+            ```\n\
+            ",
+            buf
+        );
+    }
+
+    #[test]
     fn no_trailing_newline() {
         let s = "no\ntrailing\nnewline";
 
         let mut buf = String::new();
-        super::format_bytes(s.as_bytes(), &mut buf).unwrap();
+        super::format_bytes(s.as_bytes(), &mut buf, true).unwrap();
 
         assert_eq!(
             "```

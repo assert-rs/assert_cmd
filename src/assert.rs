@@ -90,6 +90,7 @@ impl OutputAssertExt for &mut process::Command {
 pub struct Assert {
     output: process::Output,
     context: Vec<(&'static str, Box<dyn fmt::Display + Send + Sync>)>,
+    truncate_output: bool,
 }
 
 impl Assert {
@@ -101,6 +102,7 @@ impl Assert {
         Self {
             output,
             context: vec![],
+            truncate_output: true,
         }
     }
 
@@ -109,6 +111,11 @@ impl Assert {
             assert: self,
             reason,
         }
+    }
+
+    pub(crate) fn truncate_output(mut self, truncate: bool) -> Self {
+        self.truncate_output = truncate;
+        self
     }
 
     /// Clarify failures with additional context.
@@ -491,7 +498,7 @@ impl fmt::Display for Assert {
         for (name, context) in &self.context {
             writeln!(f, "{:#}=`{:#}`", palette.key(name), palette.value(context))?;
         }
-        output_fmt(&self.output, f)
+        output_fmt(&self.output, f, self.truncate_output)
     }
 }
 
@@ -1075,7 +1082,7 @@ impl fmt::Display for AssertError {
                 actual_code
                     .map(|actual_code| actual_code.to_string())
                     .unwrap_or_else(|| "<interrupted>".to_owned()),
-                DebugBytes::new(&self.assert.output.stderr),
+                DebugBytes::new(&self.assert.output.stderr, self.assert.truncate_output),
             ),
             AssertReason::UnexpectedSuccess => {
                 writeln!(f, "Unexpected success")

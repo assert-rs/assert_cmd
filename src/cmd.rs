@@ -21,6 +21,7 @@ pub struct Command {
     cmd: process::Command,
     stdin: Option<bstr::BString>,
     timeout: Option<std::time::Duration>,
+    truncate_output: bool,
 }
 
 impl Command {
@@ -30,6 +31,7 @@ impl Command {
             cmd,
             stdin: None,
             timeout: None,
+            truncate_output: true,
         }
     }
 
@@ -104,6 +106,22 @@ impl Command {
     /// ```
     pub fn timeout(&mut self, timeout: std::time::Duration) -> &mut Self {
         self.timeout = Some(timeout);
+        self
+    }
+
+    /// Set whether output is truncated
+    ///
+    /// ```rust,no_run
+    /// use assert_cmd::Command;
+    ///
+    /// let assert = Command::cargo_bin("bin_fixture")
+    ///     .unwrap()
+    ///     .truncate_output(true)
+    ///     .assert();
+    /// assert.failure();
+    /// ```
+    pub fn truncate_output(&mut self, truncate: bool) -> &mut Self {
+        self.truncate_output = truncate;
         self
     }
 
@@ -635,14 +653,14 @@ impl OutputOkExt for &mut Command {
                     panic!(
                         "Completed successfully:\ncommand=`{:?}`\nstdin=```{}```\nstdout=```{}```",
                         self.cmd,
-                        DebugBytes::new(stdin),
-                        DebugBytes::new(&output.stdout)
+                        DebugBytes::new(stdin, self.truncate_output),
+                        DebugBytes::new(&output.stdout, self.truncate_output)
                     )
                 } else {
                     panic!(
                         "Completed successfully:\ncommand=`{:?}`\nstdout=```{}```",
                         self.cmd,
-                        DebugBytes::new(&output.stdout)
+                        DebugBytes::new(&output.stdout, self.truncate_output)
                     )
                 }
             }
@@ -659,9 +677,14 @@ impl OutputAssertExt for &mut Command {
                 panic!("Failed to spawn {self:?}: {err}");
             }
         };
-        let assert = Assert::new(output).append_context("command", format!("{:?}", self.cmd));
+        let assert = Assert::new(output)
+            .append_context("command", format!("{:?}", self.cmd))
+            .truncate_output(self.truncate_output);
         if let Some(stdin) = self.stdin.as_ref() {
-            assert.append_context("stdin", DebugBuffer::new(stdin.deref().clone()))
+            assert.append_context(
+                "stdin",
+                DebugBuffer::new(stdin.deref().clone(), self.truncate_output),
+            )
         } else {
             assert
         }
