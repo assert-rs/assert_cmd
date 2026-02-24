@@ -126,6 +126,7 @@ pre-release-replacements = [
 [features]
 color = ["dep:anstream", "predicates/color"]
 color-auto = ["color"]
+tokio-command = ["dep:tokio"]
 
 [[bin]]
 name = "bin_fixture"
@@ -138,6 +139,7 @@ wait-timeout = "0.2.0"
 bstr = "1.0.1"
 anstream = { version = "0.6.7", optional = true }
 anstyle = "1.0.0"
+tokio = { version = "1.0.0", features = ["process"], optional = true }
 
 [target.'cfg(any())'.dependencies]
 libc = "0.2.137"  # HACK: bad minimal dep in wait-timeout

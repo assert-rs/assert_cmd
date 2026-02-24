@@ -150,6 +150,13 @@ impl CommandCargoExt for process::Command {
     }
 }
 
+#[cfg(feature = "tokio-command")]
+impl CommandCargoExt for tokio::process::Command {
+    fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
+        cargo_bin_cmd(name).map(tokio::process::Command::from)
+    }
+}
+
 pub(crate) fn cargo_bin_cmd<S: AsRef<str>>(name: S) -> Result<process::Command, CargoError> {
     #[allow(deprecated)]
     let path = cargo_bin(name);
