@@ -11,8 +11,8 @@ use anstream::panic;
 use predicates::str::PredicateStrExt;
 use predicates_tree::CaseTreeExt;
 
-use crate::output::output_fmt;
 use crate::output::DebugBytes;
+use crate::output::output_fmt;
 
 /// Assert the state of an [`Output`].
 ///
