@@ -229,12 +229,14 @@ pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
 }
 
 fn cargo_bin_str(name: &str) -> path::PathBuf {
-    let env_var = format!("CARGO_BIN_EXE_{name}");
+    let env_var = format!("{CARGO_BIN_EXE_}{name}");
     env::var_os(env_var)
         .map(|p| p.into())
         .or_else(|| legacy_cargo_bin(name))
         .unwrap_or_else(|| missing_cargo_bin())
 }
+
+const CARGO_BIN_EXE_: &str = "CARGO_BIN_EXE_";
 
 fn missing_cargo_bin() -> ! {
     panic!("`CARGO_BIN_EXE_*` is not set")
