@@ -40,7 +40,7 @@ fn mod_example() {
 }
 
 #[test]
-#[should_panic] // No bin named `assert_cmd
+#[should_panic] // No bin named `assert_cmd`
 fn trait_example() {
     let mut cmd = Command::cargo_bin(pkg_name!()).unwrap();
     let output = cmd.unwrap();
@@ -48,7 +48,7 @@ fn trait_example() {
 }
 
 #[test]
-#[should_panic] // No bin named `assert_cmd
+#[should_panic] // No bin named `assert_cmd`
 fn cargo_bin_example_1() {
     let mut cmd = Command::cargo_bin(pkg_name!()).unwrap();
     let output = cmd.unwrap();
