@@ -37,7 +37,10 @@ impl Command {
     ///
     /// See the [`cargo` module documentation][crate::cargo] for caveats and workarounds.
     ///
-    /// **NOTE:** Prefer [`cargo_bin!`][crate::cargo::cargo_bin!] as this makes assumptions about cargo
+    /// Cargo support:
+    /// - `>1.94`: works
+    /// - `>=1.91,<=1.93`: works with default `build-dir`
+    /// - `<=1.92`: works
     ///
     /// # Examples
     ///
@@ -60,10 +63,6 @@ impl Command {
     /// println!("{:?}", output);
     /// ```
     ///
-    #[deprecated(
-        since = "2.1.0",
-        note = "incompatible with a custom cargo build-dir, see instead `cargo::cargo_bin_cmd!`"
-    )]
     pub fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, crate::cargo::CargoError> {
         let cmd = crate::cargo::cargo_bin_cmd(name)?;
         Ok(Self::from_std(cmd))
