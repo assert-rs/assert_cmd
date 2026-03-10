@@ -42,6 +42,10 @@ impl Command {
     /// - `>=1.91,<=1.93`: works with default `build-dir`
     /// - `<=1.92`: works
     ///
+    /// # Panic
+    ///
+    /// Panicks if no binary is found
+    ///
     /// # Examples
     ///
     /// ```rust,no_run

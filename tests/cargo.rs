@@ -40,7 +40,8 @@ fn mod_example() {
 }
 
 #[test]
-#[should_panic] // No bin named `assert_cmd`
+#[should_panic = "`CARGO_BIN_EXE_assert_cmd` is unset
+help: available binary names are \"bin_fixture\""]
 fn trait_example() {
     let mut cmd = Command::cargo_bin(pkg_name!()).unwrap();
     let output = cmd.unwrap();
@@ -48,7 +49,8 @@ fn trait_example() {
 }
 
 #[test]
-#[should_panic] // No bin named `assert_cmd`
+#[should_panic = "`CARGO_BIN_EXE_assert_cmd` is unset
+help: available binary names are \"bin_fixture\""]
 fn cargo_bin_example_1() {
     let mut cmd = Command::cargo_bin(pkg_name!()).unwrap();
     let output = cmd.unwrap();

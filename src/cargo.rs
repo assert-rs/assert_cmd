@@ -107,6 +107,10 @@ where
     /// - `>=1.91,<=1.93`: works with default `build-dir`
     /// - `<=1.92`: works
     ///
+    /// # Panic
+    ///
+    /// Panicks if no binary is found
+    ///
     /// # Examples
     ///
     /// ```rust,no_run
@@ -220,6 +224,10 @@ impl fmt::Display for NotFoundError {
 /// - `>1.94`: works
 /// - `>=1.91,<=1.93`: works with default `build-dir`
 /// - `<=1.92`: works
+///
+/// # Panic
+///
+/// Panicks if no binary is found
 pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
     cargo_bin_str(name.as_ref())
 }
@@ -261,6 +269,9 @@ help: available binary names are {names}"
 fn legacy_cargo_bin(name: &str) -> Option<path::PathBuf> {
     let target_dir = target_dir()?;
     let bin_path = target_dir.join(format!("{}{}", name, env::consts::EXE_SUFFIX));
+    if !bin_path.exists() {
+        return None;
+    }
     Some(bin_path)
 }
 
@@ -277,3 +288,10 @@ fn target_dir() -> Option<path::PathBuf> {
 
 /// The current process' target triplet.
 const CURRENT_TARGET: &str = include_str!(concat!(env!("OUT_DIR"), "/current_target.txt"));
+
+#[test]
+#[should_panic = "`CARGO_BIN_EXE_non-existent` is unset
+help: if this is running within a unit test, move it to an integration test to gain access to `CARGO_BIN_EXE_non-existent`"]
+fn cargo_bin_in_unit_test() {
+    cargo_bin("non-existent");
+}
