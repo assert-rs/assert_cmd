@@ -217,18 +217,6 @@ impl fmt::Display for NotFoundError {
     }
 }
 
-// Adapted from
-// https://github.com/rust-lang/cargo/blob/485670b3983b52289a2f353d589c57fae2f60f82/tests/testsuite/support/mod.rs#L507
-fn target_dir() -> path::PathBuf {
-    let mut path =
-        env::current_exe().expect("this should only be used where a `current_exe` can be set");
-    let _test_bin_name = path.pop();
-    if path.ends_with("deps") {
-        let _deps = path.pop();
-    }
-    path
-}
-
 /// Look up the path to a cargo-built binary within an integration test.
 ///
 /// **NOTE:** Prefer [`cargo_bin!`] as this makes assumptions about cargo
@@ -245,6 +233,18 @@ fn cargo_bin_str(name: &str) -> path::PathBuf {
     env::var_os(env_var)
         .map(|p| p.into())
         .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))
+}
+
+// Adapted from
+// https://github.com/rust-lang/cargo/blob/485670b3983b52289a2f353d589c57fae2f60f82/tests/testsuite/support/mod.rs#L507
+fn target_dir() -> path::PathBuf {
+    let mut path =
+        env::current_exe().expect("this should only be used where a `current_exe` can be set");
+    let _test_bin_name = path.pop();
+    if path.ends_with("deps") {
+        let _deps = path.pop();
+    }
+    path
 }
 
 /// The current process' target triplet.
