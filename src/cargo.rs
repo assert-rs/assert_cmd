@@ -232,23 +232,25 @@ fn cargo_bin_str(name: &str) -> path::PathBuf {
     let env_var = format!("CARGO_BIN_EXE_{name}");
     env::var_os(env_var)
         .map(|p| p.into())
-        .unwrap_or_else(|| legacy_cargo_bin(name))
+        .or_else(|| legacy_cargo_bin(name))
+        .expect("`CARGO_BIN_EXE_*` is not set")
 }
 
-fn legacy_cargo_bin(name: &str) -> path::PathBuf {
-    target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX))
+fn legacy_cargo_bin(name: &str) -> Option<path::PathBuf> {
+    let target_dir = target_dir()?;
+    let bin_path = target_dir.join(format!("{}{}", name, env::consts::EXE_SUFFIX));
+    Some(bin_path)
 }
 
 // Adapted from
 // https://github.com/rust-lang/cargo/blob/485670b3983b52289a2f353d589c57fae2f60f82/tests/testsuite/support/mod.rs#L507
-fn target_dir() -> path::PathBuf {
-    let mut path =
-        env::current_exe().expect("this should only be used where a `current_exe` can be set");
+fn target_dir() -> Option<path::PathBuf> {
+    let mut path = env::current_exe().ok()?;
     let _test_bin_name = path.pop();
     if path.ends_with("deps") {
         let _deps = path.pop();
     }
-    path
+    Some(path)
 }
 
 /// The current process' target triplet.
