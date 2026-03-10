@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Un-deprecate `cargo_bin`
+
 ## [2.1.2] - 2026-01-09
 
 ### Fixes
