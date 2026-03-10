@@ -217,21 +217,6 @@ impl fmt::Display for NotFoundError {
     }
 }
 
-// Adapted from
-// https://github.com/rust-lang/cargo/blob/485670b3983b52289a2f353d589c57fae2f60f82/tests/testsuite/support/mod.rs#L507
-fn target_dir() -> path::PathBuf {
-    env::current_exe()
-        .ok()
-        .map(|mut path| {
-            path.pop();
-            if path.ends_with("deps") {
-                path.pop();
-            }
-            path
-        })
-        .expect("this should only be used where a `current_exe` can be set")
-}
-
 /// Look up the path to a cargo-built binary within an integration test.
 ///
 /// **NOTE:** Prefer [`cargo_bin!`] as this makes assumptions about cargo
@@ -244,10 +229,54 @@ pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
 }
 
 fn cargo_bin_str(name: &str) -> path::PathBuf {
-    let env_var = format!("CARGO_BIN_EXE_{name}");
+    let env_var = format!("{CARGO_BIN_EXE_}{name}");
     env::var_os(env_var)
         .map(|p| p.into())
-        .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))
+        .or_else(|| legacy_cargo_bin(name))
+        .unwrap_or_else(|| missing_cargo_bin(name))
+}
+
+const CARGO_BIN_EXE_: &str = "CARGO_BIN_EXE_";
+
+fn missing_cargo_bin(name: &str) -> ! {
+    let possible_names: Vec<_> = env::vars_os()
+        .filter_map(|(k, _)| k.into_string().ok())
+        .filter_map(|k| k.strip_prefix(CARGO_BIN_EXE_).map(|s| s.to_owned()))
+        .collect();
+    if possible_names.is_empty() {
+        panic!("`CARGO_BIN_EXE_{name}` is unset
+help: if this is running within a unit test, move it to an integration test to gain access to `CARGO_BIN_EXE_{name}`")
+    } else {
+        let mut names = String::new();
+        for (i, name) in possible_names.iter().enumerate() {
+            use std::fmt::Write as _;
+            if i != 0 {
+                let _ = write!(&mut names, ", ");
+            }
+            let _ = write!(&mut names, "\"{name}\"");
+        }
+        panic!(
+            "`CARGO_BIN_EXE_{name}` is unset
+help: available binary names are {names}"
+        )
+    }
+}
+
+fn legacy_cargo_bin(name: &str) -> Option<path::PathBuf> {
+    let target_dir = target_dir()?;
+    let bin_path = target_dir.join(format!("{}{}", name, env::consts::EXE_SUFFIX));
+    Some(bin_path)
+}
+
+// Adapted from
+// https://github.com/rust-lang/cargo/blob/485670b3983b52289a2f353d589c57fae2f60f82/tests/testsuite/support/mod.rs#L507
+fn target_dir() -> Option<path::PathBuf> {
+    let mut path = env::current_exe().ok()?;
+    let _test_bin_name = path.pop();
+    if path.ends_with("deps") {
+        let _deps = path.pop();
+    }
+    Some(path)
 }
 
 /// The current process' target triplet.
