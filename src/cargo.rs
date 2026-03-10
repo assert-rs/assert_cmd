@@ -233,13 +233,33 @@ fn cargo_bin_str(name: &str) -> path::PathBuf {
     env::var_os(env_var)
         .map(|p| p.into())
         .or_else(|| legacy_cargo_bin(name))
-        .unwrap_or_else(|| missing_cargo_bin())
+        .unwrap_or_else(|| missing_cargo_bin(name))
 }
 
 const CARGO_BIN_EXE_: &str = "CARGO_BIN_EXE_";
 
-fn missing_cargo_bin() -> ! {
-    panic!("`CARGO_BIN_EXE_*` is not set")
+fn missing_cargo_bin(name: &str) -> ! {
+    let possible_names: Vec<_> = env::vars_os()
+        .filter_map(|(k, _)| k.into_string().ok())
+        .filter_map(|k| k.strip_prefix(CARGO_BIN_EXE_).map(|s| s.to_owned()))
+        .collect();
+    if possible_names.is_empty() {
+        panic!("`CARGO_BIN_EXE_{name}` is unset
+help: if this is running within a unit test, move it to an integration test to gain access to `CARGO_BIN_EXE_{name}`")
+    } else {
+        let mut names = String::new();
+        for (i, name) in possible_names.iter().enumerate() {
+            use std::fmt::Write as _;
+            if i != 0 {
+                let _ = write!(&mut names, ", ");
+            }
+            let _ = write!(&mut names, "\"{name}\"");
+        }
+        panic!(
+            "`CARGO_BIN_EXE_{name}` is unset
+help: available binary names are {names}"
+        )
+    }
 }
 
 fn legacy_cargo_bin(name: &str) -> Option<path::PathBuf> {
