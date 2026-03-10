@@ -233,7 +233,11 @@ fn cargo_bin_str(name: &str) -> path::PathBuf {
     env::var_os(env_var)
         .map(|p| p.into())
         .or_else(|| legacy_cargo_bin(name))
-        .expect("`CARGO_BIN_EXE_*` is not set")
+        .unwrap_or_else(|| missing_cargo_bin())
+}
+
+fn missing_cargo_bin() -> ! {
+    panic!("`CARGO_BIN_EXE_*` is not set")
 }
 
 fn legacy_cargo_bin(name: &str) -> Option<path::PathBuf> {
