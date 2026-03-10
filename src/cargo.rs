@@ -102,7 +102,10 @@ where
     /// this method with [cross](https://github.com/cross-rs/cross), no extra configuration is
     /// needed.
     ///
-    /// **NOTE:** Prefer [`cargo_bin!`] as this makes assumptions about cargo
+    /// Cargo support:
+    /// - `>1.94`: works
+    /// - `>=1.91,<=1.93`: works with default `build-dir`
+    /// - `<=1.92`: works
     ///
     /// # Examples
     ///
@@ -211,9 +214,12 @@ impl fmt::Display for NotFoundError {
     }
 }
 
-/// Look up the path to a cargo-built binary within an integration test.
+/// Look up the path to a cargo-built binary within an integration test
 ///
-/// **NOTE:** Prefer [`cargo_bin!`] as this makes assumptions about cargo
+/// Cargo support:
+/// - `>1.94`: works
+/// - `>=1.91,<=1.93`: works with default `build-dir`
+/// - `<=1.92`: works
 pub fn cargo_bin<S: AsRef<str>>(name: S) -> path::PathBuf {
     cargo_bin_str(name.as_ref())
 }

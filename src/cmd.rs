@@ -37,7 +37,10 @@ impl Command {
     ///
     /// See the [`cargo` module documentation][crate::cargo] for caveats and workarounds.
     ///
-    /// **NOTE:** Prefer [`cargo_bin!`][crate::cargo::cargo_bin!] as this makes assumptions about cargo
+    /// Cargo support:
+    /// - `>1.94`: works
+    /// - `>=1.91,<=1.93`: works with default `build-dir`
+    /// - `<=1.92`: works
     ///
     /// # Examples
     ///
