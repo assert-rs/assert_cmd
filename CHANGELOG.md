@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.1.3] - 2026-03-10
+
 ### Fixes
 
 - Un-deprecate `cargo_bin`
@@ -380,7 +382,8 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.1.2...HEAD
+[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.1.3...HEAD
+[2.1.3]: https://github.com/assert-rs/assert_cmd/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/assert-rs/assert_cmd/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/assert-rs/assert_cmd/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/assert-rs/assert_cmd/compare/v2.0.17...v2.1.0
