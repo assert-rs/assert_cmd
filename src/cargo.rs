@@ -220,16 +220,13 @@ impl fmt::Display for NotFoundError {
 // Adapted from
 // https://github.com/rust-lang/cargo/blob/485670b3983b52289a2f353d589c57fae2f60f82/tests/testsuite/support/mod.rs#L507
 fn target_dir() -> path::PathBuf {
-    env::current_exe()
-        .ok()
-        .map(|mut path| {
-            path.pop();
-            if path.ends_with("deps") {
-                path.pop();
-            }
-            path
-        })
-        .expect("this should only be used where a `current_exe` can be set")
+    let mut path =
+        env::current_exe().expect("this should only be used where a `current_exe` can be set");
+    let _test_bin_name = path.pop();
+    if path.ends_with("deps") {
+        let _deps = path.pop();
+    }
+    path
 }
 
 /// Look up the path to a cargo-built binary within an integration test.
