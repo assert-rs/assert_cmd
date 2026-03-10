@@ -232,7 +232,11 @@ fn cargo_bin_str(name: &str) -> path::PathBuf {
     let env_var = format!("CARGO_BIN_EXE_{name}");
     env::var_os(env_var)
         .map(|p| p.into())
-        .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))
+        .unwrap_or_else(|| legacy_cargo_bin(name))
+}
+
+fn legacy_cargo_bin(name: &str) -> path::PathBuf {
+    target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX))
 }
 
 // Adapted from
