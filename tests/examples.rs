@@ -1,11 +1,11 @@
-use assert_cmd::cargo::cargo_bin_cmd;
+use assert_cmd::Command;
 
 #[test]
 fn lib_example() {
-    let mut cmd = cargo_bin_cmd!("bin_fixture");
+    let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
     cmd.assert().success();
 
-    let mut cmd = cargo_bin_cmd!("bin_fixture");
+    let mut cmd = Command::cargo_bin("bin_fixture").unwrap();
     let assert = cmd
         .arg("-A")
         .env("stdout", "hello")
@@ -17,7 +17,10 @@ fn lib_example() {
 
 #[test]
 fn timeout_example() {
-    let assert = cargo_bin_cmd!("bin_fixture")
+    use assert_cmd::Command;
+
+    let assert = Command::cargo_bin("bin_fixture")
+        .unwrap()
         .timeout(std::time::Duration::from_secs(1))
         .env("sleep", "100")
         .assert();
