@@ -173,7 +173,7 @@ pub(crate) fn cargo_runner() -> Option<Vec<String>> {
         CURRENT_TARGET.replace('-', "_").to_uppercase()
     );
     let runner = env::var(runner_env).ok()?;
-    Some(runner.split(' ').map(str::to_string).collect())
+    Some(runner.split(' ').map(str::to_owned).collect())
 }
 
 /// Error when finding crate binary.
