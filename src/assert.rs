@@ -58,6 +58,7 @@ impl OutputAssertExt for process::Output {
 }
 
 impl OutputAssertExt for &mut process::Command {
+    #[track_caller]
     fn assert(self) -> Assert {
         let output = match self.output() {
             Ok(output) => output,
@@ -158,7 +159,11 @@ impl Assert {
     /// ```
     #[track_caller]
     pub fn success(self) -> Self {
-        self.try_success().unwrap_or_else(AssertError::panic)
+        match self.try_success() {
+            Ok(v) => v,
+            // Called manually so `#[track_caller]` is effective.
+            Err(e) => e.panic(),
+        }
     }
 
     /// `try_` variant of [`Assert::success`].
@@ -187,7 +192,11 @@ impl Assert {
     /// ```
     #[track_caller]
     pub fn failure(self) -> Self {
-        self.try_failure().unwrap_or_else(AssertError::panic)
+        match self.try_failure() {
+            Ok(v) => v,
+            // Called manually so `#[track_caller]` is effective.
+            Err(e) => e.panic(),
+        }
     }
 
     /// Variant of [`Assert::failure`] that returns an [`AssertResult`].
@@ -201,7 +210,11 @@ impl Assert {
     /// Ensure the command aborted before returning a code.
     #[track_caller]
     pub fn interrupted(self) -> Self {
-        self.try_interrupted().unwrap_or_else(AssertError::panic)
+        match self.try_interrupted() {
+            Ok(v) => v,
+            // Called manually so `#[track_caller]` is effective.
+            Err(e) => e.panic(),
+        }
     }
 
     /// Variant of [`Assert::interrupted`] that returns an [`AssertResult`].
@@ -266,7 +279,11 @@ impl Assert {
         I: IntoCodePredicate<P>,
         P: predicates_core::Predicate<i32>,
     {
-        self.try_code(pred).unwrap_or_else(AssertError::panic)
+        match self.try_code(pred) {
+            Ok(v) => v,
+            // Called manually so `#[track_caller]` is effective.
+            Err(e) => e.panic(),
+        }
     }
 
     /// Variant of [`Assert::code`] that returns an [`AssertResult`].
@@ -364,7 +381,11 @@ impl Assert {
         I: IntoOutputPredicate<P>,
         P: predicates_core::Predicate<[u8]>,
     {
-        self.try_stdout(pred).unwrap_or_else(AssertError::panic)
+        match self.try_stdout(pred) {
+            Ok(v) => v,
+            // Called manually so `#[track_caller]` is effective.
+            Err(e) => e.panic(),
+        }
     }
 
     /// Variant of [`Assert::stdout`] that returns an [`AssertResult`].
@@ -460,7 +481,11 @@ impl Assert {
         I: IntoOutputPredicate<P>,
         P: predicates_core::Predicate<[u8]>,
     {
-        self.try_stderr(pred).unwrap_or_else(AssertError::panic)
+        match self.try_stderr(pred) {
+            Ok(v) => v,
+            // Called manually so `#[track_caller]` is effective.
+            Err(e) => e.panic(),
+        }
     }
 
     /// Variant of [`Assert::stderr`] that returns an [`AssertResult`].
