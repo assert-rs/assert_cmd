@@ -59,6 +59,7 @@ where
     /// ```
     ///
     /// [`Output`]: std::process::Output
+    #[track_caller]
     fn unwrap(self) -> process::Output {
         match self.ok() {
             Ok(output) => output,
@@ -81,6 +82,7 @@ where
     /// ```
     ///
     /// [`Output`]: std::process::Output
+    #[track_caller]
     fn unwrap_err(self) -> OutputError {
         match self.ok() {
             Ok(output) => panic!(
@@ -114,6 +116,7 @@ impl OutputOkExt for &mut process::Command {
         }
     }
 
+    #[track_caller]
     fn unwrap_err(self) -> OutputError {
         match self.ok() {
             Ok(output) => panic!(
