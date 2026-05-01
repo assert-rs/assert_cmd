@@ -143,8 +143,5 @@ default = []
 
 [dependencies]
 
-[dev-dependencies]
-automod = "1.0.14"
-
 [lints]
 workspace = true
