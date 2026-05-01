@@ -142,7 +142,7 @@ where
 
 impl CommandCargoExt for crate::cmd::Command {
     fn cargo_bin<S: AsRef<str>>(name: S) -> Result<Self, CargoError> {
-        crate::cmd::Command::cargo_bin(name)
+        Self::cargo_bin(name)
     }
 }
 

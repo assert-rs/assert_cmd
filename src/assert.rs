@@ -571,7 +571,7 @@ pub struct EqCodePredicate(predicates::ord::EqPredicate<i32>);
 impl EqCodePredicate {
     pub(crate) fn new(value: i32) -> Self {
         let pred = predicates::ord::eq(value);
-        EqCodePredicate(pred)
+        Self(pred)
     }
 }
 
@@ -640,7 +640,7 @@ pub struct InCodePredicate(predicates::iter::InPredicate<i32>);
 impl InCodePredicate {
     pub(crate) fn new<I: IntoIterator<Item = i32>>(value: I) -> Self {
         let pred = predicates::iter::in_iter(value);
-        InCodePredicate(pred)
+        Self(pred)
     }
 }
 
@@ -765,11 +765,11 @@ pub struct BytesContentOutputPredicate(Cow<'static, [u8]>);
 
 impl BytesContentOutputPredicate {
     pub(crate) fn new(value: &'static [u8]) -> Self {
-        BytesContentOutputPredicate(Cow::from(value))
+        Self(Cow::from(value))
     }
 
     pub(crate) fn from_vec(value: Vec<u8>) -> Self {
-        BytesContentOutputPredicate(Cow::from(value))
+        Self(Cow::from(value))
     }
 }
 
@@ -843,12 +843,12 @@ pub struct StrContentOutputPredicate(
 impl StrContentOutputPredicate {
     pub(crate) fn from_str(value: &'static str) -> Self {
         let pred = predicates::str::diff(value).from_utf8();
-        StrContentOutputPredicate(pred)
+        Self(pred)
     }
 
     pub(crate) fn from_string(value: String) -> Self {
         let pred = predicates::str::diff(value).from_utf8();
-        StrContentOutputPredicate(pred)
+        Self(pred)
     }
 }
 
@@ -933,7 +933,7 @@ where
 {
     pub(crate) fn new(pred: P) -> Self {
         let pred = pred.from_utf8();
-        StrOutputPredicate(pred)
+        Self(pred)
     }
 }
 
