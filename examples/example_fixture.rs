@@ -1,4 +1,4 @@
-#![allow(clippy::exit)]
+#![allow(clippy::exit, reason = "binary needs use of exit")]
 
 use std::env;
 use std::error::Error;

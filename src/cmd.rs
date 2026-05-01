@@ -455,7 +455,7 @@ impl Command {
         input: Option<Vec<u8>>,
         timeout: Option<std::time::Duration>,
     ) -> io::Result<process::Output> {
-        #![allow(clippy::unwrap_used)] // changes behavior in some tests
+        #![allow(clippy::unwrap_used, reason = "changes behavior in some tests")]
 
         fn read<R>(mut input: R) -> std::thread::JoinHandle<io::Result<Vec<u8>>>
         where
@@ -611,7 +611,7 @@ impl Command {
 
 impl From<process::Command> for Command {
     fn from(cmd: process::Command) -> Self {
-        Command::from_std(cmd)
+        Self::from_std(cmd)
     }
 }
 

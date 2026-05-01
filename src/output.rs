@@ -266,8 +266,8 @@ enum OutputCause {
 impl fmt::Display for OutputCause {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            OutputCause::Expected(ref e) => write!(f, "{e:#}"),
-            OutputCause::Unexpected(ref e) => write!(f, "{e:#}"),
+            Self::Expected(ref e) => write!(f, "{e:#}"),
+            Self::Unexpected(ref e) => write!(f, "{e:#}"),
         }
     }
 }
@@ -331,7 +331,7 @@ pub(crate) struct DebugBuffer {
 
 impl DebugBuffer {
     pub(crate) fn new(buffer: Vec<u8>) -> Self {
-        DebugBuffer {
+        Self {
             buffer: buffer.into(),
         }
     }
@@ -344,7 +344,10 @@ impl fmt::Display for DebugBuffer {
 }
 
 fn format_bytes(data: &[u8], f: &mut impl fmt::Write) -> fmt::Result {
-    #![allow(clippy::assertions_on_constants)]
+    #![allow(
+        clippy::assertions_on_constants,
+        reason = "enforce constant relationships on edit"
+    )]
 
     const LINES_MIN_OVERFLOW: usize = 80;
     const LINES_MAX_START: usize = 20;
