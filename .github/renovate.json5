@@ -1,4 +1,5 @@
 {
+  extends: ["helpers:pinGitHubActionDigests"],
   schedule: [
     'before 5am on the first day of the month',
   ],
@@ -64,11 +65,22 @@
       matchDepNames: [
         'prek',
       ],
-      extractVersion: '^(?<version>\\d+\\.\\d+\\.\\d+)',
+      extractVersion: '^v(?<version>\\d+\\.\\d+\\.\\d+)',
       schedule: [
         '* * * * *',
       ],
       automerge: true,
+    },
+    {
+      matchManagers: [
+        'github-actions',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      automerge: true,
+      groupName: 'compatible (actions)',
     },
     // Goals:
     // - Keep version reqs low, ignoring compatible normal/build dependencies
