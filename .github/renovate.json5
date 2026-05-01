@@ -71,6 +71,17 @@
       ],
       automerge: true,
     },
+    {
+      matchManagers: [
+        'github-actions',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      automerge: true,
+      groupName: 'compatible (actions)',
+    },
     // Goals:
     // - Keep version reqs low, ignoring compatible normal/build dependencies
     // - Take advantage of latest dev-dependencies
