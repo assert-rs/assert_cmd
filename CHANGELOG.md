@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [2.2.2] - 2026-05-11
+
 ### Fixes
 
 - Ensure `#[track_caller]` works for better panic messages
@@ -398,7 +400,8 @@ Stable release!
 
 
 <!-- next-url -->
-[Unreleased]: https://github.com/assert-rs/assert_cmd/compare/v2.2.1...HEAD
+[Unreleased]: https://github.com/assert-rs/assert_cmd.git/compare/v2.2.2...HEAD
+[2.2.2]: https://github.com/assert-rs/assert_cmd/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/assert-rs/assert_cmd/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/assert-rs/assert_cmd/compare/v2.1.3...v2.2.0
 [2.1.3]: https://github.com/assert-rs/assert_cmd/compare/v2.1.2...v2.1.3
