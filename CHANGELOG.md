@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Ensure `#[track_caller]` works for better panic messages
+
 ## [2.2.1] - 2026-04-17
 
 ### Internal
