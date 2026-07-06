@@ -103,9 +103,9 @@ where
     /// needed.
     ///
     /// Cargo support:
-    /// - `>1.94`: works
+    /// - `>=1.94`: works
     /// - `>=1.91,<=1.93`: works with default `build-dir`
-    /// - `<=1.92`: works
+    /// - `<=1.90`: works
     ///
     /// # Panic
     ///
@@ -221,9 +221,9 @@ impl fmt::Display for NotFoundError {
 /// Look up the path to a cargo-built binary within an integration test
 ///
 /// Cargo support:
-/// - `>1.94`: works
+/// - `>=1.94`: works
 /// - `>=1.91,<=1.93`: works with default `build-dir`
-/// - `<=1.92`: works
+/// - `<=1.90`: works
 ///
 /// # Panic
 ///
